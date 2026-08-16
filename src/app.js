@@ -161,6 +161,10 @@ function restore() {
 
 let stopSearch = false;
 
+// The XP path on screen, plus how many of its steps have been opened already.
+// Kept so the path survives an "Open" click instead of being thrown away.
+let xpView = null;
+
 // What you'd bank by just replaying the highest level every time. Spends
 // openings under the same rules as the search — including key refunds —
 // so the comparison is like for like.
@@ -216,6 +220,14 @@ function syncSmartXp() {
   const cardId = currentId();
   const isAdventure = cardId.startsWith("adventure_");
   $("#smart-xp").classList.toggle("is-hidden", !isAdventure);
+
+  // A path belongs to the chest it was solved for; drop it on a switch.
+  if (xpView && xpView.cardId !== cardId) {
+    xpView = null;
+    $("#xp-out").textContent = "";
+    $("#xp-status").textContent = "";
+  }
+
   if (!isAdventure) return;
 
   const state = live[cardId];
@@ -241,6 +253,7 @@ async function runXpSearch() {
   $("#xp-stop").classList.remove("is-hidden");
   $("#xp-status").textContent = "searching…";
   $("#xp-out").textContent = "";
+  xpView = null;
 
   const started = Date.now();
   try {
@@ -262,12 +275,13 @@ async function runXpSearch() {
       state.seed, cardId, eventType, maxLevel, vaultPercentage, openings,
       Math.max(solution.path.length, openings)
     );
-    renderXpPath($("#xp-out"), solution, baseline, openings,
-      (steps) => openXpRoute(cardId, steps));
+    xpView = { cardId, solution, baseline, openings, done: 0 };
+    drawXpPath();
     $("#xp-status").textContent =
       `${solution.nodesVisited.toLocaleString()} paths in ${Date.now() - started}ms` +
       (stopSearch ? " (stopped early)" : "");
   } catch (err) {
+    xpView = null;
     renderError($("#xp-out"), err.message);
     $("#xp-status").textContent = "";
   } finally {
@@ -314,8 +328,16 @@ function syncFindPanel() {
 
 // Commit route steps to the live seed. Each step replays at the level the
 // route chose, not the chest's current level, or the chain would diverge.
+function drawXpPath() {
+  if (!xpView) return;
+  const { cardId, solution, baseline, openings, done } = xpView;
+  renderXpPath($("#xp-out"), solution, baseline, openings,
+    (steps) => openXpRoute(cardId, steps), done);
+}
+
 // Walk the XP path's boxes at the levels it picked, then persist the seed.
-// The rendered path is now stale, so it is replaced by a short note.
+// The path stays on screen with the opened steps marked, because every later
+// step was solved from the seed those opens produce — it is still valid.
 function openXpRoute(cardId, steps) {
   const state = live[cardId];
   if (!state) return;
@@ -331,15 +353,9 @@ function openXpRoute(cardId, steps) {
     state.seed = open.nextSeed;
   }
 
+  if (xpView?.cardId === cardId) xpView.done += steps.length;
   refresh();          // persists the new seed
-  $("#xp-out").textContent = "";
-  $("#xp-out").append(
-    Object.assign(document.createElement("p"), {
-      className: "empty",
-      textContent: `${steps.length} box(es) opened — seed saved. Search again for a fresh path.`
-    })
-  );
-  $("#xp-status").textContent = "";
+  drawXpPath();       // refresh() redraws the card, not the path
 }
 
 function openRoute(cardId, steps) {

@@ -77,7 +77,11 @@ export function renderHistory(container, cardId, history) {
   }
 }
 
-export function renderXpPath(container, solution, baseline, freeOpenings, onOpen) {
+// `doneCount` steps at the head of the path have already been opened against
+// the live seed, so they drop off the list. The steps after them are still
+// valid — each was solved from the seed those opens produce — so the path can
+// be worked box by box instead of vanishing after the first commit.
+export function renderXpPath(container, solution, baseline, freeOpenings, onOpen, doneCount = 0) {
   container.textContent = "";
 
   if (!solution || solution.xp < 0 || solution.path.length === 0) {
@@ -114,24 +118,34 @@ export function renderXpPath(container, solution, baseline, freeOpenings, onOpen
       `path hit your ${solution.maxOpens}-open limit — keys kept refunding`));
   }
 
+  if (doneCount > 0) {
+    summary.append(el("span", "xp-progress",
+      doneCount >= solution.path.length
+        ? "path finished — seed saved"
+        : `${doneCount} of ${solution.path.length} opened — seed saved`));
+  }
+
   container.append(summary);
 
   for (const [i, step] of solution.path.entries()) {
+    if (i < doneCount) continue;   // already opened — off the list
+
     const box = el("div", "open");
 
     const head = el("div", "open-head");
     head.append(el("span", "open-title", `step ${i + 1} · level ${step.level}`));
     head.append(el("span", "seed", `seed ${step.usedSeed} · +${step.xp} XP`));
 
-    // Committing step N means opening every step up to it, at the levels
-    // this path specifies — that is what advances and persists the seed.
+    // Committing step N means opening every step still pending up to it, at
+    // the levels this path specifies — that is what advances and persists the
+    // seed.
     if (onOpen) {
-      const count = i + 1;
+      const count = i + 1 - doneCount;
       const btn = el("button", "open-card-btn", count === 1 ? "Open" : `Open ×${count}`);
       btn.title = count === 1
         ? "Open this box at this level and save the new seed"
         : `Open this box and the ${count - 1} before it, and save the new seed`;
-      btn.addEventListener("click", () => onOpen(solution.path.slice(0, count)));
+      btn.addEventListener("click", () => onOpen(solution.path.slice(doneCount, i + 1)));
       head.append(btn);
     }
 

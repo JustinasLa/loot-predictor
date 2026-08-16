@@ -150,6 +150,7 @@ button.ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--ac
 .xp-delta[data-sign="up"] { color: var(--ok); }
 #xp-estimate[data-heavy="yes"] { color: var(--legendary); }
 .xp-spend { font-size: 0.82rem; color: var(--dim); }
+.xp-progress { font-size: 0.82rem; color: var(--ok); font-weight: 600; }
 .xp-warn { font-size: 0.82rem; color: var(--legendary); }
 .hint {
   margin: 0 0 0.75rem;
