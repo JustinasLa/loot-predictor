@@ -212,7 +212,7 @@ export function renderItemPicker(container, items, selected, onToggle) {
   }
 }
 
-function renderFindPath(path, label, note) {
+function renderFindPath(path, label, note, onOpen) {
   const wrap = el("div", "find-route");
   wrap.append(el("h3", "route-head", label));
   if (note) wrap.append(el("p", "route-note", note));
@@ -225,6 +225,19 @@ function renderFindPath(path, label, note) {
     if (step.usedSeed !== undefined || step.seed !== undefined) {
       head.append(el("span", "seed", `seed ${step.usedSeed ?? step.seed}`));
     }
+
+    // Committing step N means opening every step up to it, at the levels
+    // this route specifies — that is what advances and persists the seed.
+    if (onOpen) {
+      const count = i + 1;
+      const btn = el("button", "open-card-btn", count === 1 ? "Open" : `Open ×${count}`);
+      btn.title = count === 1
+        ? "Open this box and save the new seed"
+        : `Open this box and the ${count - 1} before it, and save the new seed`;
+      btn.addEventListener("click", () => onOpen(path.slice(0, count)));
+      head.append(btn);
+    }
+
     box.append(head);
 
     const list = el("ul", "items");
@@ -242,7 +255,7 @@ function renderFindPath(path, label, note) {
   return wrap;
 }
 
-export function renderFindResult(container, result, targets) {
+export function renderFindResult(container, result, targets, onOpen) {
   container.textContent = "";
 
   if (!result.found) {
@@ -260,7 +273,7 @@ export function renderFindResult(container, result, targets) {
     summary.append(el("span", "xp-spend",
       `to collect ${targets.length} item(s) from the current seed`));
     container.append(summary);
-    container.append(renderFindPath(result.path, "Route"));
+    container.append(renderFindPath(result.path, "Route", null, onOpen));
     return;
   }
 
@@ -274,13 +287,15 @@ export function renderFindResult(container, result, targets) {
 
   container.append(renderFindPath(
     result.shortest.path, "Fewest opens",
-    `${result.shortest.path.length} opens, ${result.shortest.cost} chest(s) spent`
+    `${result.shortest.path.length} opens, ${result.shortest.cost} chest(s) spent`,
+    onOpen
   ));
 
   if (!result.same) {
     container.append(renderFindPath(
       result.cheapest.path, "Cheapest",
-      `${result.cheapest.path.length} opens, ${result.cheapest.cost} chest(s) spent — key refunds pay for the extra opens`
+      `${result.cheapest.path.length} opens, ${result.cheapest.cost} chest(s) spent — key refunds pay for the extra opens`,
+      onOpen
     ));
   }
 }

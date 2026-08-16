@@ -18,6 +18,9 @@ import {
 // replaces them.
 let saved = {};
 let live = {};
+// Hunt targets are per chest, so switching chests doesn't carry a selection
+// that the new chest can never drop.
+const findTargets = new Map();
 const compare = { before: null, after: null };
 
 const $ = (sel) => document.querySelector(sel);
@@ -55,6 +58,11 @@ function persist() {
   storage.save({
     saved,
     live,
+    // Hunt targets survive a refresh too — the whole point is picking the
+    // route back up on a later day.
+    targets: Object.fromEntries(
+      [...findTargets].map(([id, set]) => [id, [...set]]).filter(([, list]) => list.length)
+    ),
     ui: {
       cardId: currentId(),
       count: $("#count").value,
@@ -136,6 +144,10 @@ function restore() {
 
   saved = state.saved;
   live = state.live;
+  findTargets.clear();
+  for (const [id, list] of Object.entries(state.targets || {})) {
+    findTargets.set(id, new Set(list));
+  }
   renderChests($("#chest"), saved);
   renderChests($("#find-chest"), saved);
   if (state.ui?.cardId && live[state.ui.cardId]) $("#chest").value = state.ui.cardId;
@@ -265,9 +277,6 @@ async function runXpSearch() {
 
 // --- Find items -----------------------------------------------------------
 
-// Targets are per chest, so switching chests doesn't silently carry a
-// selection that the new chest can never drop.
-const findTargets = new Map();
 let stopFind = false;
 
 function findChestId() {
@@ -294,11 +303,50 @@ function syncFindPanel() {
 
   $("#find-selected").textContent = selected.size ? `(${selected.size})` : "";
   $("#find-run").disabled = selected.size === 0;
+  persist();
 
   const isAdventure = cardId.startsWith("adventure_");
   $("#find-maxlevel").closest("label").classList.toggle("is-hidden", !isAdventure);
   $("#find-maxdepth").closest("label").classList.toggle("is-hidden", !isAdventure);
   if (isAdventure && live[cardId]?.level) $("#find-maxlevel").value = live[cardId].level;
+}
+
+// Commit route steps to the live seed. Each step replays at the level the
+// route chose, not the chest's current level, or the chain would diverge.
+function openRoute(cardId, steps) {
+  const state = live[cardId];
+  if (!state) return;
+
+  const vaultPercentage = Number($("#vault").value) || 0;
+  const selected = targetsFor(cardId);
+
+  for (const step of steps) {
+    const [open] = predictChain(state.seed, cardId, 1, {
+      level: step.level ?? state.level,
+      vaultPercentage
+    });
+    state.history.unshift({ ...open, open: ++state.opened });
+    state.seed = open.nextSeed;
+
+    // Anything the route was hunting and just landed is no longer a target.
+    for (const item of open.items) selected.delete(item.baseName);
+  }
+
+  refresh();          // persists the new seed
+  syncFindPanel();
+
+  if (selected.size > 0) {
+    runFind();
+  } else {
+    $("#find-out").textContent = "";
+    $("#find-out").append(
+      Object.assign(document.createElement("p"), {
+        className: "empty",
+        textContent: "All targets collected. Seed saved — pick new items to hunt."
+      })
+    );
+    $("#find-status").textContent = "";
+  }
 }
 
 async function runFind() {
@@ -336,7 +384,7 @@ async function runFind() {
           level: state.level, vaultPercentage
         });
 
-    renderFindResult(out, result, targets);
+    renderFindResult(out, result, targets, (steps) => openRoute(cardId, steps));
     $("#find-status").textContent =
       `${(result.nodesVisited ?? result.opens ?? 0).toLocaleString()} ` +
       `${result.nodesVisited ? "nodes" : "opens"} in ${Date.now() - started}ms` +
