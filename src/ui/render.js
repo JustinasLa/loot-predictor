@@ -77,63 +77,6 @@ export function renderHistory(container, cardId, history) {
   }
 }
 
-export function renderVerification(container, results) {
-  container.textContent = "";
-
-  if (results.length === 0) {
-    container.append(el("p", "empty", "No chests appear in both savegames."));
-    return;
-  }
-
-  const moved = results.filter((r) => r.status === "match" || r.status === "mismatch");
-  if (moved.length === 0) {
-    container.append(
-      el("p", "empty", "No chests were opened between these two saves — nothing to verify.")
-    );
-  }
-
-  for (const result of results) {
-    const box = el("div", "result");
-    box.dataset.status = result.status;
-
-    box.append(el("span", "badge", result.status));
-
-    const detail = el("span", "result-detail");
-    if (result.status === "match") {
-      detail.append(
-        el("strong", null, result.cardId),
-        document.createTextNode(
-          ` — ${result.opens} open(s), predicted seed ${result.actualSeed} = actual`
-        )
-      );
-    } else if (result.status === "mismatch") {
-      detail.append(
-        el("strong", null, result.cardId),
-        document.createTextNode(
-          ` — ${result.opens} open(s), predicted ${result.actualSeed}, game had ${result.expectedSeed}`
-        )
-      );
-    } else {
-      detail.append(
-        el("strong", null, result.cardId),
-        document.createTextNode(` — ${result.reason}`)
-      );
-    }
-    box.append(detail);
-
-    if (result.chain) {
-      const details = el("details");
-      details.append(el("summary", null, `what those ${result.opens} open(s) contained`));
-      const inner = el("div", "out");
-      for (const open of result.chain) inner.append(renderOpen(open, result.cardId));
-      details.append(inner);
-      box.append(el("span"), details);
-    }
-
-    container.append(box);
-  }
-}
-
 export function renderXpPath(container, solution, baseline, freeOpenings) {
   container.textContent = "";
 

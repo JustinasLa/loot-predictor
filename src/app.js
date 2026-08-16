@@ -1,6 +1,5 @@
 import { parseSavegame } from "./save/parse.js";
 import { predictChain } from "./loot/simulate.js";
-import { verifyAll } from "./verify.js";
 import * as storage from "./storage.js";
 import { findOptimalXpPath } from "./solver/xp-path.js";
 import { DOMINANT_ADVENTURE_LEVELS } from "./loot/tables.js";
@@ -9,7 +8,7 @@ import { getItemXp } from "./loot/xp.js";
 import { findAllPaths, findItemLinear } from "./solver/find-items.js";
 import { getAvailableItemsForChest } from "./loot/items.js";
 import {
-  renderChests, renderResults, renderHistory, renderVerification,
+  renderChests, renderResults, renderHistory,
   renderXpPath, renderItemPicker, renderFindResult, renderError
 } from "./ui/render.js";
 
@@ -21,7 +20,6 @@ let live = {};
 // Hunt targets are per chest, so switching chests doesn't carry a selection
 // that the new chest can never drop.
 const findTargets = new Map();
-const compare = { before: null, after: null };
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -398,16 +396,6 @@ async function runFind() {
   }
 }
 
-function runVerification() {
-  const out = $("#out-verify");
-  try {
-    if (!compare.before || !compare.after) throw new Error("load both savegames");
-    renderVerification(out, verifyAll(compare.before, compare.after));
-  } catch (err) {
-    renderError(out, err.message);
-  }
-}
-
 function initTabs() {
   for (const tab of document.querySelectorAll(".tab")) {
     tab.addEventListener("click", () => {
@@ -474,22 +462,6 @@ function init() {
     stopSearch = true;
     $("#xp-status").textContent = "stopping…";
   });
-
-  for (const which of ["before", "after"]) {
-    $(`#save-${which}`).addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      try {
-        compare[which] = await readSave(file);
-        $("#run-verify").disabled = !(compare.before && compare.after);
-        if (compare.before && compare.after) runVerification();
-      } catch (err) {
-        renderError($("#out-verify"), err.message);
-      }
-    });
-  }
-
-  $("#run-verify").addEventListener("click", runVerification);
 
   restore();
 }

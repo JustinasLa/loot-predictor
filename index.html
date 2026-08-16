@@ -17,7 +17,6 @@
     <nav class="tabs">
       <button class="tab is-active" data-tab="predict">Predict</button>
       <button class="tab" data-tab="find">Find</button>
-      <button class="tab" data-tab="verify">Verify</button>
     </nav>
 
     <!-- Predict -->
@@ -150,23 +149,6 @@
             <p class="empty">Pick at least one item.</p>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- Verify -->
-    <section id="panel-verify" class="panel is-hidden">
-      <ol class="steps">
-        <li>Export a savegame and load it as <strong>Before</strong>.</li>
-        <li>Open some chests in game.</li>
-        <li>Export again and load it as <strong>After</strong>.</li>
-      </ol>
-      <div class="controls">
-        <label>Before<input id="save-before" type="file" accept=".json,application/json" /></label>
-        <label>After<input id="save-after" type="file" accept=".json,application/json" /></label>
-        <button id="run-verify" disabled>Verify</button>
-      </div>
-      <div id="out-verify" class="out">
-        <p class="empty">Load both savegames to compare.</p>
       </div>
     </section>
 

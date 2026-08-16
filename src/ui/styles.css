@@ -31,19 +31,25 @@ body {
 h1 { margin: 0; font-size: 1.5rem; letter-spacing: -0.01em; }
 .note { margin: 0.35rem 0 0; color: var(--dim); font-size: 0.85rem; }
 
-/* Tabs */
-.tabs { display: flex; gap: 0.25rem; margin: 1.5rem 0 0; border-bottom: 1px solid var(--line); }
+/* Tabs — same selected treatment as a picked target chip in Find */
+.tabs { display: flex; gap: 0.35rem; margin: 1.5rem 0 0; }
 .tab {
-  padding: 0.5rem 0.9rem;
-  background: none;
-  border: 0;
-  border-bottom: 2px solid transparent;
+  padding: 0.4rem 0.9rem;
+  background: var(--bg);
   color: var(--dim);
+  border: 1px solid var(--line);
+  border-radius: 5px;
   font: inherit;
+  font-size: 0.85rem;
   cursor: pointer;
 }
-.tab:hover { color: var(--text); }
-.tab.is-active { color: var(--text); border-bottom-color: var(--accent); }
+.tab:hover { color: var(--text); border-color: var(--accent); }
+.tab.is-active {
+  color: var(--text);
+  border-color: var(--accent);
+  background: rgba(110, 168, 254, 0.14);
+  font-weight: 600;
+}
 
 .panel { padding-top: 1.25rem; }
 .is-hidden { display: none; }
@@ -174,7 +180,21 @@ button.ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--ac
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
 }
+/* WebKit: the default light scrollbar reads as a seam against the dark panel */
+.item-picker::-webkit-scrollbar { width: 10px; }
+.item-picker::-webkit-scrollbar-track { background: transparent; }
+.item-picker::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border: 3px solid var(--panel);
+  border-radius: 999px;
+}
+.item-picker::-webkit-scrollbar-thumb:hover { background: #3d4350; }
+
 .item-chip {
   display: inline-flex;
   align-items: baseline;
@@ -210,9 +230,6 @@ button.ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--ac
   background: rgba(87, 201, 138, 0.12);
   outline: 1px solid rgba(87, 201, 138, 0.4);
 }
-
-.steps { margin: 0 0 1rem; padding-left: 1.2rem; color: var(--dim); font-size: 0.85rem; }
-.steps strong { color: var(--text); }
 
 /* Output */
 .out { margin-top: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
@@ -282,34 +299,3 @@ button.ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--ac
 .items li[data-rarity="Ultimate"]  .item-rarity { color: var(--ultimate); }
 .items li[data-rarity="Mythic"]    .item-rarity { color: var(--mythic); }
 
-/* Verify results */
-.result {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.5rem 0.9rem;
-  align-items: center;
-  padding: 0.85rem 1rem;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-left-width: 3px;
-  border-radius: 8px;
-}
-.result[data-status="match"]    { border-left-color: var(--ok); }
-.result[data-status="mismatch"] { border-left-color: var(--bad); }
-.badge {
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.result[data-status="match"] .badge    { background: rgba(87, 201, 138, 0.15); color: var(--ok); }
-.result[data-status="mismatch"] .badge { background: rgba(240, 102, 94, 0.15); color: var(--bad); }
-.result[data-status="unchanged"] .badge,
-.result[data-status="skipped"] .badge  { background: var(--line); color: var(--dim); }
-.result-detail { color: var(--dim); font-size: 0.8rem; font-family: ui-monospace, monospace; }
-.result-detail strong { color: var(--text); font-weight: 600; }
-
-details summary { cursor: pointer; color: var(--dim); font-size: 0.8rem; padding-top: 0.4rem; }
-details[open] summary { margin-bottom: 0.5rem; }
