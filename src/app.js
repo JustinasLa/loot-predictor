@@ -262,7 +262,8 @@ async function runXpSearch() {
       state.seed, cardId, eventType, maxLevel, vaultPercentage, openings,
       Math.max(solution.path.length, openings)
     );
-    renderXpPath($("#xp-out"), solution, baseline, openings);
+    renderXpPath($("#xp-out"), solution, baseline, openings,
+      (steps) => openXpRoute(cardId, steps));
     $("#xp-status").textContent =
       `${solution.nodesVisited.toLocaleString()} paths in ${Date.now() - started}ms` +
       (stopSearch ? " (stopped early)" : "");
@@ -313,6 +314,34 @@ function syncFindPanel() {
 
 // Commit route steps to the live seed. Each step replays at the level the
 // route chose, not the chest's current level, or the chain would diverge.
+// Walk the XP path's boxes at the levels it picked, then persist the seed.
+// The rendered path is now stale, so it is replaced by a short note.
+function openXpRoute(cardId, steps) {
+  const state = live[cardId];
+  if (!state) return;
+
+  const vaultPercentage = Number($("#xp-vault").value) || 0;
+
+  for (const step of steps) {
+    const [open] = predictChain(state.seed, cardId, 1, {
+      level: step.level ?? state.level,
+      vaultPercentage
+    });
+    state.history.unshift({ ...open, open: ++state.opened });
+    state.seed = open.nextSeed;
+  }
+
+  refresh();          // persists the new seed
+  $("#xp-out").textContent = "";
+  $("#xp-out").append(
+    Object.assign(document.createElement("p"), {
+      className: "empty",
+      textContent: `${steps.length} box(es) opened — seed saved. Search again for a fresh path.`
+    })
+  );
+  $("#xp-status").textContent = "";
+}
+
 function openRoute(cardId, steps) {
   const state = live[cardId];
   if (!state) return;

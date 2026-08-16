@@ -77,7 +77,7 @@ export function renderHistory(container, cardId, history) {
   }
 }
 
-export function renderXpPath(container, solution, baseline, freeOpenings) {
+export function renderXpPath(container, solution, baseline, freeOpenings, onOpen) {
   container.textContent = "";
 
   if (!solution || solution.xp < 0 || solution.path.length === 0) {
@@ -122,6 +122,19 @@ export function renderXpPath(container, solution, baseline, freeOpenings) {
     const head = el("div", "open-head");
     head.append(el("span", "open-title", `step ${i + 1} · level ${step.level}`));
     head.append(el("span", "seed", `seed ${step.usedSeed} · +${step.xp} XP`));
+
+    // Committing step N means opening every step up to it, at the levels
+    // this path specifies — that is what advances and persists the seed.
+    if (onOpen) {
+      const count = i + 1;
+      const btn = el("button", "open-card-btn", count === 1 ? "Open" : `Open ×${count}`);
+      btn.title = count === 1
+        ? "Open this box at this level and save the new seed"
+        : `Open this box and the ${count - 1} before it, and save the new seed`;
+      btn.addEventListener("click", () => onOpen(solution.path.slice(0, count)));
+      head.append(btn);
+    }
+
     box.append(head);
 
     const list = el("ul", "items");
