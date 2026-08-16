@@ -57,7 +57,8 @@ function persist() {
 }
 
 function enableControls() {
-  for (const id of ["#seed", "#open-1", "#open-10", "#reset"]) $(id).disabled = false;
+  for (const id of ["#seed", "#reset", "#open-custom-go"]) $(id).disabled = false;
+  for (const btn of document.querySelectorAll(".open-btn")) btn.disabled = false;
 }
 
 // Advance the live seed by `times` opens, recording what each one produced.
@@ -182,8 +183,17 @@ function init() {
     refresh();
   });
 
-  $("#open-1").addEventListener("click", () => openChest(1));
-  $("#open-10").addEventListener("click", () => openChest(10));
+  for (const btn of document.querySelectorAll(".open-btn")) {
+    btn.addEventListener("click", () => openChest(Number(btn.dataset.open)));
+  }
+
+  $("#open-custom-go").addEventListener("click", () => {
+    const times = Number($("#open-custom").value);
+    if (!Number.isInteger(times) || times < 1) return;
+    // Each open is three-plus draws; keep the click from locking up the tab.
+    openChest(Math.min(times, 10000));
+  });
+
   $("#reset").addEventListener("click", resetChest);
 
   for (const which of ["before", "after"]) {

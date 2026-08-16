@@ -30,9 +30,35 @@
       </div>
 
       <div class="controls actions">
-        <button id="open-1" disabled>Open ×1</button>
-        <button id="open-10" class="ghost" disabled>Open ×10</button>
-        <button id="reset" class="ghost" disabled>Reset to savegame</button>
+        <div class="field">
+          <span class="field-label">Open</span>
+          <div class="field-row">
+            <button class="open-btn" data-open="1" disabled>1</button>
+            <button class="open-btn" data-open="2" disabled>2</button>
+            <button class="open-btn" data-open="3" disabled>3</button>
+            <button class="open-btn" data-open="4" disabled>4</button>
+            <button class="open-btn" data-open="5" disabled>5</button>
+            <button class="open-btn" data-open="6" disabled>6</button>
+            <button class="open-btn" data-open="7" disabled>7</button>
+            <button class="open-btn" data-open="10" disabled>10</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">Custom</span>
+          <div class="field-row">
+            <input id="open-custom" type="number" value="25" min="1" max="10000" />
+            <button id="open-custom-go" class="ghost" disabled>Open</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field-label">&nbsp;</span>
+          <div class="field-row">
+            <button id="reset" class="ghost" disabled>Reset to savegame</button>
+          </div>
+        </div>
+
         <span id="open-status" class="open-status"></span>
       </div>
 
