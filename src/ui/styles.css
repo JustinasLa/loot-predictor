@@ -83,6 +83,24 @@ button {
 }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
 
+.controls.actions { margin-top: 0.5rem; align-items: center; }
+button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+button.ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.open-status { color: var(--dim); font-size: 0.78rem; font-family: ui-monospace, monospace; }
+
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+@media (max-width: 820px) { .columns { grid-template-columns: 1fr; } }
+.col-head {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--dim);
+  font-weight: 600;
+}
+.dim { color: var(--dim); }
+.open.is-past { opacity: 0.62; }
+
 .steps { margin: 0 0 1rem; padding-left: 1.2rem; color: var(--dim); font-size: 0.85rem; }
 .steps strong { color: var(--text); }
 

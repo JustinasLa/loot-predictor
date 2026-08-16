@@ -49,6 +49,20 @@ export function renderResults(container, cardId, chain) {
   for (const open of chain) container.append(renderOpen(open, cardId));
 }
 
+// Opens already walked past, newest first.
+export function renderHistory(container, cardId, history) {
+  container.textContent = "";
+  if (history.length === 0) {
+    container.append(el("p", "empty", "Nothing opened yet."));
+    return;
+  }
+  for (const open of history) {
+    const box = renderOpen(open, cardId);
+    box.classList.add("is-past");
+    container.append(box);
+  }
+}
+
 export function renderVerification(container, results) {
   container.textContent = "";
 
