@@ -105,6 +105,10 @@ export const XP_VALUES_EGGS = { Common: 25, Rare: 50, Epic: 150, Legendary: 425,
 // at these points, so the XP search branches on them instead of all 100.
 export const DOMINANT_ADVENTURE_LEVELS = [4, 24, 39, 59, 100];
 
+// Item hunting needs a finer set than XP farming: the levels either side of
+// each item-count step matter when you want a specific drop rather than bulk.
+export const DOMINANT_ADVENTURE_LEVELS_FOR_ITEMS = [1, 4, 5, 24, 25, 39, 40, 59, 60];
+
 // savegame -> card id maps (from the file-upload handler)
 export const CHEST_ID_MAP = {
     0: 'small', 1: 'big', 9: 'adventure_Zeus', 10: 'adventure_Pirate',

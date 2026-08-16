@@ -6,9 +6,11 @@ import { findOptimalXpPath } from "./solver/xp-path.js";
 import { DOMINANT_ADVENTURE_LEVELS } from "./loot/tables.js";
 import { simulateAdventureChestOpening } from "./loot/simulate.js";
 import { getItemXp } from "./loot/xp.js";
+import { findAllPaths, findItemLinear } from "./solver/find-items.js";
+import { getAvailableItemsForChest } from "./loot/items.js";
 import {
   renderChests, renderResults, renderHistory, renderVerification,
-  renderXpPath, renderError
+  renderXpPath, renderItemPicker, renderFindResult, renderError
 } from "./ui/render.js";
 
 // `saved` is the untouched baseline from the file; `live` tracks the seed as
@@ -122,8 +124,10 @@ function adoptSave(parsed) {
     ])
   );
   renderChests($("#chest"), saved);
+  renderChests($("#find-chest"), saved);
   enableControls();
   refresh();
+  syncFindPanel();
 }
 
 function restore() {
@@ -133,11 +137,13 @@ function restore() {
   saved = state.saved;
   live = state.live;
   renderChests($("#chest"), saved);
+  renderChests($("#find-chest"), saved);
   if (state.ui?.cardId && live[state.ui.cardId]) $("#chest").value = state.ui.cardId;
   if (state.ui?.count) $("#count").value = state.ui.count;
   if (state.ui?.vault) $("#vault").value = state.ui.vault;
   enableControls();
   refresh();
+  syncFindPanel();
   return true;
 }
 
@@ -257,6 +263,93 @@ async function runXpSearch() {
   }
 }
 
+// --- Find items -----------------------------------------------------------
+
+// Targets are per chest, so switching chests doesn't silently carry a
+// selection that the new chest can never drop.
+const findTargets = new Map();
+let stopFind = false;
+
+function findChestId() {
+  return $("#find-chest").value;
+}
+
+function targetsFor(cardId) {
+  if (!findTargets.has(cardId)) findTargets.set(cardId, new Set());
+  return findTargets.get(cardId);
+}
+
+function syncFindPanel() {
+  const cardId = findChestId();
+  if (!cardId) return;
+
+  const selected = targetsFor(cardId);
+  const items = getAvailableItemsForChest(cardId);
+
+  renderItemPicker($("#find-items"), items, selected, (baseName) => {
+    if (selected.has(baseName)) selected.delete(baseName);
+    else selected.add(baseName);
+    syncFindPanel();
+  });
+
+  $("#find-selected").textContent = selected.size ? `(${selected.size})` : "";
+  $("#find-run").disabled = selected.size === 0;
+
+  const isAdventure = cardId.startsWith("adventure_");
+  $("#find-maxlevel").closest("label").classList.toggle("is-hidden", !isAdventure);
+  $("#find-maxdepth").closest("label").classList.toggle("is-hidden", !isAdventure);
+  if (isAdventure && live[cardId]?.level) $("#find-maxlevel").value = live[cardId].level;
+}
+
+async function runFind() {
+  const cardId = findChestId();
+  const state = live[cardId];
+  const targets = [...targetsFor(cardId)];
+  const out = $("#find-out");
+
+  if (!state) { renderError(out, "load a savegame first"); return; }
+  if (targets.length === 0) { renderError(out, "pick at least one item"); return; }
+
+  stopFind = false;
+  $("#find-run").disabled = true;
+  $("#find-stop").classList.remove("is-hidden");
+  $("#find-status").textContent = "searching…";
+  out.textContent = "";
+
+  const started = Date.now();
+  // Let the browser paint the searching state before the solver blocks.
+  await new Promise((r) => setTimeout(r, 0));
+
+  try {
+    const vaultPercentage = Number($("#vault").value) || 0;
+    const result = cardId.startsWith("adventure_")
+      ? findAllPaths({
+          startSeed: state.seed,
+          targets,
+          cardId,
+          maxLevel: Number($("#find-maxlevel").value) || state.level || 1,
+          vaultPercentage,
+          maxDepth: Number($("#find-maxdepth").value) || 10,
+          shouldStop: () => stopFind
+        })
+      : findItemLinear(state.seed, cardId, targets, {
+          level: state.level, vaultPercentage
+        });
+
+    renderFindResult(out, result, targets);
+    $("#find-status").textContent =
+      `${(result.nodesVisited ?? result.opens ?? 0).toLocaleString()} ` +
+      `${result.nodesVisited ? "nodes" : "opens"} in ${Date.now() - started}ms` +
+      (stopFind ? " (stopped early)" : "");
+  } catch (err) {
+    renderError(out, err.message);
+    $("#find-status").textContent = "";
+  } finally {
+    $("#find-run").disabled = false;
+    $("#find-stop").classList.add("is-hidden");
+  }
+}
+
 function runVerification() {
   const out = $("#out-verify");
   try {
@@ -321,6 +414,13 @@ function init() {
 
   $("#xp-openings").addEventListener("input", syncXpEstimate);
   $("#xp-maxlevel").addEventListener("input", syncXpEstimate);
+  $("#find-chest").addEventListener("change", syncFindPanel);
+  $("#find-run").addEventListener("click", runFind);
+  $("#find-stop").addEventListener("click", () => {
+    stopFind = true;
+    $("#find-status").textContent = "stopping…";
+  });
+
   $("#xp-search").addEventListener("click", runXpSearch);
   $("#xp-stop").addEventListener("click", () => {
     stopSearch = true;

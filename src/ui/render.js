@@ -194,6 +194,97 @@ export function renderXpPath(container, solution, baseline, freeOpenings) {
   }
 }
 
+export function renderItemPicker(container, items, selected, onToggle) {
+  container.textContent = "";
+  if (items.length === 0) {
+    container.append(el("p", "empty", "This chest has no item pool mapped."));
+    return;
+  }
+
+  for (const item of items) {
+    const chip = el("button", "item-chip");
+    chip.dataset.rarity = item.rarity;
+    chip.dataset.on = selected.has(item.baseName) ? "yes" : "no";
+    chip.append(el("span", null, item.baseName));
+    chip.append(el("span", "item-rarity", item.rarity));
+    chip.addEventListener("click", () => onToggle(item.baseName));
+    container.append(chip);
+  }
+}
+
+function renderFindPath(path, label, note) {
+  const wrap = el("div", "find-route");
+  wrap.append(el("h3", "route-head", label));
+  if (note) wrap.append(el("p", "route-note", note));
+
+  for (const [i, step] of path.entries()) {
+    const box = el("div", "open");
+    const head = el("div", "open-head");
+    head.append(el("span", "open-title",
+      step.level ? `step ${i + 1} · level ${step.level}` : `open ${i + 1}`));
+    if (step.usedSeed !== undefined || step.seed !== undefined) {
+      head.append(el("span", "seed", `seed ${step.usedSeed ?? step.seed}`));
+    }
+    box.append(head);
+
+    const list = el("ul", "items");
+    for (const item of step.items) {
+      const li = el("li");
+      li.dataset.rarity = item.rarity;
+      if (step.hits?.includes(item.baseName)) li.dataset.hit = "yes";
+      li.append(el("span", null, item.name));
+      li.append(el("span", "item-rarity", item.rarity));
+      list.append(li);
+    }
+    box.append(list);
+    wrap.append(box);
+  }
+  return wrap;
+}
+
+export function renderFindResult(container, result, targets) {
+  container.textContent = "";
+
+  if (!result.found) {
+    const msg = result.missing
+      ? `Not found in ${result.opens} opens. Still missing: ${result.missing.join(", ")}`
+      : `No route found within ${result.maxDepth} opens.`;
+    container.append(el("p", "error", msg));
+    return;
+  }
+
+  // Linear (non-adventure) result: one chain, no choices to compare.
+  if (result.path) {
+    const summary = el("div", "xp-summary");
+    summary.append(el("span", "xp-total", `${result.opens} opens`));
+    summary.append(el("span", "xp-spend",
+      `to collect ${targets.length} item(s) from the current seed`));
+    container.append(summary);
+    container.append(renderFindPath(result.path, "Route"));
+    return;
+  }
+
+  const summary = el("div", "xp-summary");
+  summary.append(el("span", "xp-total", `${result.shortest.path.length} opens`));
+  summary.append(el("span", "xp-spend",
+    result.same
+      ? `costs ${result.cheapest.cost} chest(s) · ${result.solutions} route(s) considered`
+      : `fewest opens · cheapest route costs ${result.cheapest.cost} chest(s) in ${result.cheapest.path.length} opens`));
+  container.append(summary);
+
+  container.append(renderFindPath(
+    result.shortest.path, "Fewest opens",
+    `${result.shortest.path.length} opens, ${result.shortest.cost} chest(s) spent`
+  ));
+
+  if (!result.same) {
+    container.append(renderFindPath(
+      result.cheapest.path, "Cheapest",
+      `${result.cheapest.path.length} opens, ${result.cheapest.cost} chest(s) spent — key refunds pay for the extra opens`
+    ));
+  }
+}
+
 export function renderError(container, message) {
   container.textContent = "";
   container.append(el("p", "error", `Error: ${message}`));

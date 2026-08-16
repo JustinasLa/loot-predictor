@@ -16,6 +16,7 @@
 
     <nav class="tabs">
       <button class="tab is-active" data-tab="predict">Predict</button>
+      <button class="tab" data-tab="find">Find</button>
       <button class="tab" data-tab="verify">Verify</button>
     </nav>
 
@@ -114,6 +115,39 @@
           <h2 class="col-head">Opened <span id="history-count" class="dim"></span></h2>
           <div id="history" class="out">
             <p class="empty">Nothing opened yet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Find -->
+    <section id="panel-find" class="panel is-hidden">
+      <p class="hint">
+        Pick the items you want, then search from the current live seed. Adventure
+        chests get a full search over levels — everything else has no level to
+        choose, so it just walks the chain until the items turn up.
+      </p>
+
+      <div class="controls">
+        <label>Chest<select id="find-chest" disabled></select></label>
+        <label>Max level<input id="find-maxlevel" type="number" min="1" max="100" /></label>
+        <label>Max opens<input id="find-maxdepth" type="number" value="10" min="1" /></label>
+        <button id="find-run" disabled>Find items</button>
+        <button id="find-stop" class="ghost is-hidden">Stop</button>
+        <span id="find-status" class="open-status"></span>
+      </div>
+
+      <div class="find-layout">
+        <div>
+          <h2 class="col-head">Targets <span id="find-selected" class="dim"></span></h2>
+          <div id="find-items" class="item-picker">
+            <p class="empty">Load a savegame first.</p>
+          </div>
+        </div>
+        <div>
+          <h2 class="col-head">Result</h2>
+          <div id="find-out" class="out">
+            <p class="empty">Pick at least one item.</p>
           </div>
         </div>
       </div>
