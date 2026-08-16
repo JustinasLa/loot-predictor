@@ -220,6 +220,8 @@ function syncSmartXp() {
 
   const state = live[cardId];
   if (state?.level) $("#xp-maxlevel").value = state.level;
+  // One vault rate for the whole app; this field is a second view of #vault.
+  $("#xp-vault").value = $("#vault").value;
   $("#xp-search").disabled = false;
   syncXpEstimate();
 }
@@ -230,7 +232,7 @@ async function runXpSearch() {
   const eventType = cardId.slice("adventure_".length);
   const openings = Math.max(Number($("#xp-openings").value) || 4, 1);
   const maxLevel = Number($("#xp-maxlevel").value) || state.level || 1;
-  const vaultPercentage = Number($("#vault").value) || 0;
+  const vaultPercentage = Number($("#xp-vault").value) || 0;
   // Blank means no limit.
   const maxOpens = Number($("#xp-maxopens").value) || Infinity;
 
@@ -447,6 +449,13 @@ function init() {
   });
 
   $("#reset").addEventListener("click", resetChest);
+
+  // Write back to #vault so the Upcoming preview and the search never
+  // disagree about the vault rate; refresh() mirrors it back and persists.
+  $("#xp-vault").addEventListener("change", () => {
+    $("#vault").value = $("#xp-vault").value;
+    refresh();
+  });
 
   $("#xp-openings").addEventListener("input", syncXpEstimate);
   $("#xp-maxlevel").addEventListener("input", syncXpEstimate);

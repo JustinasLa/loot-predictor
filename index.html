@@ -66,7 +66,8 @@
         <p class="hint">
           Free keys you have to spend — 4 per day by default. A vault key dropped
           by a box refunds an opening, so the path can run longer than this.
-          Keys only drop when <strong>Vault %</strong> is above 0.
+          Keys only drop when <strong>Vault %</strong> is above 0 — it is the
+          same value as the one in the Predict controls above, edit either.
           <strong>Max opens</strong> is unlimited unless you set it; with a high
           vault rate refunds can outpace spending and the search will run until
           you press Stop, which keeps the best path found so far.
@@ -82,6 +83,12 @@
             <span class="field-label">Max level</span>
             <div class="field-row">
               <input id="xp-maxlevel" type="number" value="60" min="1" max="100" />
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">Vault %</span>
+            <div class="field-row">
+              <input id="xp-vault" type="number" value="0" min="0" max="100" />
             </div>
           </div>
           <div class="field">
