@@ -62,6 +62,47 @@
         <span id="open-status" class="open-status"></span>
       </div>
 
+      <section id="smart-xp" class="smart is-hidden">
+        <p class="hint">
+          Free keys you have to spend — 4 per day by default. A vault key dropped
+          by a box refunds an opening, so the path can run longer than this.
+          Keys only drop when <strong>Vault %</strong> is above 0.
+          <strong>Max opens</strong> is unlimited unless you set it; with a high
+          vault rate refunds can outpace spending and the search will run until
+          you press Stop, which keeps the best path found so far.
+        </p>
+        <div class="controls actions">
+          <div class="field">
+            <span class="field-label">Free openings</span>
+            <div class="field-row">
+              <input id="xp-openings" type="number" value="4" min="1" />
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">Max level</span>
+            <div class="field-row">
+              <input id="xp-maxlevel" type="number" value="60" min="1" max="100" />
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">Max opens</span>
+            <div class="field-row">
+              <input id="xp-maxopens" type="number" min="1" placeholder="none" />
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">&nbsp;</span>
+            <div class="field-row">
+              <button id="xp-search" disabled>Find best XP path</button>
+              <button id="xp-stop" class="ghost is-hidden">Stop</button>
+            </div>
+          </div>
+          <span id="xp-status" class="open-status"></span>
+          <span id="xp-estimate" class="open-status"></span>
+        </div>
+        <div id="xp-out" class="out"></div>
+      </section>
+
       <div class="columns">
         <div>
           <h2 class="col-head">Upcoming</h2>

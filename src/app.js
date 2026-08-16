@@ -2,8 +2,13 @@ import { parseSavegame } from "./save/parse.js";
 import { predictChain } from "./loot/simulate.js";
 import { verifyAll } from "./verify.js";
 import * as storage from "./storage.js";
+import { findOptimalXpPath } from "./solver/xp-path.js";
+import { DOMINANT_ADVENTURE_LEVELS } from "./loot/tables.js";
+import { simulateAdventureChestOpening } from "./loot/simulate.js";
+import { getItemXp } from "./loot/xp.js";
 import {
-  renderChests, renderResults, renderHistory, renderVerification, renderError
+  renderChests, renderResults, renderHistory, renderVerification,
+  renderXpPath, renderError
 } from "./ui/render.js";
 
 // `saved` is the untouched baseline from the file; `live` tracks the seed as
@@ -98,9 +103,11 @@ function refresh() {
 
     renderResults(
       out, cardId,
-      predictChain(state.seed, cardId, Number($("#count").value) || 5, chainOpts(state))
+      predictChain(state.seed, cardId, Number($("#count").value) || 5, chainOpts(state)),
+      openChest
     );
     renderHistory($("#history"), cardId, state.history);
+    syncSmartXp();
     persist();
   } catch (err) {
     renderError(out, err.message);
@@ -132,6 +139,122 @@ function restore() {
   enableControls();
   refresh();
   return true;
+}
+
+// --- Smart XP -------------------------------------------------------------
+
+let stopSearch = false;
+
+// What you'd bank by just replaying the highest level every time. Spends
+// openings under the same rules as the search — including key refunds —
+// so the comparison is like for like.
+function naiveXp(seed, cardId, eventType, level, vaultPercentage, openings, maxOpens) {
+  let current = seed;
+  let openingsLeft = openings;
+  let xp = 0;
+  let opens = 0;
+
+  while (openingsLeft > 0 && opens < maxOpens) {
+    const result = simulateAdventureChestOpening(
+      current, level, eventType, vaultPercentage, cardId
+    );
+    xp += result.items.reduce((sum, item) => sum + getItemXp(item), 0);
+    openingsLeft += result.items.filter((i) => i.baseName.endsWith("KeyIcon")).length - 1;
+    current = result.nextSeed;
+    opens++;
+  }
+
+  return { xp, opens };
+}
+
+// The search branches once per candidate level, so cost is levels^openings.
+// There is no cap on openings — but show what you're asking for first.
+function branchCount(maxLevel) {
+  const levels = DOMINANT_ADVENTURE_LEVELS.filter((level) => level <= maxLevel);
+  if (!levels.includes(maxLevel)) levels.push(maxLevel);
+  return levels.length;
+}
+
+function syncXpEstimate() {
+  const openings = Number($("#xp-openings").value) || 1;
+  const branches = branchCount(Number($("#xp-maxlevel").value) || 1);
+  const paths = Math.pow(branches, openings);
+
+  const label = $("#xp-estimate");
+  // ~200k paths/second measured in browser; rough, but the order of
+  // magnitude is what matters when deciding whether to hit the button.
+  const seconds = paths / 200000;
+  const cost =
+    seconds < 1 ? "instant"
+      : seconds < 60 ? `~${Math.round(seconds)}s`
+      : seconds < 3600 ? `~${Math.round(seconds / 60)}min`
+      : `~${(seconds / 3600).toFixed(1)}h`;
+
+  // Key refunds extend the path, so this is a floor, not a ceiling.
+  label.textContent =
+    `≥ ${branches}^${openings} = ${paths.toExponential(1)} paths · ${cost}`;
+  label.dataset.heavy = seconds > 20 ? "yes" : "no";
+}
+
+function syncSmartXp() {
+  const cardId = currentId();
+  const isAdventure = cardId.startsWith("adventure_");
+  $("#smart-xp").classList.toggle("is-hidden", !isAdventure);
+  if (!isAdventure) return;
+
+  const state = live[cardId];
+  if (state?.level) $("#xp-maxlevel").value = state.level;
+  $("#xp-search").disabled = false;
+  syncXpEstimate();
+}
+
+async function runXpSearch() {
+  const cardId = currentId();
+  const state = currentState();
+  const eventType = cardId.slice("adventure_".length);
+  const openings = Math.max(Number($("#xp-openings").value) || 4, 1);
+  const maxLevel = Number($("#xp-maxlevel").value) || state.level || 1;
+  const vaultPercentage = Number($("#vault").value) || 0;
+  // Blank means no limit.
+  const maxOpens = Number($("#xp-maxopens").value) || Infinity;
+
+  stopSearch = false;
+  $("#xp-search").disabled = true;
+  $("#xp-stop").classList.remove("is-hidden");
+  $("#xp-status").textContent = "searching…";
+  $("#xp-out").textContent = "";
+
+  const started = Date.now();
+  try {
+    const solution = await findOptimalXpPath({
+      startSeed: state.seed,
+      eventType,
+      cardId,
+      maxLevel,
+      vaultPercentage,
+      openings,
+      maxOpens,
+      onProgress: (depth) => { $("#xp-status").textContent = `searching… depth ${depth}`; },
+      shouldStop: () => stopSearch
+    });
+
+    // Bound the baseline by the path the solver actually found, so an
+    // uncapped run can't spin here forever on refunded keys.
+    const baseline = naiveXp(
+      state.seed, cardId, eventType, maxLevel, vaultPercentage, openings,
+      Math.max(solution.path.length, openings)
+    );
+    renderXpPath($("#xp-out"), solution, baseline, openings);
+    $("#xp-status").textContent =
+      `${solution.nodesVisited.toLocaleString()} paths in ${Date.now() - started}ms` +
+      (stopSearch ? " (stopped early)" : "");
+  } catch (err) {
+    renderError($("#xp-out"), err.message);
+    $("#xp-status").textContent = "";
+  } finally {
+    $("#xp-search").disabled = false;
+    $("#xp-stop").classList.add("is-hidden");
+  }
 }
 
 function runVerification() {
@@ -195,6 +318,14 @@ function init() {
   });
 
   $("#reset").addEventListener("click", resetChest);
+
+  $("#xp-openings").addEventListener("input", syncXpEstimate);
+  $("#xp-maxlevel").addEventListener("input", syncXpEstimate);
+  $("#xp-search").addEventListener("click", runXpSearch);
+  $("#xp-stop").addEventListener("click", () => {
+    stopSearch = true;
+    $("#xp-status").textContent = "stopping…";
+  });
 
   for (const which of ["before", "after"]) {
     $(`#save-${which}`).addEventListener("change", async (e) => {

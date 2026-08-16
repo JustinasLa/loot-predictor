@@ -101,6 +101,10 @@ export const ITEM_POOLS = {
 export const XP_VALUES_ITEMS = { Common: 4, Rare: 9, Epic: 22, Legendary: 26, Ultimate: 61, Mythic: 144 };
 export const XP_VALUES_EGGS = { Common: 25, Rare: 50, Epic: 150, Legendary: 425, Ultimate: 1000 };
 
+// Adventure levels worth replaying: the rate curve only changes meaningfully
+// at these points, so the XP search branches on them instead of all 100.
+export const DOMINANT_ADVENTURE_LEVELS = [4, 24, 39, 59, 100];
+
 // savegame -> card id maps (from the file-upload handler)
 export const CHEST_ID_MAP = {
     0: 'small', 1: 'big', 9: 'adventure_Zeus', 10: 'adventure_Pirate',

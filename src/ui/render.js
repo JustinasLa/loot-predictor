@@ -18,7 +18,7 @@ export function renderChests(select, cardStates) {
   select.disabled = false;
 }
 
-function renderOpen(open, cardId) {
+function renderOpen(open, cardId, position, onOpen) {
   const box = el("div", "open");
 
   const head = el("div", "open-head");
@@ -29,6 +29,18 @@ function renderOpen(open, cardId) {
       ? `seed ${open.seed} · key roll ${open.keyRoll} → ${open.nextSeed}`
       : `seed ${open.seed} → ${open.nextSeed}`;
   head.append(el("span", "seed", seedText));
+
+  // Opening card N means consuming every box up to and including it, since
+  // the seed chain runs through them — so the label spells out the cost.
+  if (onOpen) {
+    const btn = el("button", "open-card-btn", position === 1 ? "Open" : `Open ×${position}`);
+    btn.title = position === 1
+      ? "Open this box and advance the seed"
+      : `Open this box and the ${position - 1} before it`;
+    btn.addEventListener("click", () => onOpen(position));
+    head.append(btn);
+  }
+
   box.append(head);
 
   const list = el("ul", "items");
@@ -44,9 +56,11 @@ function renderOpen(open, cardId) {
   return box;
 }
 
-export function renderResults(container, cardId, chain) {
+export function renderResults(container, cardId, chain, onOpen) {
   container.textContent = "";
-  for (const open of chain) container.append(renderOpen(open, cardId));
+  for (const [i, open] of chain.entries()) {
+    container.append(renderOpen(open, cardId, i + 1, onOpen));
+  }
 }
 
 // Opens already walked past, newest first.
@@ -116,6 +130,66 @@ export function renderVerification(container, results) {
       box.append(el("span"), details);
     }
 
+    container.append(box);
+  }
+}
+
+export function renderXpPath(container, solution, baseline, freeOpenings) {
+  container.textContent = "";
+
+  if (!solution || solution.xp < 0 || solution.path.length === 0) {
+    container.append(el("p", "empty", "No path found."));
+    return;
+  }
+
+  const summary = el("div", "xp-summary");
+  summary.append(el("span", "xp-total", `${solution.xp} XP`));
+
+  const delta = solution.xp - baseline.xp;
+  const pct = baseline.xp > 0 ? Math.round((delta / baseline.xp) * 100) : 0;
+  const cmp = el("span", "xp-delta");
+  cmp.dataset.sign = delta > 0 ? "up" : "flat";
+  cmp.textContent =
+    delta > 0
+      ? `+${delta} XP (+${pct}%) vs always max level (${baseline.xp} XP in ${baseline.opens} opens)`
+      : `same as always max level (${baseline.xp} XP in ${baseline.opens} opens)`;
+  summary.append(cmp);
+
+  // Keys refund an opening, so a path can be longer than the free openings.
+  const keys = solution.path.reduce(
+    (n, step) => n + step.items.filter((i) => i.baseName.endsWith("KeyIcon")).length, 0
+  );
+  const spend = el("span", "xp-spend");
+  spend.textContent =
+    keys > 0
+      ? `${solution.path.length} opens from ${freeOpenings} free — ${keys} key(s) refunded`
+      : `${solution.path.length} opens from ${freeOpenings} free — no keys dropped`;
+  summary.append(spend);
+
+  if (solution.truncated) {
+    summary.append(el("span", "xp-warn",
+      `path hit your ${solution.maxOpens}-open limit — keys kept refunding`));
+  }
+
+  container.append(summary);
+
+  for (const [i, step] of solution.path.entries()) {
+    const box = el("div", "open");
+
+    const head = el("div", "open-head");
+    head.append(el("span", "open-title", `step ${i + 1} · level ${step.level}`));
+    head.append(el("span", "seed", `seed ${step.usedSeed} · +${step.xp} XP`));
+    box.append(head);
+
+    const list = el("ul", "items");
+    for (const item of step.items) {
+      const li = el("li");
+      li.dataset.rarity = item.rarity;
+      li.append(el("span", null, item.name));
+      li.append(el("span", "item-rarity", item.rarity));
+      list.append(li);
+    }
+    box.append(list);
     container.append(box);
   }
 }
