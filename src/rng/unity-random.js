@@ -1,55 +1,68 @@
 // Reimplementation of the game engine's PRNG.
-// Confirm which algorithm the target build uses (xorshift128 vs LCG) by
-// matching known seed -> output pairs before trusting any prediction.
 //
-// Current implementation: 32-bit linear congruential generator,
-//   state = (state * MULTIPLIER + INCREMENT) mod 2^32
-// with the Numerical Recipes constants. Stock Unity's UnityEngine.Random is
-// xorshift128, so these constants are a starting point, not a confirmed
-// match — override them via the `opts` argument once real pairs are logged.
-
-export const LCG_MULTIPLIER = 1664525;
-export const LCG_INCREMENT = 1013904223;
+// The engine does NOT use an LCG. It uses C#'s System.Random — Knuth's
+// subtractive (lagged Fibonacci) generator — which is what Mono ships and
+// what a persisted int32 `Seed` per chest is fed into. Ported to match the
+// reference implementation (github.com/1vcian/ev) draw for draw.
 
 export class UnityRandom {
-  constructor(seed, opts = {}) {
-    this.multiplier = (opts.multiplier ?? LCG_MULTIPLIER) >>> 0;
-    this.increment = (opts.increment ?? LCG_INCREMENT) >>> 0;
-    this.seed = seed >>> 0;
-    this.state = this.seed;
+  #MBIG = 2147483647;
+  #MSEED = 161803398;
+  #SeedArray = new Array(56);
+  #inext;
+  #inextp;
+
+  constructor(seed) {
+    this.initState(seed);
   }
 
-  // Restart the sequence from the original (or a new) seed.
-  reset(seed = this.seed) {
-    this.seed = seed >>> 0;
-    this.state = this.seed;
-    return this;
-  }
+  initState(seed) {
+    let ii, mj, mk;
 
-  // Raw 32-bit draw.
-  nextUint() {
-    // Math.imul keeps the multiply in 32-bit space; >>> 0 forces unsigned.
-    this.state = (Math.imul(this.state, this.multiplier) + this.increment) >>> 0;
-    return this.state;
+    mj = (this.#MSEED - Math.abs(seed)) | 0;
+    this.#SeedArray[55] = mj;
+    mk = 1;
+
+    for (let i = 1; i < 55; i++) {
+      ii = (21 * i) % 55;
+      this.#SeedArray[ii] = mk;
+      mk = (mj - mk) | 0;
+      if (mk < 0) mk = (mk + this.#MBIG) | 0;
+      mj = this.#SeedArray[ii];
+    }
+
+    for (let k = 1; k < 5; k++) {
+      for (let i = 1; i < 56; i++) {
+        this.#SeedArray[i] =
+          (this.#SeedArray[i] - this.#SeedArray[1 + ((i + 30) % 55)]) | 0;
+        if (this.#SeedArray[i] < 0) {
+          this.#SeedArray[i] = (this.#SeedArray[i] + this.#MBIG) | 0;
+        }
+      }
+    }
+
+    this.#inext = 0;
+    this.#inextp = 21;
   }
 
   // [0, 1)
-  nextFloat() {
-    // Take the top 24 bits: the low bits of an LCG have short periods and
-    // 24 bits is the mantissa width of the float32 the engine would produce.
-    return (this.nextUint() >>> 8) / 0x1000000;
+  sample() {
+    this.#inext = (this.#inext + 1) % 56;
+    this.#inextp = (this.#inextp + 1) % 56;
+
+    let retVal = (this.#SeedArray[this.#inext] - this.#SeedArray[this.#inextp]) | 0;
+    if (retVal < 0) retVal = (retVal + this.#MBIG) | 0;
+
+    return retVal * (1 / this.#MBIG);
   }
 
-  // [min, max)
+  // Integer in [min, max). Note this floors — it is not a float range.
   range(min, max) {
-    return min + this.nextFloat() * (max - min);
-  }
-
-  // [min, max) over integers. Returns min when the span is empty.
-  rangeInt(min, max) {
-    const lo = Math.ceil(min);
-    const span = Math.floor(max) - lo;
-    if (span <= 0) return lo;
-    return lo + Math.floor(this.nextFloat() * span);
+    if (min >= max) {
+      console.error("min is greater than or equal to max, returning min");
+      return min;
+    }
+    const span = max - min;
+    return min + Math.floor(this.sample() * span);
   }
 }
