@@ -4,16 +4,52 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Loot Predictor</title>
+    <link rel="stylesheet" href="/src/ui/styles.css" />
   </head>
   <body>
-    <h1>Loot Predictor</h1>
-    <p>Load a savegame export. Nothing is uploaded — parsing happens in your browser.</p>
-    <label>Savegame <input id="save" type="file" accept=".json,application/json" /></label>
-    <label>Chest <select id="chest"></select></label>
-    <label>Opens <input id="count" type="number" value="5" min="1" /></label>
-    <label>Vault % <input id="vault" type="number" value="0" min="0" max="100" /></label>
-    <button id="run">Predict</button>
-    <div id="out"></div>
+    <header>
+      <h1>Loot Predictor</h1>
+      <p class="note">
+        Savegames are parsed in your browser. Nothing is uploaded, nothing is written back.
+      </p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab is-active" data-tab="predict">Predict</button>
+      <button class="tab" data-tab="verify">Verify</button>
+    </nav>
+
+    <!-- Predict -->
+    <section id="panel-predict" class="panel">
+      <div class="controls">
+        <label>Savegame<input id="save" type="file" accept=".json,application/json" /></label>
+        <label>Chest<select id="chest" disabled></select></label>
+        <label>Opens<input id="count" type="number" value="5" min="1" max="200" /></label>
+        <label>Vault %<input id="vault" type="number" value="0" min="0" max="100" /></label>
+        <button id="run" disabled>Predict</button>
+      </div>
+      <div id="out" class="out">
+        <p class="empty">Load a savegame to begin.</p>
+      </div>
+    </section>
+
+    <!-- Verify -->
+    <section id="panel-verify" class="panel is-hidden">
+      <ol class="steps">
+        <li>Export a savegame and load it as <strong>Before</strong>.</li>
+        <li>Open some chests in game.</li>
+        <li>Export again and load it as <strong>After</strong>.</li>
+      </ol>
+      <div class="controls">
+        <label>Before<input id="save-before" type="file" accept=".json,application/json" /></label>
+        <label>After<input id="save-after" type="file" accept=".json,application/json" /></label>
+        <button id="run-verify" disabled>Verify</button>
+      </div>
+      <div id="out-verify" class="out">
+        <p class="empty">Load both savegames to compare.</p>
+      </div>
+    </section>
+
     <script type="module" src="/src/app.js"></script>
   </body>
 </html>
