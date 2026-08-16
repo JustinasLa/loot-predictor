@@ -1,12 +1,14 @@
 import { parseSavegame } from "./save/parse.js";
 import { predictChain } from "./loot/simulate.js";
 import { verifyAll } from "./verify.js";
+import * as storage from "./storage.js";
 import {
   renderChests, renderResults, renderHistory, renderVerification, renderError
 } from "./ui/render.js";
 
 // `saved` is the untouched baseline from the file; `live` tracks the seed as
-// you walk it forward in the browser. Opening never touches the savegame.
+// you walk it forward. Both survive a refresh — only loading a new savegame
+// replaces them.
 let saved = {};
 let live = {};
 const compare = { before: null, after: null };
@@ -42,6 +44,22 @@ function chainOpts(state) {
   };
 }
 
+function persist() {
+  storage.save({
+    saved,
+    live,
+    ui: {
+      cardId: currentId(),
+      count: $("#count").value,
+      vault: $("#vault").value
+    }
+  });
+}
+
+function enableControls() {
+  for (const id of ["#seed", "#open-1", "#open-10", "#reset"]) $(id).disabled = false;
+}
+
 // Advance the live seed by `times` opens, recording what each one produced.
 function openChest(times) {
   const cardId = currentId();
@@ -64,7 +82,7 @@ function resetChest() {
   refresh();
 }
 
-// Redraw everything that depends on the live seed.
+// Redraw everything that depends on the live seed, then checkpoint.
 function refresh() {
   const out = $("#out");
   try {
@@ -82,9 +100,37 @@ function refresh() {
       predictChain(state.seed, cardId, Number($("#count").value) || 5, chainOpts(state))
     );
     renderHistory($("#history"), cardId, state.history);
+    persist();
   } catch (err) {
     renderError(out, err.message);
   }
+}
+
+function adoptSave(parsed) {
+  saved = parsed;
+  live = Object.fromEntries(
+    Object.entries(saved).map(([id, st]) => [
+      id, { seed: st.initialSeed, level: st.level, opened: 0, history: [] }
+    ])
+  );
+  renderChests($("#chest"), saved);
+  enableControls();
+  refresh();
+}
+
+function restore() {
+  const state = storage.load();
+  if (!state) return false;
+
+  saved = state.saved;
+  live = state.live;
+  renderChests($("#chest"), saved);
+  if (state.ui?.cardId && live[state.ui.cardId]) $("#chest").value = state.ui.cardId;
+  if (state.ui?.count) $("#count").value = state.ui.count;
+  if (state.ui?.vault) $("#vault").value = state.ui.vault;
+  enableControls();
+  refresh();
+  return true;
 }
 
 function runVerification() {
@@ -117,15 +163,7 @@ function init() {
     const file = e.target.files[0];
     if (!file) return;
     try {
-      saved = await readSave(file);
-      live = Object.fromEntries(
-        Object.entries(saved).map(([id, st]) => [
-          id, { seed: st.initialSeed, level: st.level, opened: 0, history: [] }
-        ])
-      );
-      renderChests($("#chest"), saved);
-      for (const id of ["#seed", "#open-1", "#open-10", "#reset"]) $(id).disabled = false;
-      refresh();
+      adoptSave(await readSave(file));
     } catch (err) {
       renderError($("#out"), err.message);
     }
@@ -163,6 +201,8 @@ function init() {
   }
 
   $("#run-verify").addEventListener("click", runVerification);
+
+  restore();
 }
 
 init();
