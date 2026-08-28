@@ -7,162 +7,190 @@
     <link rel="stylesheet" href="/src/ui/styles.css" />
   </head>
   <body>
-    <header>
-      <h1>Loot Predictor</h1>
-      <p class="note">
-        Savegames are parsed in your browser. Nothing is uploaded, nothing is written back.
-      </p>
-    </header>
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <aside class="w-60 shrink-0 bg-discord-bg-secondary border-r border-discord-border flex flex-col">
+        <div class="h-12 shrink-0 flex items-center px-4 border-b border-discord-border shadow-sm">
+          <h1 class="text-sm font-bold truncate">Loot Predictor</h1>
+        </div>
 
-    <nav class="tabs">
-      <button class="tab is-active" data-tab="predict">Predict</button>
-      <button class="tab" data-tab="find">Find</button>
-    </nav>
-
-    <!-- Predict -->
-    <section id="panel-predict" class="panel">
-      <div class="controls">
-        <label>Savegame<input id="save" type="file" accept=".json,application/json" /></label>
-        <label>Chest<select id="chest" disabled></select></label>
-        <label>Seed<input id="seed" type="number" step="1" disabled /></label>
-        <label>Opens<input id="count" type="number" value="5" min="1" max="200" /></label>
-        <label>Vault %<input id="vault" type="number" value="0" min="0" max="100" /></label>
-      </div>
-
-      <div class="controls actions">
-        <div class="field">
-          <span class="field-label">Open</span>
-          <div class="field-row">
-            <button class="open-btn" data-open="1" disabled>1</button>
-            <button class="open-btn" data-open="2" disabled>2</button>
-            <button class="open-btn" data-open="3" disabled>3</button>
-            <button class="open-btn" data-open="4" disabled>4</button>
-            <button class="open-btn" data-open="5" disabled>5</button>
-            <button class="open-btn" data-open="6" disabled>6</button>
-            <button class="open-btn" data-open="7" disabled>7</button>
-            <button class="open-btn" data-open="10" disabled>10</button>
+        <div class="flex-1 overflow-y-auto scroll-thin px-2 py-3 flex flex-col gap-4">
+          <div>
+            <div class="channel-category-head" data-toggle="predict">
+              <span>▾</span><span>predict</span>
+            </div>
+            <div id="sidebar-predict-list" class="flex flex-col gap-0.5 mt-0.5"></div>
+          </div>
+          <div>
+            <div class="channel-category-head" data-toggle="find">
+              <span>▾</span><span>find</span>
+            </div>
+            <div id="sidebar-find-list" class="flex flex-col gap-0.5 mt-0.5"></div>
           </div>
         </div>
 
-        <div class="field">
-          <span class="field-label">Custom</span>
-          <div class="field-row">
-            <input id="open-custom" type="number" value="25" min="1" max="10000" />
-            <input
-              id="open-custom-level" class="is-hidden" type="number"
-              min="1" max="100" placeholder="level"
-              title="Level to open these boxes at (adventure chests only)"
-            />
-            <button id="open-custom-go" class="ghost" disabled>Open</button>
-          </div>
+        <input id="save" type="file" accept=".json,application/json" class="hidden" />
+
+        <!-- Guest: no savegame loaded yet -->
+        <div id="user-panel-guest" class="shrink-0 border-t border-discord-border bg-discord-bg-tertiary p-2 flex flex-col gap-1.5">
+          <p class="text-[0.7rem] text-discord-text-muted px-1">
+            savegame stays on your machine, we dont upload or write back anything lol
+          </p>
+          <label for="save" class="d-btn-ghost text-center cursor-pointer">load savegame</label>
         </div>
 
-        <div class="field">
-          <span class="field-label">&nbsp;</span>
-          <div class="field-row">
-            <button id="reset" class="ghost" disabled>Reset to savegame</button>
+        <!-- Logged in: savegame loaded, styled like a Discord user bar -->
+        <div id="user-panel-loggedin" class="is-hidden relative shrink-0">
+          <!-- Account popover: menu items appear once the bar below is clicked -->
+          <div id="user-menu" class="is-hidden absolute bottom-full left-2 right-2 mb-2 rounded-lg bg-discord-bg-float border border-discord-border shadow-lg py-1.5 flex flex-col">
+            <label for="save" class="flex items-center gap-2.5 px-2.5 py-2 text-sm text-discord-text cursor-pointer hover:bg-discord-blurple hover:text-white">
+              <svg viewBox="0 0 24 24" class="h-4 w-4 shrink-0 fill-current"><path d="M5 20h14a1 1 0 0 0 1-1v-7a1 1 0 1 0-2 0v6H6v-6a1 1 0 1 0-2 0v7a1 1 0 0 0 1 1Zm6-16.41 3.3 3.3a1 1 0 0 0 1.4-1.42l-5-5a1 1 0 0 0-1.4 0l-5 5a1 1 0 0 0 1.4 1.42L10 3.59V15a1 1 0 1 0 2 0V3.59Z"/></svg>
+              load a different savegame
+            </label>
+            <button id="reset" class="flex items-center gap-2.5 px-2.5 py-2 text-sm text-discord-text cursor-pointer hover:bg-discord-blurple hover:text-white" disabled>
+              <svg viewBox="0 0 24 24" class="h-4 w-4 shrink-0 fill-current"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg>
+              reset to savegame lol
+            </button>
+            <div class="my-1 border-t border-discord-border"></div>
+            <button id="unload" class="flex items-center gap-2.5 px-2.5 py-2 text-sm text-discord-red cursor-pointer hover:bg-discord-red hover:text-white">
+              <svg viewBox="0 0 24 24" class="h-4 w-4 shrink-0 fill-current"><path d="M16 17v-3H9v-4h7V7l5 5-5 5ZM14 2a2 2 0 0 1 2 2v2h-2V4H5v16h9v-2h2v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9Z"/></svg>
+              unload savegame
+            </button>
           </div>
+
+          <button id="user-menu-trigger" type="button"
+            class="w-full border-t border-discord-border bg-discord-bg-tertiary h-13 px-2 flex items-center gap-2 cursor-pointer hover:bg-discord-bg-float">
+            <div class="relative shrink-0">
+              <div class="h-8 w-8 rounded-full bg-discord-blurple flex items-center justify-center">
+                <svg viewBox="0 0 24 24" class="h-5 w-5 fill-white"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.4 0-8 2.2-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.8-3.6-5-8-5Z"/></svg>
+              </div>
+              <span class="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-discord-green border-2 border-discord-bg-tertiary"></span>
+            </div>
+            <div class="min-w-0 flex-1 text-left">
+              <p id="user-filename" class="text-sm font-semibold truncate leading-tight" title="">savegame</p>
+              <p class="text-xs text-discord-green leading-tight">loaded</p>
+            </div>
+          </button>
         </div>
+      </aside>
 
-        <span id="open-status" class="open-status"></span>
-      </div>
+      <!-- Main -->
+      <main class="flex-1 overflow-y-auto scroll-thin">
+        <!-- Predict -->
+        <section id="panel-predict" class="p-5 max-w-5xl mx-auto flex flex-col gap-4">
+          <div class="d-panel-toolbar">
+            <label class="d-field">seed<input id="seed" type="number" step="1" class="d-input" disabled /></label>
+            <label class="d-field">opens<input id="count" type="number" value="5" min="1" max="200" class="d-input" /></label>
+            <label class="d-field">vault %<input id="vault" type="number" value="0" min="0" max="100" class="d-input" /></label>
+          </div>
 
-      <section id="smart-xp" class="smart is-hidden">
-        <p class="hint">
-          Free keys you have to spend — 4 per day by default. A vault key dropped
-          by a box refunds an opening, so the path can run longer than this.
-          Keys only drop when <strong>Vault %</strong> is above 0 — it is the
-          same value as the one in the Predict controls above, edit either.
-          <strong>Max opens</strong> is unlimited unless you set it; with a high
-          vault rate refunds can outpace spending and the search will run until
-          you press Stop, which keeps the best path found so far.
-        </p>
-        <div class="controls actions">
-          <div class="field">
-            <span class="field-label">Free openings</span>
-            <div class="field-row">
-              <input id="xp-openings" type="number" value="4" min="1" />
+          <div class="d-panel-toolbar">
+            <div class="d-field">
+              <span>open</span>
+              <div class="flex gap-1">
+                <button class="open-btn d-btn-open" data-open="1" disabled>1</button>
+                <button class="open-btn d-btn-open" data-open="2" disabled>2</button>
+                <button class="open-btn d-btn-open" data-open="3" disabled>3</button>
+                <button class="open-btn d-btn-open" data-open="4" disabled>4</button>
+                <button class="open-btn d-btn-open" data-open="5" disabled>5</button>
+                <button class="open-btn d-btn-open" data-open="6" disabled>6</button>
+                <button class="open-btn d-btn-open" data-open="7" disabled>7</button>
+                <button class="open-btn d-btn-open" data-open="10" disabled>10</button>
+              </div>
+            </div>
+
+            <div class="d-field">
+              <span>custom</span>
+              <div class="flex gap-1">
+                <input id="open-custom" type="number" value="25" min="1" max="10000" class="d-input" />
+                <input
+                  id="open-custom-level" class="d-input is-hidden" type="number"
+                  min="1" max="100" placeholder="level"
+                  title="Level to open these boxes at (adventure chests only)"
+                />
+                <button id="open-custom-go" class="d-btn-ghost" disabled>open</button>
+              </div>
+            </div>
+
+            <span id="open-status" class="text-discord-text-muted text-xs font-mono self-center"></span>
+          </div>
+
+          <section id="smart-xp" class="smart is-hidden flex flex-col gap-3">
+            <p class="hint-text">
+              free keys you got to spend, 4 a day by default. box drops a vault key,
+              refunds an opening, so path can run longer than that. keys only drop
+              if <strong>vault %</strong> above 0, same field as up top, edit
+              either one. <strong>max opens</strong> unlimited unless you cap it, high
+              vault rate and refunds outpace spending, search just runs till you hit
+              stop, keeps best path found so far
+            </p>
+            <div class="d-panel-toolbar">
+              <label class="d-field">free openings<input id="xp-openings" type="number" value="4" min="1" class="d-input" /></label>
+              <label class="d-field">max level<input id="xp-maxlevel" type="number" value="60" min="1" max="100" class="d-input" /></label>
+              <label class="d-field">vault %<input id="xp-vault" type="number" value="0" min="0" max="100" class="d-input" /></label>
+              <label class="d-field">max opens<input id="xp-maxopens" type="number" min="1" placeholder="none" class="d-input" /></label>
+              <div class="d-field">
+                <span>&nbsp;</span>
+                <div class="flex gap-1">
+                  <button id="xp-search" class="d-btn" disabled>find best xp path</button>
+                  <button id="xp-stop" class="d-btn-ghost is-hidden">stop</button>
+                </div>
+              </div>
+              <span id="xp-status" class="text-discord-text-muted text-xs font-mono self-center"></span>
+              <span id="xp-estimate" class="text-discord-text-muted text-xs font-mono self-center"></span>
+            </div>
+            <div id="xp-out" class="flex flex-col gap-3"></div>
+          </section>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <h2 class="col-head mb-2">upcoming</h2>
+              <div id="out" class="flex flex-col gap-3">
+                <p class="empty-text">load a savegame bro</p>
+              </div>
+            </div>
+            <div>
+              <h2 class="col-head mb-2">opened <span id="history-count" class="text-discord-text-muted"></span></h2>
+              <div id="history" class="flex flex-col gap-3">
+                <p class="empty-text">nothing opened yet lmao</p>
+              </div>
             </div>
           </div>
-          <div class="field">
-            <span class="field-label">Max level</span>
-            <div class="field-row">
-              <input id="xp-maxlevel" type="number" value="60" min="1" max="100" />
+        </section>
+
+        <!-- Find -->
+        <section id="panel-find" class="p-5 max-w-5xl mx-auto flex flex-col gap-4 is-hidden">
+          <p class="hint-text">
+            pick your items, search runs off current live seed. adventure chests get
+            full search over levels, everything else got no level to pick so it just
+            walks the chain till stuff turns up
+          </p>
+
+          <div class="d-panel-toolbar">
+            <label class="d-field">max level<input id="find-maxlevel" type="number" min="1" max="100" class="d-input" /></label>
+            <label class="d-field">max opens<input id="find-maxdepth" type="number" value="10" min="1" class="d-input" /></label>
+            <button id="find-run" class="d-btn" disabled>find items</button>
+            <button id="find-stop" class="d-btn-ghost is-hidden">stop</button>
+            <span id="find-status" class="text-discord-text-muted text-xs font-mono self-center"></span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-[22rem_1fr] gap-5">
+            <div>
+              <h2 class="col-head mb-2">targets <span id="find-selected" class="text-discord-text-muted"></span></h2>
+              <div id="find-items" class="flex flex-wrap gap-1.5 content-start max-h-[34rem] overflow-y-auto scroll-thin rounded-lg bg-discord-bg-secondary border border-discord-border p-3">
+                <p class="empty-text">load a savegame first bro</p>
+              </div>
+            </div>
+            <div>
+              <h2 class="col-head mb-2">result</h2>
+              <div id="find-out" class="flex flex-col gap-3">
+                <p class="empty-text">pick at least one item lol</p>
+              </div>
             </div>
           </div>
-          <div class="field">
-            <span class="field-label">Vault %</span>
-            <div class="field-row">
-              <input id="xp-vault" type="number" value="0" min="0" max="100" />
-            </div>
-          </div>
-          <div class="field">
-            <span class="field-label">Max opens</span>
-            <div class="field-row">
-              <input id="xp-maxopens" type="number" min="1" placeholder="none" />
-            </div>
-          </div>
-          <div class="field">
-            <span class="field-label">&nbsp;</span>
-            <div class="field-row">
-              <button id="xp-search" disabled>Find best XP path</button>
-              <button id="xp-stop" class="ghost is-hidden">Stop</button>
-            </div>
-          </div>
-          <span id="xp-status" class="open-status"></span>
-          <span id="xp-estimate" class="open-status"></span>
-        </div>
-        <div id="xp-out" class="out"></div>
-      </section>
-
-      <div class="columns">
-        <div>
-          <h2 class="col-head">Upcoming</h2>
-          <div id="out" class="out">
-            <p class="empty">Load a savegame to begin.</p>
-          </div>
-        </div>
-        <div>
-          <h2 class="col-head">Opened <span id="history-count" class="dim"></span></h2>
-          <div id="history" class="out">
-            <p class="empty">Nothing opened yet.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Find -->
-    <section id="panel-find" class="panel is-hidden">
-      <p class="hint">
-        Pick the items you want, then search from the current live seed. Adventure
-        chests get a full search over levels — everything else has no level to
-        choose, so it just walks the chain until the items turn up.
-      </p>
-
-      <div class="controls">
-        <label>Chest<select id="find-chest" disabled></select></label>
-        <label>Max level<input id="find-maxlevel" type="number" min="1" max="100" /></label>
-        <label>Max opens<input id="find-maxdepth" type="number" value="10" min="1" /></label>
-        <button id="find-run" disabled>Find items</button>
-        <button id="find-stop" class="ghost is-hidden">Stop</button>
-        <span id="find-status" class="open-status"></span>
-      </div>
-
-      <div class="find-layout">
-        <div>
-          <h2 class="col-head">Targets <span id="find-selected" class="dim"></span></h2>
-          <div id="find-items" class="item-picker">
-            <p class="empty">Load a savegame first.</p>
-          </div>
-        </div>
-        <div>
-          <h2 class="col-head">Result</h2>
-          <div id="find-out" class="out">
-            <p class="empty">Pick at least one item.</p>
-          </div>
-        </div>
-      </div>
-    </section>
+        </section>
+      </main>
+    </div>
 
     <script type="module" src="/src/app.js"></script>
   </body>

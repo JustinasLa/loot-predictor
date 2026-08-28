@@ -5,12 +5,12 @@ import { CHEST_ID_MAP, EGG_RARITY_MAP } from "../loot/tables.js";
 export function parseSavegame(text) {
   const jsonStart = text.indexOf("{");
   const jsonEnd = text.lastIndexOf("}");
-  if (jsonStart === -1 || jsonEnd === -1) throw new Error("no JSON found in file");
+  if (jsonStart === -1 || jsonEnd === -1) throw new Error("no json in that file bro");
 
   const savegame = JSON.parse(text.substring(jsonStart, jsonEnd + 1));
   const data = savegame.Data || savegame;
   const gameData = data.GameSavegame;
-  if (!gameData) throw new Error("invalid savegame format");
+  if (!gameData) throw new Error("thats not a valid savegame fr");
 
   const cardStates = {};
   const character = gameData.CharacterSavegame || {};

@@ -1,302 +1,164 @@
-:root {
-  --bg: #14161a;
-  --panel: #1c1f25;
-  --line: #2c313a;
-  --text: #e6e8ec;
-  --dim: #949aa6;
-  --accent: #6ea8fe;
-  --ok: #57c98a;
-  --bad: #f0665e;
+@import "tailwindcss";
 
-  --common: #9aa3b0;
-  --rare: #4fc27a;
-  --epic: #b57bf0;
-  --legendary: #f2a93b;
-  --ultimate: #f0665e;
-  --mythic: #57e0d0;
-}
+@theme {
+  --color-discord-bg: #313338;
+  --color-discord-bg-secondary: #2b2d31;
+  --color-discord-bg-tertiary: #1e1f22;
+  --color-discord-bg-float: #383a40;
+  --color-discord-bg-float-hover: #35373c;
+  --color-discord-border: #26282c;
 
-* { box-sizing: border-box; }
+  --color-discord-blurple: #5865f2;
+  --color-discord-blurple-hover: #4752c4;
 
-body {
-  margin: 0;
-  padding: 2rem 1.5rem 4rem;
-  max-width: 1100px;
-  margin-inline: auto;
-  background: var(--bg);
-  color: var(--text);
-  font: 15px/1.55 ui-sans-serif, system-ui, sans-serif;
-}
+  --color-discord-text: #f2f3f5;
+  --color-discord-text-muted: #949ba4;
+  --color-discord-text-faint: #6d6f78;
 
-h1 { margin: 0; font-size: 1.5rem; letter-spacing: -0.01em; }
-.note { margin: 0.35rem 0 0; color: var(--dim); font-size: 0.85rem; }
+  --color-discord-green: #23a55a;
+  --color-discord-red: #f23f42;
+  --color-discord-yellow: #f0b232;
 
-/* Tabs — same selected treatment as a picked target chip in Find */
-.tabs { display: flex; gap: 0.35rem; margin: 1.5rem 0 0; }
-.tab {
-  padding: 0.4rem 0.9rem;
-  background: var(--bg);
-  color: var(--dim);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  font: inherit;
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-.tab:hover { color: var(--text); border-color: var(--accent); }
-.tab.is-active {
-  color: var(--text);
-  border-color: var(--accent);
-  background: rgba(110, 168, 254, 0.14);
-  font-weight: 600;
+  --color-common: #9aa3b0;
+  --color-rare: #4fc27a;
+  --color-epic: #b57bf0;
+  --color-legendary: #f2a93b;
+  --color-ultimate: #f0665e;
+  --color-mythic: #57e0d0;
+
+  --font-sans: "gg sans", "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
-.panel { padding-top: 1.25rem; }
-.is-hidden { display: none; }
-
-/* Controls */
-.controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: end;
-  padding: 1rem;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.75rem; color: var(--dim); }
-input, select {
-  padding: 0.4rem 0.55rem;
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  font: inherit;
-  font-size: 0.85rem;
-}
-input[type="number"] { width: 6rem; }
-select { min-width: 12rem; }
-button {
-  padding: 0.45rem 1.1rem;
-  background: var(--accent);
-  color: #10131a;
-  border: 0;
-  border-radius: 5px;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-button:disabled { opacity: 0.4; cursor: not-allowed; }
-
-.controls.actions { margin-top: 0.5rem; align-items: center; }
-button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
-button.ghost:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
-.open-status { color: var(--dim); font-size: 0.78rem; font-family: ui-monospace, monospace; }
-
-/* Every group in the actions row shares a label slot and a control height,
-   so the buttons line up on one baseline regardless of label length. */
-.actions { --control-h: 2.15rem; }
-.field { display: flex; flex-direction: column; gap: 0.3rem; }
-.field-label { font-size: 0.75rem; color: var(--dim); }
-.field-row { display: flex; gap: 0.35rem; align-items: stretch; }
-.actions .field-row > button,
-.actions .field-row > input {
-  height: var(--control-h);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding-block: 0;
+@layer base {
+  * { box-sizing: border-box; }
+  body { @apply bg-discord-bg text-discord-text font-sans text-[15px] leading-normal m-0; }
+  input, select, button { font: inherit; }
 }
 
-.open-btn {
-  min-width: 2.5rem;
-  padding-inline: 0.55rem;
-  font-variant-numeric: tabular-nums;
-}
-.open-btn:hover:not(:disabled) { filter: brightness(1.12); }
+/* Unlayered: cascade layers put every @layer rule (including Tailwind's own
+   utilities like `flex`) ahead of anything in @layer, so this has to sit
+   outside @layer entirely to reliably beat `flex`/`grid` on the same element. */
+.is-hidden { display: none !important; }
 
-.actions .field-row input[type="number"] { width: 5.5rem; text-align: center; }
-.actions .open-status { align-self: center; margin-top: 1.1rem; }
+@layer components {
+  /* Sidebar channel category + rows */
+  .channel-category-head {
+    @apply flex items-center gap-1 px-1 py-1.5 text-xs font-semibold uppercase tracking-wide
+           text-discord-text-muted cursor-pointer select-none hover:text-discord-text;
+  }
+  .channel-row {
+    @apply flex items-center gap-1.5 rounded px-2 py-1.5 text-sm text-discord-text-muted
+           cursor-pointer truncate hover:bg-discord-bg-float-hover hover:text-discord-text;
+  }
+  .channel-row.is-active {
+    @apply bg-discord-bg-float text-discord-text font-medium;
+  }
+  .channel-row .hash { @apply text-discord-text-faint text-base leading-none shrink-0; }
+  .channel-row.is-active .hash { @apply text-discord-text-muted; }
+  .channel-badge {
+    @apply ml-auto shrink-0 rounded-full bg-discord-bg-tertiary px-1.5 py-0.5 text-[10px]
+           font-semibold text-discord-text-muted;
+  }
 
-.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
-@media (max-width: 820px) { .columns { grid-template-columns: 1fr; } }
-.col-head {
-  margin: 0;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--dim);
-  font-weight: 600;
-}
-.dim { color: var(--dim); }
-.open.is-past { opacity: 0.62; }
+  /* Form controls */
+  .d-field { @apply flex flex-col gap-1 text-xs text-discord-text-muted; }
+  .d-input {
+    @apply rounded bg-discord-bg-tertiary text-discord-text border border-discord-border
+           px-2.5 py-1.5 text-sm outline-none focus:border-discord-blurple;
+    color-scheme: dark;
+  }
+  .d-input[type="number"] { @apply w-24; }
 
-/* Smart XP */
-.smart { margin-top: 0.75rem; }
-.smart .out { margin-top: 1rem; }
-.xp-summary {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.xp-total { font-size: 1.35rem; font-weight: 700; color: var(--legendary); }
-.xp-delta { font-size: 0.82rem; color: var(--dim); }
-.xp-delta[data-sign="up"] { color: var(--ok); }
-#xp-estimate[data-heavy="yes"] { color: var(--legendary); }
-.xp-spend { font-size: 0.82rem; color: var(--dim); }
-.xp-progress { font-size: 0.82rem; color: var(--ok); font-weight: 600; }
-.xp-warn { font-size: 0.82rem; color: var(--legendary); }
-.hint {
-  margin: 0 0 0.75rem;
-  max-width: 62ch;
-  color: var(--dim);
-  font-size: 0.82rem;
-}
-.hint strong { color: var(--text); }
+  .d-btn {
+    @apply rounded px-4 py-1.5 text-sm font-medium bg-discord-blurple text-white
+           hover:bg-discord-blurple-hover disabled:opacity-40 disabled:cursor-not-allowed
+           disabled:hover:bg-discord-blurple cursor-pointer;
+  }
+  .d-btn-ghost {
+    @apply rounded px-4 py-1.5 text-sm font-medium bg-transparent text-discord-text-muted
+           border border-discord-border hover:border-discord-text-muted hover:text-discord-text
+           disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer;
+  }
+  .d-btn-open {
+    @apply min-w-10 rounded px-2.5 py-1.5 text-sm font-medium bg-discord-bg-float
+           text-discord-text-muted hover:bg-discord-blurple hover:text-white
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-discord-bg-float
+           disabled:hover:text-discord-text-muted cursor-pointer tabular-nums;
+  }
 
-/* Find */
-.find-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-@media (max-width: 900px) { .find-layout { grid-template-columns: 1fr; } }
+  /* Cards (opens, xp summary, item picker) */
+  .d-card {
+    @apply rounded-lg bg-discord-bg-secondary border border-discord-border p-4;
+  }
+  .d-panel-toolbar {
+    @apply flex flex-wrap items-end gap-3 rounded-lg bg-discord-bg-secondary
+           border border-discord-border p-3;
+  }
 
-.item-picker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  align-content: start;
-  max-height: 34rem;
-  overflow-y: auto;
-  padding: 0.85rem;
-  margin-top: 0.6rem;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  .open-box { @apply rounded-lg bg-discord-bg-secondary border border-discord-border p-3.5; }
+  .open-box.is-past { @apply opacity-60; }
+  .open-head { @apply flex items-center gap-3 mb-2.5; }
+  .open-title { @apply font-semibold text-[0.95rem]; }
+  .seed-text { @apply text-discord-text-muted text-xs font-mono ml-auto; }
 
-  /* Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: var(--line) transparent;
-}
-/* WebKit: the default light scrollbar reads as a seam against the dark panel */
-.item-picker::-webkit-scrollbar { width: 10px; }
-.item-picker::-webkit-scrollbar-track { background: transparent; }
-.item-picker::-webkit-scrollbar-thumb {
-  background: var(--line);
-  border: 3px solid var(--panel);
-  border-radius: 999px;
-}
-.item-picker::-webkit-scrollbar-thumb:hover { background: #3d4350; }
+  .open-card-btn {
+    @apply shrink-0 rounded px-2.5 py-1 text-xs font-semibold bg-transparent
+           text-discord-text-muted border border-discord-border cursor-pointer
+           hover:bg-discord-blurple hover:border-discord-blurple hover:text-white;
+  }
 
-.item-chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.4rem;
-  padding: 0.3rem 0.55rem;
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 400;
-  cursor: pointer;
-}
-.item-chip:hover { border-color: var(--accent); }
-.item-chip[data-on="yes"] {
-  border-color: var(--accent);
-  background: rgba(110, 168, 254, 0.14);
-  font-weight: 600;
-}
+  .item-row {
+    @apply flex gap-2 items-baseline px-2 py-1.5 rounded bg-discord-bg-tertiary text-sm;
+  }
+  .item-rarity {
+    @apply ml-auto text-[0.7rem] font-bold uppercase tracking-wide text-discord-text-muted;
+  }
+  .item-row[data-rarity="Common"]    .item-rarity { @apply text-common; }
+  .item-row[data-rarity="Rare"]      .item-rarity { @apply text-rare; }
+  .item-row[data-rarity="Epic"]      .item-rarity { @apply text-epic; }
+  .item-row[data-rarity="Legendary"] .item-rarity { @apply text-legendary; }
+  .item-row[data-rarity="Ultimate"]  .item-rarity { @apply text-ultimate; }
+  .item-row[data-rarity="Mythic"]    .item-rarity { @apply text-mythic; }
+  .item-row[data-hit="yes"] { @apply bg-discord-green/10 outline outline-1 outline-discord-green/40; }
 
-.find-route { margin-top: 1rem; }
-.route-head {
-  margin: 0 0 0.25rem;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--dim);
-}
-.route-note { margin: 0 0 0.6rem; font-size: 0.8rem; color: var(--dim); }
-.find-route .open { margin-bottom: 0.5rem; }
-.items li[data-hit="yes"] {
-  background: rgba(87, 201, 138, 0.12);
-  outline: 1px solid rgba(87, 201, 138, 0.4);
-}
+  .item-chip {
+    @apply inline-flex items-baseline gap-1.5 rounded px-2 py-1 text-xs bg-discord-bg-tertiary
+           text-discord-text border border-discord-border cursor-pointer
+           hover:border-discord-blurple;
+  }
+  .item-chip[data-on="yes"] {
+    @apply border-discord-blurple bg-discord-blurple/15 font-semibold;
+  }
+  .item-chip .item-rarity { @apply text-discord-text-muted; }
 
-/* Output */
-.out { margin-top: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
-.empty { color: var(--dim); font-size: 0.9rem; }
-.error {
-  padding: 0.75rem 1rem;
-  background: rgba(240, 102, 94, 0.1);
-  border: 1px solid var(--bad);
-  border-radius: 6px;
-  color: var(--bad);
-}
+  .col-head {
+    @apply m-0 text-xs uppercase tracking-wide text-discord-text-muted font-semibold;
+  }
+  .empty-text { @apply text-discord-text-muted text-sm; }
+  .error-box {
+    @apply rounded-md p-3 bg-discord-red/10 border border-discord-red text-discord-red text-sm;
+  }
 
-.open {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.85rem 1rem;
-}
-.open-head {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.6rem;
-}
-.open-head .seed { margin-left: auto; }
+  .xp-summary { @apply flex flex-wrap items-baseline gap-3 rounded-lg bg-discord-bg-secondary border border-discord-border px-4 py-3; }
+  .xp-total { @apply text-xl font-bold text-legendary; }
+  .xp-delta { @apply text-discord-text-muted text-[0.82rem]; }
+  .xp-delta[data-sign="up"] { @apply text-discord-green; }
+  .xp-spend { @apply text-discord-text-muted text-[0.82rem]; }
+  .xp-progress { @apply text-discord-green text-[0.82rem] font-semibold; }
+  .xp-warn { @apply text-legendary text-[0.82rem]; }
+  #xp-estimate[data-heavy="yes"] { @apply text-legendary; }
 
-.open-card-btn {
-  flex-shrink: 0;
-  padding: 0.25rem 0.7rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  background: transparent;
-  color: var(--dim);
-  border: 1px solid var(--line);
-  border-radius: 5px;
-}
-.open-card-btn:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #10131a;
-}
-.open-title { font-weight: 600; font-size: 0.95rem; }
-.seed { color: var(--dim); font-size: 0.75rem; font-family: ui-monospace, monospace; }
+  .hint-text { @apply max-w-[62ch] text-discord-text-muted text-[0.82rem]; }
+  .hint-text strong { @apply text-discord-text; }
 
-.items { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
-.items li {
-  display: flex;
-  gap: 0.5rem;
-  align-items: baseline;
-  padding: 0.3rem 0.5rem;
-  background: var(--bg);
-  border-radius: 4px;
-  font-size: 0.85rem;
+  /* Scrollbars, matched to the dark panel */
+  .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--color-discord-border) transparent; }
+  .scroll-thin::-webkit-scrollbar { width: 10px; }
+  .scroll-thin::-webkit-scrollbar-track { background: transparent; }
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: var(--color-discord-border);
+    border: 3px solid var(--color-discord-bg-secondary);
+    border-radius: 999px;
+  }
+  .scroll-thin::-webkit-scrollbar-thumb:hover { background: #3d4350; }
 }
-.item-rarity {
-  margin-left: auto;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--dim);
-}
-.items li[data-rarity="Common"]    .item-rarity { color: var(--common); }
-.items li[data-rarity="Rare"]      .item-rarity { color: var(--rare); }
-.items li[data-rarity="Epic"]      .item-rarity { color: var(--epic); }
-.items li[data-rarity="Legendary"] .item-rarity { color: var(--legendary); }
-.items li[data-rarity="Ultimate"]  .item-rarity { color: var(--ultimate); }
-.items li[data-rarity="Mythic"]    .item-rarity { color: var(--mythic); }
-

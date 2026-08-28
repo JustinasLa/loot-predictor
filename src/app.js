@@ -8,18 +8,25 @@ import { getItemXp } from "./loot/xp.js";
 import { findAllPaths, findItemLinear } from "./solver/find-items.js";
 import { getAvailableItemsForChest } from "./loot/items.js";
 import {
-  renderChests, renderResults, renderHistory,
+  renderChestList, renderResults, renderHistory,
   renderXpPath, renderItemPicker, renderFindResult, renderError
 } from "./ui/render.js";
 
 // `saved` is the untouched baseline from the file; `live` tracks the seed as
-// you walk it forward. Both survive a refresh — only loading a new savegame
+// you walk it forward. Both survive a refresh, only loading a new savegame
 // replaces them.
 let saved = {};
 let live = {};
 // Hunt targets are per chest, so switching chests doesn't carry a selection
 // that the new chest can never drop.
 const findTargets = new Map();
+
+// The chest picked in each sidebar category. Predict and Find each keep
+// their own selection, same as the two separate dropdowns they replaced.
+let predictChestId = null;
+let findChestIdState = null;
+// The uploaded file's name, shown in the sidebar's user panel once loaded.
+let savegameFilename = "";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -30,18 +37,46 @@ function readSave(file) {
       try { resolve(parseSavegame(e.target.result)); }
       catch (err) { reject(err); }
     };
-    reader.onerror = () => reject(new Error("could not read file"));
+    reader.onerror = () => reject(new Error("couldnt read file bruh"));
     reader.readAsText(file);
   });
 }
 
 function currentId() {
-  return $("#chest").value;
+  return predictChestId;
+}
+
+// Which panel is on screen. Picking a chest in either sidebar category
+// switches to that category's panel, same as clicking a Discord channel
+// jumps you to that channel.
+function showTab(tab) {
+  $("#panel-predict").classList.toggle("is-hidden", tab !== "predict");
+  $("#panel-find").classList.toggle("is-hidden", tab !== "find");
+}
+
+// Redraws both sidebar categories so the active row matches current state.
+function renderSidebars() {
+  renderChestList($("#sidebar-predict-list"), saved, predictChestId, selectPredictChest);
+  renderChestList($("#sidebar-find-list"), saved, findChestIdState, selectFindChest);
+}
+
+function selectPredictChest(id) {
+  predictChestId = id;
+  showTab("predict");
+  renderSidebars();
+  refresh();
+}
+
+function selectFindChest(id) {
+  findChestIdState = id;
+  showTab("find");
+  renderSidebars();
+  syncFindPanel();
 }
 
 function currentState() {
   const state = live[currentId()];
-  if (!state) throw new Error("load a savegame first");
+  if (!state) throw new Error("load a savegame first bro");
   return state;
 }
 
@@ -56,27 +91,43 @@ function persist() {
   storage.save({
     saved,
     live,
-    // Hunt targets survive a refresh too — the whole point is picking the
+    // Hunt targets survive a refresh too, the whole point is picking the
     // route back up on a later day.
     targets: Object.fromEntries(
       [...findTargets].map(([id, set]) => [id, [...set]]).filter(([, list]) => list.length)
     ),
     ui: {
       cardId: currentId(),
+      findCardId: findChestId(),
       count: $("#count").value,
-      vault: $("#vault").value
+      vault: $("#vault").value,
+      filename: savegameFilename
     }
   });
+}
+
+// Wipes the persisted state and reloads, which is the simplest way back to
+// a clean guest view, everything else already derives from a fresh load.
+function unloadSave() {
+  storage.clear();
+  location.reload();
 }
 
 function enableControls() {
   for (const id of ["#seed", "#reset", "#open-custom-go"]) $(id).disabled = false;
   for (const btn of document.querySelectorAll(".open-btn")) btn.disabled = false;
+  // Swap the sidebar's user panel from "load a savegame" to a logged-in bar,
+  // like signing into Discord.
+  $("#user-panel-guest").classList.add("is-hidden");
+  $("#user-panel-loggedin").classList.remove("is-hidden");
+  const nameEl = $("#user-filename");
+  nameEl.textContent = savegameFilename;
+  nameEl.title = savegameFilename;
 }
 
 // Advance the live seed by `times` opens, recording what each one produced.
 // `levelOverride` lets you replay a box at a level other than the chest's
-// current one — for adventure chests, where you may have opened at whatever
+// current one, for adventure chests, where you may have opened at whatever
 // level was dominant that day rather than the chest's latest level.
 function openChest(times, levelOverride) {
   const cardId = currentId();
@@ -110,8 +161,8 @@ function refresh() {
     $("#seed").value = state.seed;
     $("#history-count").textContent = state.opened ? `(${state.opened})` : "";
     $("#open-status").textContent = state.opened
-      ? `${state.opened} open(s) ahead of the savegame`
-      : "at savegame seed";
+      ? `${state.opened} open(s) ahead of the savegame fr`
+      : "at savegame seed lol";
 
     renderResults(
       out, cardId,
@@ -127,15 +178,18 @@ function refresh() {
   }
 }
 
-function adoptSave(parsed) {
+function adoptSave(parsed, filename) {
   saved = parsed;
+  savegameFilename = filename;
   live = Object.fromEntries(
     Object.entries(saved).map(([id, st]) => [
       id, { seed: st.initialSeed, level: st.level, opened: 0, history: [] }
     ])
   );
-  renderChests($("#chest"), saved);
-  renderChests($("#find-chest"), saved);
+  const firstId = Object.keys(saved)[0] ?? null;
+  predictChestId = firstId;
+  findChestIdState = firstId;
+  renderSidebars();
   enableControls();
   refresh();
   syncFindPanel();
@@ -151,9 +205,11 @@ function restore() {
   for (const [id, list] of Object.entries(state.targets || {})) {
     findTargets.set(id, new Set(list));
   }
-  renderChests($("#chest"), saved);
-  renderChests($("#find-chest"), saved);
-  if (state.ui?.cardId && live[state.ui.cardId]) $("#chest").value = state.ui.cardId;
+  const firstId = Object.keys(saved)[0] ?? null;
+  predictChestId = state.ui?.cardId && live[state.ui.cardId] ? state.ui.cardId : firstId;
+  findChestIdState = state.ui?.findCardId && live[state.ui.findCardId] ? state.ui.findCardId : firstId;
+  savegameFilename = state.ui?.filename || "savegame";
+  renderSidebars();
   if (state.ui?.count) $("#count").value = state.ui.count;
   if (state.ui?.vault) $("#vault").value = state.ui.vault;
   enableControls();
@@ -171,7 +227,7 @@ let stopSearch = false;
 let xpView = null;
 
 // What you'd bank by just replaying the highest level every time. Spends
-// openings under the same rules as the search — including key refunds —
+// openings under the same rules as the search, including key refunds,
 // so the comparison is like for like.
 function naiveXp(seed, cardId, eventType, level, vaultPercentage, openings, maxOpens) {
   let current = seed;
@@ -193,7 +249,7 @@ function naiveXp(seed, cardId, eventType, level, vaultPercentage, openings, maxO
 }
 
 // The search branches once per candidate level, so cost is levels^openings.
-// There is no cap on openings — but show what you're asking for first.
+// There is no cap on openings, but show what you're asking for first.
 function branchCount(maxLevel) {
   const levels = DOMINANT_ADVENTURE_LEVELS.filter((level) => level <= maxLevel);
   if (!levels.includes(maxLevel)) levels.push(maxLevel);
@@ -256,7 +312,7 @@ async function runXpSearch() {
   stopSearch = false;
   $("#xp-search").disabled = true;
   $("#xp-stop").classList.remove("is-hidden");
-  $("#xp-status").textContent = "searching…";
+  $("#xp-status").textContent = "searching… lol";
   $("#xp-out").textContent = "";
   xpView = null;
 
@@ -283,8 +339,8 @@ async function runXpSearch() {
     xpView = { cardId, solution, baseline, openings, done: 0 };
     drawXpPath();
     $("#xp-status").textContent =
-      `${solution.nodesVisited.toLocaleString()} paths in ${Date.now() - started}ms` +
-      (stopSearch ? " (stopped early)" : "");
+      `${solution.nodesVisited.toLocaleString()} paths in ${Date.now() - started}ms fr` +
+      (stopSearch ? " (stopped early lol)" : "");
   } catch (err) {
     xpView = null;
     renderError($("#xp-out"), err.message);
@@ -300,7 +356,7 @@ async function runXpSearch() {
 let stopFind = false;
 
 function findChestId() {
-  return $("#find-chest").value;
+  return findChestIdState;
 }
 
 function targetsFor(cardId) {
@@ -342,7 +398,7 @@ function drawXpPath() {
 
 // Walk the XP path's boxes at the levels it picked, then persist the seed.
 // The path stays on screen with the opened steps marked, because every later
-// step was solved from the seed those opens produce — it is still valid.
+// step was solved from the seed those opens produce, it is still valid.
 function openXpRoute(cardId, steps) {
   const state = live[cardId];
   if (!state) return;
@@ -392,7 +448,7 @@ function openRoute(cardId, steps) {
     $("#find-out").append(
       Object.assign(document.createElement("p"), {
         className: "empty",
-        textContent: "All targets collected. Seed saved — pick new items to hunt."
+        textContent: "got all targets, seed saved, pick new items to hunt lol"
       })
     );
     $("#find-status").textContent = "";
@@ -405,13 +461,13 @@ async function runFind() {
   const targets = [...targetsFor(cardId)];
   const out = $("#find-out");
 
-  if (!state) { renderError(out, "load a savegame first"); return; }
-  if (targets.length === 0) { renderError(out, "pick at least one item"); return; }
+  if (!state) { renderError(out, "load a savegame first bro"); return; }
+  if (targets.length === 0) { renderError(out, "pick at least one item lol"); return; }
 
   stopFind = false;
   $("#find-run").disabled = true;
   $("#find-stop").classList.remove("is-hidden");
-  $("#find-status").textContent = "searching…";
+  $("#find-status").textContent = "searching… lol";
   out.textContent = "";
 
   const started = Date.now();
@@ -437,8 +493,8 @@ async function runFind() {
     renderFindResult(out, result, targets, (steps) => openRoute(cardId, steps));
     $("#find-status").textContent =
       `${(result.nodesVisited ?? result.opens ?? 0).toLocaleString()} ` +
-      `${result.nodesVisited ? "nodes" : "opens"} in ${Date.now() - started}ms` +
-      (stopFind ? " (stopped early)" : "");
+      `${result.nodesVisited ? "nodes" : "opens"} in ${Date.now() - started}ms fr` +
+      (stopFind ? " (stopped early lol)" : "");
   } catch (err) {
     renderError(out, err.message);
     $("#find-status").textContent = "";
@@ -448,33 +504,55 @@ async function runFind() {
   }
 }
 
-function initTabs() {
-  for (const tab of document.querySelectorAll(".tab")) {
-    tab.addEventListener("click", () => {
-      for (const other of document.querySelectorAll(".tab")) {
-        other.classList.toggle("is-active", other === tab);
-      }
-      for (const panel of document.querySelectorAll(".panel")) {
-        panel.classList.toggle("is-hidden", panel.id !== `panel-${tab.dataset.tab}`);
-      }
+// Category headers collapse their channel list, like a Discord category.
+function initSidebarToggles() {
+  for (const head of document.querySelectorAll(".channel-category-head")) {
+    const list = head.nextElementSibling;
+    head.addEventListener("click", () => {
+      list.classList.toggle("is-hidden");
+      head.firstElementChild.textContent = list.classList.contains("is-hidden") ? "▸" : "▾";
     });
   }
 }
 
+// The user bar's account popover: opens on click, closes on an outside
+// click or Escape, same as Discord's own account menu.
+function initUserMenu() {
+  const menu = $("#user-menu");
+  const trigger = $("#user-menu-trigger");
+
+  const close = () => menu.classList.add("is-hidden");
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    menu.classList.toggle("is-hidden");
+  });
+  menu.addEventListener("click", (e) => {
+    // Let the load-savegame label and reset button do their thing, then close.
+    if (e.target.closest("label, button")) close();
+  });
+  document.addEventListener("click", (e) => {
+    if (!menu.contains(e.target) && e.target !== trigger) close();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") close();
+  });
+}
+
 function init() {
-  initTabs();
+  initSidebarToggles();
+  initUserMenu();
 
   $("#save").addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     try {
-      adoptSave(await readSave(file));
+      adoptSave(await readSave(file), file.name);
     } catch (err) {
       renderError($("#out"), err.message);
     }
   });
 
-  $("#chest").addEventListener("change", refresh);
   $("#count").addEventListener("change", refresh);
   $("#vault").addEventListener("change", refresh);
 
@@ -502,6 +580,7 @@ function init() {
   });
 
   $("#reset").addEventListener("click", resetChest);
+  $("#unload").addEventListener("click", unloadSave);
 
   // Write back to #vault so the Upcoming preview and the search never
   // disagree about the vault rate; refresh() mirrors it back and persists.
@@ -512,17 +591,16 @@ function init() {
 
   $("#xp-openings").addEventListener("input", syncXpEstimate);
   $("#xp-maxlevel").addEventListener("input", syncXpEstimate);
-  $("#find-chest").addEventListener("change", syncFindPanel);
   $("#find-run").addEventListener("click", runFind);
   $("#find-stop").addEventListener("click", () => {
     stopFind = true;
-    $("#find-status").textContent = "stopping…";
+    $("#find-status").textContent = "stopping… bruh";
   });
 
   $("#xp-search").addEventListener("click", runXpSearch);
   $("#xp-stop").addEventListener("click", () => {
     stopSearch = true;
-    $("#xp-status").textContent = "stopping…";
+    $("#xp-status").textContent = "stopping… bruh";
   });
 
   restore();
