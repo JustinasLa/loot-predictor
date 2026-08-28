@@ -75,12 +75,16 @@ function enableControls() {
 }
 
 // Advance the live seed by `times` opens, recording what each one produced.
-function openChest(times) {
+// `levelOverride` lets you replay a box at a level other than the chest's
+// current one — for adventure chests, where you may have opened at whatever
+// level was dominant that day rather than the chest's latest level.
+function openChest(times, levelOverride) {
   const cardId = currentId();
   const state = currentState();
+  const opts = levelOverride ? { ...chainOpts(state), level: levelOverride } : chainOpts(state);
 
   for (let i = 0; i < times; i++) {
-    const [open] = predictChain(state.seed, cardId, 1, chainOpts(state));
+    const [open] = predictChain(state.seed, cardId, 1, opts);
     state.history.unshift({ ...open, open: ++state.opened });
     state.seed = open.nextSeed;
   }
@@ -115,6 +119,7 @@ function refresh() {
       openChest
     );
     renderHistory($("#history"), cardId, state.history);
+    $("#open-custom-level").classList.toggle("is-hidden", !cardId.startsWith("adventure_"));
     syncSmartXp();
     persist();
   } catch (err) {
@@ -489,8 +494,11 @@ function init() {
   $("#open-custom-go").addEventListener("click", () => {
     const times = Number($("#open-custom").value);
     if (!Number.isInteger(times) || times < 1) return;
+    const levelValue = $("#open-custom-level").value;
+    const level = levelValue ? Number(levelValue) : undefined;
+    if (level !== undefined && (!Number.isInteger(level) || level < 1)) return;
     // Each open is three-plus draws; keep the click from locking up the tab.
-    openChest(Math.min(times, 10000));
+    openChest(Math.min(times, 10000), level);
   });
 
   $("#reset").addEventListener("click", resetChest);
