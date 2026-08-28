@@ -82,6 +82,13 @@
             <label class="d-field">seed<input id="seed" type="number" step="1" class="d-input" disabled /></label>
             <label class="d-field">opens<input id="count" type="number" value="5" min="1" max="200" class="d-input" /></label>
             <label class="d-field">vault %<input id="vault" type="number" value="0" min="0" max="100" class="d-input" /></label>
+            <label id="preview-level-field" class="d-field is-hidden">
+              level
+              <input
+                id="preview-level" type="number" min="1" max="100" class="d-input"
+                title="Preview and open at this level instead of the chest's current level"
+              />
+            </label>
           </div>
 
           <div class="d-panel-toolbar">
@@ -103,11 +110,6 @@
               <span>custom</span>
               <div class="flex gap-1">
                 <input id="open-custom" type="number" value="25" min="1" max="10000" class="d-input" />
-                <input
-                  id="open-custom-level" class="d-input is-hidden" type="number"
-                  min="1" max="100" placeholder="level"
-                  title="Level to open these boxes at (adventure chests only)"
-                />
                 <button id="open-custom-go" class="d-btn-ghost" disabled>open</button>
               </div>
             </div>

@@ -27,6 +27,10 @@ let predictChestId = null;
 let findChestIdState = null;
 // The uploaded file's name, shown in the sidebar's user panel once loaded.
 let savegameFilename = "";
+// Which chest the level field was last shown/reset for, so switching chests
+// snaps it back to that chest's real level without stomping on an edit
+// you're still making on the same chest.
+let previewLevelChestId = null;
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -80,9 +84,15 @@ function currentState() {
   return state;
 }
 
+// For adventure chests, the level field lets you preview (and open) at a
+// level other than the chest's current one, e.g. "what's in a level 6 box".
+// It stays put across opens on the same chest, only resetting when you
+// switch chests, so it can also just drive a run of same-level opens.
 function chainOpts(state) {
+  const isAdventure = currentId()?.startsWith("adventure_");
+  const level = isAdventure ? Number($("#preview-level").value) || state.level : state.level;
   return {
-    level: state.level,
+    level,
     vaultPercentage: Number($("#vault").value) || 0
   };
 }
@@ -126,13 +136,12 @@ function enableControls() {
 }
 
 // Advance the live seed by `times` opens, recording what each one produced.
-// `levelOverride` lets you replay a box at a level other than the chest's
-// current one, for adventure chests, where you may have opened at whatever
-// level was dominant that day rather than the chest's latest level.
-function openChest(times, levelOverride) {
+// For adventure chests this opens at whatever level the level field shows,
+// which may not be the chest's current level, see chainOpts.
+function openChest(times) {
   const cardId = currentId();
   const state = currentState();
-  const opts = levelOverride ? { ...chainOpts(state), level: levelOverride } : chainOpts(state);
+  const opts = chainOpts(state);
 
   for (let i = 0; i < times; i++) {
     const [open] = predictChain(state.seed, cardId, 1, opts);
@@ -141,6 +150,18 @@ function openChest(times, levelOverride) {
   }
 
   refresh();
+}
+
+// Shows the level field for adventure chests and resets it to the chest's
+// real level, but only on an actual chest switch, so a level you typed in
+// to preview/open with survives further opens on that same chest.
+function syncPreviewLevelField(cardId, state) {
+  const isAdventure = cardId.startsWith("adventure_");
+  $("#preview-level-field").classList.toggle("is-hidden", !isAdventure);
+  if (isAdventure && cardId !== previewLevelChestId) {
+    $("#preview-level").value = state.level ?? "";
+  }
+  previewLevelChestId = cardId;
 }
 
 function resetChest() {
@@ -170,7 +191,7 @@ function refresh() {
       openChest
     );
     renderHistory($("#history"), cardId, state.history);
-    $("#open-custom-level").classList.toggle("is-hidden", !cardId.startsWith("adventure_"));
+    syncPreviewLevelField(cardId, state);
     syncSmartXp();
     persist();
   } catch (err) {
@@ -572,12 +593,12 @@ function init() {
   $("#open-custom-go").addEventListener("click", () => {
     const times = Number($("#open-custom").value);
     if (!Number.isInteger(times) || times < 1) return;
-    const levelValue = $("#open-custom-level").value;
-    const level = levelValue ? Number(levelValue) : undefined;
-    if (level !== undefined && (!Number.isInteger(level) || level < 1)) return;
     // Each open is three-plus draws; keep the click from locking up the tab.
-    openChest(Math.min(times, 10000), level);
+    openChest(Math.min(times, 10000));
   });
+
+  // Live-updates the Upcoming preview as you type a level to check.
+  $("#preview-level").addEventListener("input", refresh);
 
   $("#reset").addEventListener("click", resetChest);
   $("#unload").addEventListener("click", unloadSave);
