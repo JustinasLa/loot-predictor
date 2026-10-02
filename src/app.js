@@ -185,13 +185,13 @@ function refresh() {
       ? `${state.opened} open(s) ahead of the savegame fr`
       : "at savegame seed lol";
 
+    syncPreviewLevelField(cardId, state);
     renderResults(
       out, cardId,
       predictChain(state.seed, cardId, Number($("#count").value) || 5, chainOpts(state)),
       openChest
     );
     renderHistory($("#history"), cardId, state.history);
-    syncPreviewLevelField(cardId, state);
     syncSmartXp();
     persist();
   } catch (err) {
@@ -202,6 +202,7 @@ function refresh() {
 function adoptSave(parsed, filename) {
   saved = parsed;
   savegameFilename = filename;
+  previewLevelChestId = null;
   live = Object.fromEntries(
     Object.entries(saved).map(([id, st]) => [
       id, { seed: st.initialSeed, level: st.level, opened: 0, history: [] }

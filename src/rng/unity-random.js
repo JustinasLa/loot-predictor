@@ -19,7 +19,8 @@ export class UnityRandom {
   initState(seed) {
     let ii, mj, mk;
 
-    mj = (this.#MSEED - Math.abs(seed)) | 0;
+    const subtraction = seed === -2147483648 ? this.#MBIG : Math.abs(seed);
+    mj = (this.#MSEED - subtraction) | 0;
     this.#SeedArray[55] = mj;
     mk = 1;
 
@@ -47,11 +48,13 @@ export class UnityRandom {
 
   // [0, 1)
   sample() {
-    this.#inext = (this.#inext + 1) % 56;
-    this.#inextp = (this.#inextp + 1) % 56;
+    // Index zero is unused. Update the buffer after each draw, as C# does.
+    if (++this.#inext >= 56) this.#inext = 1;
+    if (++this.#inextp >= 56) this.#inextp = 1;
 
     let retVal = (this.#SeedArray[this.#inext] - this.#SeedArray[this.#inextp]) | 0;
     if (retVal < 0) retVal = (retVal + this.#MBIG) | 0;
+    this.#SeedArray[this.#inext] = retVal;
 
     return retVal * (1 / this.#MBIG);
   }

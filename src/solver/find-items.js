@@ -51,8 +51,9 @@ export function findAllPaths({
   levels = [...new Set(levels)].sort((a, b) => a - b);
 
   const queue = [{ seed: startSeed, path: [], cost: 0, foundItems: new Set() }];
-  // seed -> (collected-set signature -> best {length, cost}) so two branches
-  // that reach the same position with the same haul don't both expand.
+  // Breadth-first traversal reaches shorter paths first. Keep the cheapest
+  // cost for each seed/haul, but also expand a later, longer path if it costs
+  // less: key refunds can make that route the best way to finish the hunt.
   const visited = new Map();
   let minCostFound = Infinity;
   let nodesVisited = 0;
@@ -90,15 +91,10 @@ export function findAllPaths({
 
       const signature = [...newFound].sort().join(",");
       const forSeed = visited.get(result.nextSeed) || new Map();
-      const seen = forSeed.get(signature);
+      const previousCost = forSeed.get(signature) ?? Infinity;
 
-      const better =
-        !seen ||
-        newPath.length < seen.length ||
-        (newPath.length === seen.length && newCost < seen.cost);
-
-      if (better && newCost < minCostFound) {
-        forSeed.set(signature, { length: newPath.length, cost: newCost });
+      if (newCost < previousCost && newCost < minCostFound) {
+        forSeed.set(signature, newCost);
         visited.set(result.nextSeed, forSeed);
         queue.push({
           seed: result.nextSeed, path: newPath, cost: newCost, foundItems: newFound
@@ -113,7 +109,8 @@ export function findAllPaths({
 
   // Fewest opens vs fewest chests actually spent — key refunds can make these
   // different routes, so report both.
-  const shortest = solutions.reduce((a, b) => (a.path.length <= b.path.length ? a : b));
+  // The first solution is shortest because the queue is breadth-first.
+  const shortest = solutions[0];
   const cheapest = solutions.reduce((a, b) => (a.cost <= b.cost ? a : b));
 
   return {
