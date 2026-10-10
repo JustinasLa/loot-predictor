@@ -8,7 +8,7 @@ export function getItemXp(item) {
   if (
     !item || !item.rarity ||
     item.baseName === "PetFood" ||
-    (item.baseName && (item.baseName.endsWith("Key") || item.baseName.endsWith("KeyIcon")))
+    (item.baseName && item.baseName.endsWith("KeyIcon"))
   ) {
     return 0;
   }

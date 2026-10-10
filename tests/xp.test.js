@@ -15,8 +15,12 @@ describe("XP scoring", () => {
     expect(getItemXp({ ...item("Pet_Egg", rarity), name: `Pet Egg: Pet_Egg (${rarity})` })).toBe(xp);
   });
 
-  it.each([null, {}, { rarity: "" }, item("PetFood"), item("VaultKey"), item("ZeusKeyIcon"), item("PirateKeyIcon")])("gives zero XP to %j", (value) => {
+  it.each([null, {}, { rarity: "" }, item("PetFood"), item("ZeusKeyIcon"), item("PirateKeyIcon")])("gives zero XP to %j", (value) => {
     expect(getItemXp(value)).toBe(0);
+  });
+
+  it("scores the Ultimate key necklace as equipment", () => {
+    expect(getItemXp(item("Necklace_Key", "Ultimate"))).toBe(61);
   });
 
   it("scores missing base names and unknown rarities defensively", () => {

@@ -110,6 +110,20 @@ describe("adventure item search", () => {
 });
 
 describe("XP path search", () => {
+  it("chooses the higher-XP Pirate opening when it contains a key necklace", async () => {
+    const result = await findOptimalXpPath({
+      startSeed: 46, cardId: "adventure_Pirate", eventType: "Pirate",
+      maxLevel: 100, vaultPercentage: 0, openings: 1,
+    });
+    // Rare + Legendary + Ultimate + Rare + Rare = 9 + 26 + 61 + 9 + 9.
+    expect(result.xp).toBe(114);
+    expect(result.path).toHaveLength(1);
+    expect(result.path[0].level).toBe(100);
+    expect(result.path[0].items).toContainEqual(expect.objectContaining({
+      baseName: "Necklace_Key", rarity: "Ultimate",
+    }));
+  });
+
   it("matches exhaustive enumeration of all small replay paths", async () => {
     let expected = -1;
     for (const first of [4, 5]) for (const second of [4, 5]) {
