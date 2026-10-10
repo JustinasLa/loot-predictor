@@ -26,8 +26,26 @@ written back to the save.
 
 ## Run
 
-    npm install
+Use Node.js 24 LTS. The tooling also supports Node.js 22 (22.12 or later)
+and Node.js 26 or later.
+
+    npm ci
     npm run dev
+
+## Tests
+
+    npm test
+    npm run test:watch
+    npm run test:coverage
+
+The suite checks C# PRNG reference draws, loot tables and seed chaining,
+savegame parsing, session persistence, both solvers, DOM rendering, app flows,
+and the CLI. Save fixtures are synthetic; no real savegame files are needed.
+
+Coverage includes every JavaScript file under `src/` and the CLI under `tools/`.
+Each file must reach **100% statements, branches, functions, and lines**.
+`npm run test:coverage` writes an HTML report to `coverage/index.html` and JSON
+reports alongside it. CI runs the same coverage check before building.
 
 ## Web UI
 
@@ -105,6 +123,7 @@ vault percentage is high enough for a key to drop:
 ## Library use
 
 ```js
+import { readFileSync } from "node:fs";
 import { parseSavegame } from "./src/save/parse.js";
 import { predictChain } from "./src/loot/simulate.js";
 import { findItemLinear } from "./src/solver/find-items.js";

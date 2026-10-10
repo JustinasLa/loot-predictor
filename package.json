@@ -3,14 +3,23 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0 || >=26.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@vitest/coverage-istanbul": "^5.0.3",
+    "jsdom": "^26.1.0",
     "tailwindcss": "^4.3.3",
-    "vite": "^5.4.0"
+    "vite": "^6.4.3",
+    "vitest": "^5.0.3"
   }
 }
