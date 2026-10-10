@@ -5,8 +5,9 @@ import { findOptimalXpPath } from "./solver/xp-path.js";
 import { DOMINANT_ADVENTURE_LEVELS } from "./loot/tables.js";
 import { simulateAdventureChestOpening } from "./loot/simulate.js";
 import { getItemXp } from "./loot/xp.js";
-import { findAllPaths, findItemLinear } from "./solver/find-items.js";
+import { findAllPathsAsync, findItemLinearAsync } from "./solver/find-items.js";
 import { getAvailableItemsForChest } from "./loot/items.js";
+import { validateInteger, validateSeed, validateLevel, validateVaultPercentage } from "./validation.js";
 import {
   renderChestList, renderResults, renderHistory,
   renderXpPath, renderItemPicker, renderFindResult, renderError
@@ -31,8 +32,87 @@ let savegameFilename = "";
 // snaps it back to that chest's real level without stomping on an edit
 // you're still making on the same chest.
 let previewLevelChestId = null;
+let xpLevelChestId = null;
+let findLevelChestId = null;
+let xpRun = null;
+let findRun = null;
+let xpView = null;
+let findView = null;
+let saveLoadToken = 0;
 
 const $ = (sel) => document.querySelector(sel);
+
+function numberField(selector, validate, fallback) {
+  const field = $(selector);
+  const label = field.labels?.[0]?.textContent.trim() || "this field";
+  if (field.validity.badInput) throw new Error("enter a valid number for " + label);
+  const value = field.value.trim();
+  if (value === "" && fallback !== undefined) return fallback;
+  if (value === "") throw new Error("enter a value for " + label);
+  return validate(Number(value));
+}
+
+const positiveInteger = (value) => validateInteger(value, "openings", 1);
+const vaultValue = () => numberField("#vault", validateVaultPercentage, 0);
+
+function syncSearchControls() {
+  $("#xp-search").disabled = !!xpRun || !currentId()?.startsWith("adventure_");
+  $("#xp-stop").classList.toggle("is-hidden", !xpRun);
+  const cardId = findChestId();
+  $("#find-run").disabled = !!findRun || !live[cardId] || targetsFor(cardId).size === 0;
+  $("#find-stop").classList.toggle("is-hidden", !findRun);
+}
+
+function invalidateXp() {
+  xpRun = null;
+  xpView = null;
+  $("#xp-out").textContent = "";
+  $("#xp-status").textContent = "";
+  syncSearchControls();
+}
+
+function invalidateFind() {
+  findRun = null;
+  findView = null;
+  $("#find-out").textContent = "";
+  $("#find-status").textContent = "";
+  syncSearchControls();
+}
+
+function invalidateChest(cardId, keepXp = false) {
+  if (!keepXp && (xpRun?.cardId === cardId || xpView?.cardId === cardId)) invalidateXp();
+  if (findRun?.cardId === cardId || findView?.cardId === cardId) invalidateFind();
+}
+
+function xpOptions() {
+  const state = currentState();
+  return {
+    openings: numberField("#xp-openings", positiveInteger, 4),
+    maxLevel: numberField("#xp-maxlevel", validateLevel, state.level ?? 1),
+    vaultPercentage: numberField("#xp-vault", validateVaultPercentage, 0),
+    maxOpens: numberField("#xp-maxopens", positiveInteger, Infinity)
+  };
+}
+
+function findOptions(cardId) {
+  return {
+    vaultPercentage: vaultValue(),
+    ...(cardId?.startsWith("adventure_") ? {
+      maxLevel: numberField("#find-maxlevel", validateLevel, live[cardId].level ?? 1),
+      maxDepth: numberField("#find-maxdepth", positiveInteger, 10)
+    } : {})
+  };
+}
+
+function contextMatches(context, kind) {
+  try {
+    const options = kind === "xp" ? xpOptions() : findOptions(context.cardId);
+    if (JSON.stringify(options) !== context.optionsKey || vaultValue() !== context.vaultPercentage) return false;
+    return kind === "xp" || JSON.stringify([...targetsFor(context.cardId)]) === context.targetsKey;
+  } catch {
+    return false;
+  }
+}
 
 function readSave(file) {
   return new Promise((resolve, reject) => {
@@ -65,6 +145,7 @@ function renderSidebars() {
 }
 
 function selectPredictChest(id) {
+  if (predictChestId !== id) invalidateXp();
   predictChestId = id;
   showTab("predict");
   renderSidebars();
@@ -72,6 +153,7 @@ function selectPredictChest(id) {
 }
 
 function selectFindChest(id) {
+  if (findChestIdState !== id) invalidateFind();
   findChestIdState = id;
   showTab("find");
   renderSidebars();
@@ -90,14 +172,18 @@ function currentState() {
 // switch chests, so it can also just drive a run of same-level opens.
 function chainOpts(state) {
   const isAdventure = currentId()?.startsWith("adventure_");
-  const level = isAdventure ? Number($("#preview-level").value) || state.level : state.level;
+  const level = isAdventure ? numberField("#preview-level", validateLevel, state.level ?? 1) : state.level;
   return {
     level,
-    vaultPercentage: Number($("#vault").value) || 0
+    vaultPercentage: vaultValue()
   };
 }
 
 function persist() {
+  let count = "5";
+  let vault = "0";
+  try { count = String(numberField("#count", (value) => validateInteger(value, "preview count", 1, 200), 5)); } catch { /* keep a valid preference while an input is being edited */ }
+  try { vault = String(vaultValue()); } catch { /* keep a valid preference while an input is being edited */ }
   storage.save({
     saved,
     live,
@@ -109,8 +195,8 @@ function persist() {
     ui: {
       cardId: currentId(),
       findCardId: findChestId(),
-      count: $("#count").value,
-      vault: $("#vault").value,
+      count,
+      vault,
       filename: savegameFilename
     }
   });
@@ -139,15 +225,18 @@ function enableControls() {
 // For adventure chests this opens at whatever level the level field shows,
 // which may not be the chest's current level, see chainOpts.
 function openChest(times) {
+  validateInteger(times, "open count", 1, 10000);
   const cardId = currentId();
   const state = currentState();
   const opts = chainOpts(state);
+  invalidateChest(cardId);
 
   for (let i = 0; i < times; i++) {
     const [open] = predictChain(state.seed, cardId, 1, opts);
     state.history.unshift({ ...open, open: ++state.opened });
     state.seed = open.nextSeed;
   }
+  state.history.length = Math.min(state.history.length, storage.MAX_HISTORY);
 
   refresh();
 }
@@ -165,6 +254,7 @@ function syncPreviewLevelField(cardId, state) {
 }
 
 function resetChest() {
+  invalidateChest(currentId());
   const state = currentState();
   state.seed = saved[currentId()].initialSeed;
   state.opened = 0;
@@ -175,9 +265,10 @@ function resetChest() {
 // Redraw everything that depends on the live seed, then checkpoint.
 function refresh() {
   const out = $("#out");
+  let state;
   try {
     const cardId = currentId();
-    const state = currentState();
+    state = currentState();
 
     $("#seed").value = state.seed;
     $("#history-count").textContent = state.opened ? `(${state.opened})` : "";
@@ -186,23 +277,36 @@ function refresh() {
       : "at savegame seed lol";
 
     syncPreviewLevelField(cardId, state);
-    renderResults(
-      out, cardId,
-      predictChain(state.seed, cardId, Number($("#count").value) || 5, chainOpts(state)),
-      openChest
-    );
     renderHistory($("#history"), cardId, state.history);
     syncSmartXp();
-    persist();
+    const seed = state.seed;
+    const options = chainOpts(state);
+    renderResults(
+      out, cardId,
+      predictChain(seed, cardId, numberField("#count", (value) => validateInteger(value, "preview count", 1, 200), 5), options),
+      (times) => {
+        if (currentId() !== cardId || live[cardId] !== state || state.seed !== seed) return;
+        try {
+          if (JSON.stringify(chainOpts(state)) !== JSON.stringify(options)) return;
+          openChest(times);
+        } catch (err) { renderError(out, err.message); }
+      }
+    );
   } catch (err) {
     renderError(out, err.message);
+  } finally {
+    if (state) persist();
   }
 }
 
 function adoptSave(parsed, filename) {
+  invalidateXp();
+  invalidateFind();
   saved = parsed;
   savegameFilename = filename;
   previewLevelChestId = null;
+  xpLevelChestId = null;
+  findLevelChestId = null;
   live = Object.fromEntries(
     Object.entries(saved).map(([id, st]) => [
       id, { seed: st.initialSeed, level: st.level, opened: 0, history: [] }
@@ -227,7 +331,7 @@ function restore() {
   for (const [id, list] of Object.entries(state.targets || {})) {
     findTargets.set(id, new Set(list));
   }
-  const firstId = Object.keys(saved)[0] ?? null;
+  const firstId = Object.keys(saved)[0];
   predictChestId = state.ui?.cardId && live[state.ui.cardId] ? state.ui.cardId : firstId;
   findChestIdState = state.ui?.findCardId && live[state.ui.findCardId] ? state.ui.findCardId : firstId;
   savegameFilename = state.ui?.filename || "savegame";
@@ -241,12 +345,6 @@ function restore() {
 }
 
 // --- Smart XP -------------------------------------------------------------
-
-let stopSearch = false;
-
-// The XP path on screen, plus how many of its steps have been opened already.
-// Kept so the path survives an "Open" click instead of being thrown away.
-let xpView = null;
 
 // What you'd bank by just replaying the highest level every time. Spends
 // openings under the same rules as the search, including key refunds,
@@ -279,8 +377,16 @@ function branchCount(maxLevel) {
 }
 
 function syncXpEstimate() {
-  const openings = Number($("#xp-openings").value) || 1;
-  const branches = branchCount(Number($("#xp-maxlevel").value) || 1);
+  let options;
+  try {
+    options = xpOptions();
+  } catch (err) {
+    $("#xp-estimate").textContent = err.message;
+    $("#xp-estimate").dataset.heavy = "no";
+    return;
+  }
+  const { openings, maxLevel } = options;
+  const branches = branchCount(maxLevel);
   const paths = Math.pow(branches, openings);
 
   const label = $("#xp-estimate");
@@ -304,78 +410,73 @@ function syncSmartXp() {
   const isAdventure = cardId.startsWith("adventure_");
   $("#smart-xp").classList.toggle("is-hidden", !isAdventure);
 
-  // A path belongs to the chest it was solved for; drop it on a switch.
-  if (xpView && xpView.cardId !== cardId) {
-    xpView = null;
-    $("#xp-out").textContent = "";
-    $("#xp-status").textContent = "";
-  }
-
+  syncSearchControls();
+  const previousChestId = xpLevelChestId;
+  xpLevelChestId = cardId;
   if (!isAdventure) return;
 
   const state = live[cardId];
-  if (state?.level) $("#xp-maxlevel").value = state.level;
+  if (previousChestId !== cardId) $("#xp-maxlevel").value = state.level ?? 1;
   // One vault rate for the whole app; this field is a second view of #vault.
   $("#xp-vault").value = $("#vault").value;
-  $("#xp-search").disabled = false;
   syncXpEstimate();
 }
 
 async function runXpSearch() {
-  const cardId = currentId();
-  const state = currentState();
-  const eventType = cardId.slice("adventure_".length);
-  const openings = Math.max(Number($("#xp-openings").value) || 4, 1);
-  const maxLevel = Number($("#xp-maxlevel").value) || state.level || 1;
-  const vaultPercentage = Number($("#xp-vault").value) || 0;
-  // Blank means no limit.
-  const maxOpens = Number($("#xp-maxopens").value) || Infinity;
-
-  stopSearch = false;
-  $("#xp-search").disabled = true;
-  $("#xp-stop").classList.remove("is-hidden");
-  $("#xp-status").textContent = "searching… lol";
-  $("#xp-out").textContent = "";
-  xpView = null;
-
-  const started = Date.now();
+  if (xpRun) return;
+  let run;
   try {
+    const cardId = currentId();
+    const state = currentState();
+    if (!cardId.startsWith("adventure_")) throw new Error("choose an adventure chest");
+    const options = xpOptions();
+    const { openings, maxLevel, vaultPercentage, maxOpens } = options;
+    if (vaultPercentage !== vaultValue()) throw new Error("vault percentages must match");
+    run = { cardId, state, seed: state.seed, vaultPercentage, optionsKey: JSON.stringify(options), stopped: false };
+    invalidateXp();
+    xpRun = run;
+    syncSearchControls();
+    $("#xp-status").textContent = "searching… lol";
+    const started = Date.now();
+    const eventType = cardId.slice("adventure_".length);
     const solution = await findOptimalXpPath({
-      startSeed: state.seed,
+      startSeed: run.seed,
       eventType,
       cardId,
       maxLevel,
       vaultPercentage,
       openings,
       maxOpens,
-      onProgress: (depth) => { $("#xp-status").textContent = `searching… depth ${depth}`; },
-      shouldStop: () => stopSearch
+      onProgress: (depth) => {
+        if (xpRun === run && contextMatches(run, "xp")) $("#xp-status").textContent = `searching… depth ${depth}`;
+      },
+      shouldStop: () => run.stopped || xpRun !== run || !contextMatches(run, "xp")
     });
+    if (xpRun !== run || !contextMatches(run, "xp")) return;
 
     // Bound the baseline by the path the solver actually found, so an
     // uncapped run can't spin here forever on refunded keys.
     const baseline = naiveXp(
-      state.seed, cardId, eventType, maxLevel, vaultPercentage, openings,
-      Math.max(solution.path.length, openings)
+      run.seed, cardId, eventType, maxLevel, vaultPercentage, openings,
+      Math.min(maxOpens, solution.path.length)
     );
-    xpView = { cardId, solution, baseline, openings, done: 0 };
+    xpView = { ...run, solution, baseline, openings, done: 0 };
     drawXpPath();
     $("#xp-status").textContent =
       `${solution.nodesVisited.toLocaleString()} paths in ${Date.now() - started}ms fr` +
-      (stopSearch ? " (stopped early lol)" : "");
+      (run.stopped ? " (stopped early lol)" : "");
   } catch (err) {
+    if (run && (xpRun !== run || !contextMatches(run, "xp"))) return;
     xpView = null;
     renderError($("#xp-out"), err.message);
     $("#xp-status").textContent = "";
   } finally {
-    $("#xp-search").disabled = false;
-    $("#xp-stop").classList.add("is-hidden");
+    if (xpRun === run) xpRun = null;
+    syncSearchControls();
   }
 }
 
 // --- Find items -----------------------------------------------------------
-
-let stopFind = false;
 
 function findChestId() {
   return findChestIdState;
@@ -388,141 +489,162 @@ function targetsFor(cardId) {
 
 function syncFindPanel() {
   const cardId = findChestId();
-  if (!cardId) return;
 
   const selected = targetsFor(cardId);
   const items = getAvailableItemsForChest(cardId);
 
   renderItemPicker($("#find-items"), items, selected, (baseName) => {
+    invalidateFind();
     if (selected.has(baseName)) selected.delete(baseName);
     else selected.add(baseName);
     syncFindPanel();
   });
 
   $("#find-selected").textContent = selected.size ? `(${selected.size})` : "";
-  $("#find-run").disabled = selected.size === 0;
+  syncSearchControls();
   persist();
 
   const isAdventure = cardId.startsWith("adventure_");
   $("#find-maxlevel").closest("label").classList.toggle("is-hidden", !isAdventure);
   $("#find-maxdepth").closest("label").classList.toggle("is-hidden", !isAdventure);
-  if (isAdventure && live[cardId]?.level) $("#find-maxlevel").value = live[cardId].level;
+  if (isAdventure && findLevelChestId !== cardId) $("#find-maxlevel").value = live[cardId].level ?? 1;
+  findLevelChestId = cardId;
 }
 
 // Commit route steps to the live seed. Each step replays at the level the
 // route chose, not the chest's current level, or the chain would diverge.
 function drawXpPath() {
-  if (!xpView) return;
-  const { cardId, solution, baseline, openings, done } = xpView;
+  const view = xpView;
+  const { solution, baseline, openings, done } = view;
   renderXpPath($("#xp-out"), solution, baseline, openings,
-    (steps) => openXpRoute(cardId, steps), done);
+    (steps) => { if (view.done === done) openXpRoute(view, steps); }, done);
+}
+
+// Validate the whole batch before changing any live state. Detached buttons
+// and searches solved for an older seed must never consume current chests.
+function replayRoute(view, steps) {
+  let seed = view.state.seed;
+  return steps.map((step) => {
+    if ((step.usedSeed ?? step.seed) !== seed) throw new Error("route is out of date; search again");
+    const [open] = predictChain(seed, view.cardId, 1, {
+      level: step.level ?? view.state.level ?? 1,
+      vaultPercentage: view.vaultPercentage
+    });
+    if (step.nextSeed !== undefined && step.nextSeed !== open.nextSeed) throw new Error("route is out of date; search again");
+    seed = open.nextSeed;
+    return open;
+  });
+}
+
+function commitOpenings(state, openings) {
+  for (const open of openings) {
+    state.history.unshift({ ...open, open: ++state.opened });
+    state.seed = open.nextSeed;
+  }
+  state.history.length = Math.min(state.history.length, storage.MAX_HISTORY);
 }
 
 // Walk the XP path's boxes at the levels it picked, then persist the seed.
 // The path stays on screen with the opened steps marked, because every later
 // step was solved from the seed those opens produce, it is still valid.
-function openXpRoute(cardId, steps) {
-  const state = live[cardId];
-  if (!state) return;
-
-  const vaultPercentage = Number($("#xp-vault").value) || 0;
-
-  for (const step of steps) {
-    const [open] = predictChain(state.seed, cardId, 1, {
-      level: step.level ?? state.level,
-      vaultPercentage
-    });
-    state.history.unshift({ ...open, open: ++state.opened });
-    state.seed = open.nextSeed;
+function openXpRoute(view, steps) {
+  if (xpView !== view || steps.length === 0) return;
+  try {
+    if (!contextMatches(view, "xp") || steps.some((step, i) => step !== view.solution.path[view.done + i])) {
+      throw new Error("route is out of date; search again");
+    }
+    const openings = replayRoute(view, steps);
+    invalidateChest(view.cardId, true);
+    commitOpenings(view.state, openings);
+    view.done += steps.length;
+    view.seed = view.state.seed;
+    refresh();
+    drawXpPath();
+  } catch (err) {
+    invalidateXp();
+    renderError($("#xp-out"), err.message);
   }
-
-  if (xpView?.cardId === cardId) xpView.done += steps.length;
-  refresh();          // persists the new seed
-  drawXpPath();       // refresh() redraws the card, not the path
 }
 
-function openRoute(cardId, steps) {
-  const state = live[cardId];
-  if (!state) return;
-
-  const vaultPercentage = Number($("#vault").value) || 0;
-  const selected = targetsFor(cardId);
-
-  for (const step of steps) {
-    const [open] = predictChain(state.seed, cardId, 1, {
-      level: step.level ?? state.level,
-      vaultPercentage
-    });
-    state.history.unshift({ ...open, open: ++state.opened });
-    state.seed = open.nextSeed;
-
-    // Anything the route was hunting and just landed is no longer a target.
-    for (const item of open.items) selected.delete(item.baseName);
-  }
-
-  refresh();          // persists the new seed
-  syncFindPanel();
-
-  if (selected.size > 0) {
-    runFind();
-  } else {
-    $("#find-out").textContent = "";
-    $("#find-out").append(
-      Object.assign(document.createElement("p"), {
+function openRoute(view, steps) {
+  if (findView !== view || steps.length === 0) return;
+  try {
+    const result = view.result;
+    const paths = result.path ? [result.path] : [result.shortest.path, result.cheapest.path];
+    if (!contextMatches(view, "find") || !paths.some((path) => steps.every((step, i) => step === path[i]))) {
+      throw new Error("route is out of date; search again");
+    }
+    const openings = replayRoute(view, steps);
+    const selected = targetsFor(view.cardId);
+    invalidateChest(view.cardId);
+    commitOpenings(view.state, openings);
+    for (const open of openings) for (const item of open.items) selected.delete(item.baseName);
+    refresh();
+    syncFindPanel();
+    if (selected.size > 0) {
+      runFind();
+    } else {
+      $("#find-out").append(Object.assign(document.createElement("p"), {
         className: "empty",
         textContent: "got all targets, seed saved, pick new items to hunt lol"
-      })
-    );
-    $("#find-status").textContent = "";
+      }));
+    }
+  } catch (err) {
+    invalidateFind();
+    renderError($("#find-out"), err.message);
   }
 }
 
 async function runFind() {
-  const cardId = findChestId();
-  const state = live[cardId];
-  const targets = [...targetsFor(cardId)];
+  if (findRun) return;
   const out = $("#find-out");
-
-  if (!state) { renderError(out, "load a savegame first bro"); return; }
-  if (targets.length === 0) { renderError(out, "pick at least one item lol"); return; }
-
-  stopFind = false;
-  $("#find-run").disabled = true;
-  $("#find-stop").classList.remove("is-hidden");
-  $("#find-status").textContent = "searching… lol";
-  out.textContent = "";
-
-  const started = Date.now();
-  // Let the browser paint the searching state before the solver blocks.
-  await new Promise((r) => setTimeout(r, 0));
-
+  let run;
   try {
-    const vaultPercentage = Number($("#vault").value) || 0;
+    const cardId = findChestId();
+    const state = live[cardId];
+    const targets = [...targetsFor(cardId)];
+    if (!state) throw new Error("load a savegame first bro");
+    if (targets.length === 0) throw new Error("pick at least one item lol");
+    const options = findOptions(cardId);
+    run = { cardId, state, seed: state.seed, vaultPercentage: options.vaultPercentage, optionsKey: JSON.stringify(options), targetsKey: JSON.stringify(targets), stopped: false };
+    invalidateFind();
+    findRun = run;
+    syncSearchControls();
+    $("#find-status").textContent = "searching… lol";
+    const started = Date.now();
+    const controls = {
+      shouldStop: () => run.stopped || findRun !== run || !contextMatches(run, "find"),
+      onProgress: (nodes) => {
+        if (findRun === run && contextMatches(run, "find")) $("#find-status").textContent = `searching… ${nodes.toLocaleString()} nodes`;
+      }
+    };
     const result = cardId.startsWith("adventure_")
-      ? findAllPaths({
-          startSeed: state.seed,
+      ? await findAllPathsAsync({
+          startSeed: run.seed,
           targets,
           cardId,
-          maxLevel: Number($("#find-maxlevel").value) || state.level || 1,
-          vaultPercentage,
-          maxDepth: Number($("#find-maxdepth").value) || 10,
-          shouldStop: () => stopFind
+          ...options,
+          ...controls
         })
-      : findItemLinear(state.seed, cardId, targets, {
-          level: state.level, vaultPercentage
+      : await findItemLinearAsync(run.seed, cardId, targets, {
+          level: state.level, ...options, ...controls
         });
-
-    renderFindResult(out, result, targets, (steps) => openRoute(cardId, steps));
+    if (findRun !== run || !contextMatches(run, "find")) return;
+    const view = { ...run, result };
+    findView = view;
+    renderFindResult(out, result, targets, (steps) => openRoute(view, steps));
     $("#find-status").textContent =
       `${(result.nodesVisited ?? result.opens ?? 0).toLocaleString()} ` +
       `${cardId.startsWith("adventure_") ? "nodes" : "opens"} in ${Date.now() - started}ms fr` +
-      (stopFind ? " (stopped early lol)" : "");
+      (run.stopped || result.stopped ? " (stopped early lol)" : "") +
+      (result.truncated ? " (search limit reached)" : "");
   } catch (err) {
+    if (run && (findRun !== run || !contextMatches(run, "find"))) return;
     renderError(out, err.message);
     $("#find-status").textContent = "";
   } finally {
-    $("#find-run").disabled = false;
-    $("#find-stop").classList.add("is-hidden");
+    if (findRun === run) findRun = null;
+    syncSearchControls();
   }
 }
 
@@ -532,6 +654,7 @@ function initSidebarToggles() {
     const list = head.nextElementSibling;
     head.addEventListener("click", () => {
       list.classList.toggle("is-hidden");
+      head.setAttribute("aria-expanded", String(!list.classList.contains("is-hidden")));
       head.firstElementChild.textContent = list.classList.contains("is-hidden") ? "▸" : "▾";
     });
   }
@@ -543,11 +666,17 @@ function initUserMenu() {
   const menu = $("#user-menu");
   const trigger = $("#user-menu-trigger");
 
-  const close = () => menu.classList.add("is-hidden");
+  const close = () => {
+    const restoreFocus = menu.contains(document.activeElement);
+    menu.classList.add("is-hidden");
+    trigger.setAttribute("aria-expanded", "false");
+    if (restoreFocus) trigger.focus();
+  };
 
   trigger.addEventListener("click", (e) => {
     e.stopPropagation();
     menu.classList.toggle("is-hidden");
+    trigger.setAttribute("aria-expanded", String(!menu.classList.contains("is-hidden")));
   });
   menu.addEventListener("click", (e) => {
     // Let the load-savegame label and reset button do their thing, then close.
@@ -564,64 +693,102 @@ function initUserMenu() {
 function init() {
   initSidebarToggles();
   initUserMenu();
+  for (const id of ["#load-save", "#load-save-menu"]) {
+    $(id)?.addEventListener("click", () => $("#save").click());
+  }
+
+  const predictAction = (action) => {
+    try { action(); }
+    catch (err) { renderError($("#out"), err.message); }
+  };
 
   $("#save").addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    const token = ++saveLoadToken;
     try {
-      adoptSave(await readSave(file), file.name);
+      const parsed = await readSave(file);
+      if (token === saveLoadToken) adoptSave(parsed, file.name);
     } catch (err) {
-      renderError($("#out"), err.message);
+      if (token === saveLoadToken) renderError($("#out"), err.message);
     }
   });
 
   $("#count").addEventListener("change", refresh);
-  $("#vault").addEventListener("change", refresh);
+  $("#vault").addEventListener("change", () => {
+    invalidateXp();
+    invalidateFind();
+    predictAction(() => {
+      const value = numberField("#vault", validateVaultPercentage, 0);
+      $("#xp-vault").value = String(value);
+      refresh();
+    });
+  });
 
   // Editing the seed by hand replaces the live seed but keeps the history,
   // so you can jump to an arbitrary seed without reloading a savegame.
   $("#seed").addEventListener("change", () => {
-    const value = Number($("#seed").value);
-    if (!Number.isInteger(value)) return;
-    currentState().seed = value;
-    refresh();
+    predictAction(() => {
+      const state = currentState();
+      let value;
+      try { value = numberField("#seed", validateSeed); }
+      catch (err) { $("#seed").value = state.seed; throw err; }
+      invalidateChest(currentId());
+      state.seed = value;
+      refresh();
+    });
   });
 
   for (const btn of document.querySelectorAll(".open-btn")) {
-    btn.addEventListener("click", () => openChest(Number(btn.dataset.open)));
+    btn.addEventListener("click", () => predictAction(() => openChest(Number(btn.dataset.open))));
   }
 
   $("#open-custom-go").addEventListener("click", () => {
-    const times = Number($("#open-custom").value);
-    if (!Number.isInteger(times) || times < 1) return;
-    // Each open is three-plus draws; keep the click from locking up the tab.
-    openChest(Math.min(times, 10000));
+    predictAction(() => {
+      const times = numberField("#open-custom", positiveInteger);
+      // Each open is three-plus draws; keep the click from locking up the tab.
+      openChest(Math.min(times, 10000));
+    });
   });
 
   // Live-updates the Upcoming preview as you type a level to check.
   $("#preview-level").addEventListener("input", refresh);
 
-  $("#reset").addEventListener("click", resetChest);
+  $("#reset").addEventListener("click", () => predictAction(resetChest));
   $("#unload").addEventListener("click", unloadSave);
 
   // Write back to #vault so the Upcoming preview and the search never
   // disagree about the vault rate; refresh() mirrors it back and persists.
   $("#xp-vault").addEventListener("change", () => {
-    $("#vault").value = $("#xp-vault").value;
-    refresh();
+    invalidateXp();
+    invalidateFind();
+    predictAction(() => {
+      const value = numberField("#xp-vault", validateVaultPercentage, 0);
+      $("#vault").value = String(value);
+      refresh();
+    });
   });
 
-  $("#xp-openings").addEventListener("input", syncXpEstimate);
-  $("#xp-maxlevel").addEventListener("input", syncXpEstimate);
+  for (const id of ["#xp-openings", "#xp-maxlevel", "#xp-maxopens"]) {
+    const change = () => { invalidateXp(); syncXpEstimate(); };
+    $(id).addEventListener("input", change);
+    $(id).addEventListener("change", change);
+  }
+  for (const id of ["#find-maxlevel", "#find-maxdepth"]) {
+    $(id).addEventListener("input", invalidateFind);
+    $(id).addEventListener("change", invalidateFind);
+  }
   $("#find-run").addEventListener("click", runFind);
   $("#find-stop").addEventListener("click", () => {
-    stopFind = true;
+    if (!findRun) return;
+    findRun.stopped = true;
     $("#find-status").textContent = "stopping… bruh";
   });
 
   $("#xp-search").addEventListener("click", runXpSearch);
   $("#xp-stop").addEventListener("click", () => {
-    stopSearch = true;
+    if (!xpRun) return;
+    xpRun.stopped = true;
     $("#xp-status").textContent = "stopping… bruh";
   });
 
