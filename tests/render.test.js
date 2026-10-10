@@ -149,6 +149,14 @@ describe("item hunts and errors", () => {
     expect(container.querySelector('[role="alert"]')).toBeNull();
   });
 
+  it("describes a truncated external search result without optional budget metadata", () => {
+    renderFindResult(container, { found: false, truncated: true, maxDepth: 5 }, ["A"]);
+    expect(container.textContent)
+      .toBe("search reached its node limit before completion; continue searching to find a route");
+    expect(container.querySelector('[role="status"]')).not.toBeNull();
+    expect(container.querySelector('[role="alert"]')).toBeNull();
+  });
+
   it("renders a linear route and highlights hits, using either seed field", () => {
     const path = [opening(), { ...step(), hits: [] }, { items: [item()], hits: ["Ring_Bronze"] }];
     const open = vi.fn();
