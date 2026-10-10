@@ -4,6 +4,11 @@ import { predictChain } from "../src/loot/simulate.js";
 import { findItemLinear } from "../src/solver/find-items.js";
 
 describe("item picker target semantics", () => {
+  it.each(["__proto__", "constructor", "toString", "valueOf", "hasOwnProperty"])
+    ("treats inherited object property %s as an unknown chest", (cardId) => {
+      expect(getAvailableItemsForChest(cardId)).toEqual([]);
+    });
+
   it("labels Mine tool belts with both rarities accepted by the hunt", () => {
     const belts = getAvailableItemsForChest("event_Mine")
       .filter((item) => item.baseName === "Body_ToolBelt");

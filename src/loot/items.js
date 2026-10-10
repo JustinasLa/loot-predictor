@@ -37,7 +37,7 @@ export function getAvailableItemsForChest(cardId) {
   } else if (chestType === "egg") {
     addPool(`${eventType}Pet`, eventType, "Pet");
   } else {
-    const config = LOOT_TABLES[chestType === "event" ? "event" : chestType];
+    const config = Object.hasOwn(LOOT_TABLES, chestType) ? LOOT_TABLES[chestType] : null;
     if (config) {
       for (const entry of config.table) {
         const { type, rarity } = entry.result;
