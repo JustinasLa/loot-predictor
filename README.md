@@ -26,7 +26,10 @@ written back to the save.
 
 ## Run
 
-    npm install
+Use Node.js 24 LTS. The tooling also supports Node.js 22 (22.12 or later)
+and Node.js 26 or later.
+
+    npm ci
     npm run dev
 
 ## Tests
@@ -120,6 +123,7 @@ vault percentage is high enough for a key to drop:
 ## Library use
 
 ```js
+import { readFileSync } from "node:fs";
 import { parseSavegame } from "./src/save/parse.js";
 import { predictChain } from "./src/loot/simulate.js";
 import { findItemLinear } from "./src/solver/find-items.js";
