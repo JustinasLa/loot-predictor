@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, unlinkSync, rmdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -48,12 +48,22 @@ describe("CLI", () => {
     expect(error).toHaveBeenCalledWith(expect.stringContaining("available: big, small"));
   });
 
-  it.each([undefined, "0", "invalid"])("defaults missing or invalid counts to five: %s", async (count) => {
-    const args = count === undefined ? ["save.json", "big"] : ["save.json", "big", count];
-    await run(...args);
+  it("defaults an omitted count to five", async () => {
+    await run("save.json", "big");
     expect(output.mock.calls.flat().join("\n")).toContain("next 5 opens");
     expect(output.mock.calls.filter(([line]) => line.startsWith("open #"))).toHaveLength(5);
     expect(exit).not.toHaveBeenCalled();
+  });
+
+  it.each(["0", "-1", "1.5", "invalid", "Infinity", "1e309", "10001", ""])("rejects invalid or excessive count %j", async (count) => {
+    await expect(run("save.json", "big", count)).rejects.toThrow("exit:1");
+    expect(error).toHaveBeenCalledWith("count must be an integer from 1 to 10000");
+    expect(output).not.toHaveBeenCalled();
+  });
+
+  it.each(["__proto__", "constructor"])("rejects inherited chest names %s", async (cardId) => {
+    await expect(run("save.json", cardId, "1")).rejects.toThrow("exit:1");
+    expect(error).toHaveBeenCalledWith(`no such chest in save: ${cardId}`);
   });
 
   it("prints adventure key rolls and every chained next seed", async () => {
@@ -65,12 +75,14 @@ describe("CLI", () => {
     expect(lines).toContain("Ring_");
   });
 
-  it("propagates file and parsing errors", async () => {
+  it("prints file and parsing errors and exits with failure", async () => {
     read.mockImplementationOnce(() => { throw new Error("file missing"); });
-    await expect(run("missing.json", "big")).rejects.toThrow("file missing");
+    await expect(run("missing.json", "big")).rejects.toThrow("exit:1");
+    expect(error).toHaveBeenCalledWith("file missing");
     vi.resetModules();
     read.mockReturnValueOnce("{}");
-    await expect(run("invalid.json", "big")).rejects.toThrow("not a valid savegame");
+    await expect(run("invalid.json", "big")).rejects.toThrow("exit:1");
+    expect(error).toHaveBeenCalledWith(expect.stringContaining("not a valid savegame"));
   });
 
   it("works as an actual process with a save file whose path contains spaces", () => {
@@ -82,6 +94,10 @@ describe("CLI", () => {
       const text = execFileSync(process.execPath, [script, file, "egg_Rare", "1"], { encoding: "utf8" });
       expect(text).toContain("Pet: Pet_GoldenRetriever (Rare)");
       expect(text).toContain("-> nextSeed 302596119");
+      const rejected = spawnSync(process.execPath, [script, file, "big", "Infinity"], { encoding: "utf8", timeout: 5000 });
+      expect(rejected.status).toBe(1);
+      expect(rejected.stdout).toBe("");
+      expect(rejected.stderr.trim()).toBe("count must be an integer from 1 to 10000");
     } finally {
       unlinkSync(file);
       rmdirSync(directory);

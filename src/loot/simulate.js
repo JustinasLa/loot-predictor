@@ -1,10 +1,14 @@
 import { UnityRandom } from "../rng/unity-random.js";
 import { LOOT_TABLES, ADVENTURE_LOOT_RATES, ITEM_POOLS } from "./tables.js";
+import {
+  validateSeed, validateInteger, validateLevel, validateVaultPercentage, validateCardId
+} from "../validation.js";
 
 // Draw order per chest, exactly as the engine consumes it:
 //   per item: draw 1 -> prize type (weighted), draw 2 -> item within pool
 //   after all items: one final draw -> the seed persisted for the NEXT open
 // That trailing draw is why chests chain: nextSeed feeds the following open.
+// Pet boxes skip pool draws because each egg rarity has one possible item.
 
 export function determinePrizeType(roll, table) {
   let cumulativeWeight = 0;
@@ -42,6 +46,7 @@ export function getSpecificItem(rng, prize, eventType = null) {
 }
 
 export function simulateChestOpening(seed, config, eventType = null) {
+  if (config === LOOT_TABLES.event) validateCardId(`event_${eventType}`);
   const rng = new UnityRandom(seed);
   const items = [];
 
@@ -59,7 +64,7 @@ export function simulateChestOpening(seed, config, eventType = null) {
   if (config.title === "Pet Box") {
     items.push({
       name: "150 Pet Food", typeRoll: "Guaranteed", itemRoll: "150",
-      baseName: "PetFood", rarity: "common"
+      baseName: "PetFood", rarity: "Common"
     });
   }
 
@@ -67,8 +72,9 @@ export function simulateChestOpening(seed, config, eventType = null) {
 }
 
 export function simulateEggOpening(seed, rarity) {
+  validateCardId(`egg_${rarity}`);
   const rng = new UnityRandom(seed);
-  const pool = ITEM_POOLS[rarity + "Pet"] || [];
+  const pool = ITEM_POOLS[rarity + "Pet"];
   const itemRoll = rng.range(0, pool.length);
   const baseName = pool[itemRoll];
   const itemName = `Pet: ${baseName} (${rarity})`;
@@ -78,18 +84,19 @@ export function simulateEggOpening(seed, rarity) {
   };
 }
 
-export function simulateAdventureChestOpening(seed, level, eventType, vaultPercentage, typeAdventure = "") {
+export function simulateAdventureChestOpening(seed, level, eventType, vaultPercentage = 0) {
+  validateLevel(level);
+  validateCardId(`adventure_${eventType}`);
+  validateVaultPercentage(vaultPercentage);
   const rng = new UnityRandom(seed);
   const items = [];
-  let keyDropsAt = -1;
 
   const levelData = ADVENTURE_LOOT_RATES[level - 1];
-  if (!levelData) return { items: [], nextSeed: seed, error: "Invalid level" };
 
   const table = [];
   let totalWeight = 0;
   for (const [rarity, rate] of Object.entries(levelData.rates)) {
-    const weight = rate * 10000;
+    const weight = Math.round(rate * 10000);
     table.push({ result: { type: "Equipment", rarity }, weight });
     totalWeight += weight;
   }
@@ -106,19 +113,23 @@ export function simulateAdventureChestOpening(seed, level, eventType, vaultPerce
   if (keyRoll < vaultPercentage) {
     items.push({
       name: `${eventType} Vault Key`,
-      baseName: typeAdventure.includes("Zeus") ? "ZeusKeyIcon" : "PirateKeyIcon",
+      baseName: eventType === "Zeus" ? "ZeusKeyIcon" : "PirateKeyIcon",
       rarity: "Common", typeRoll: "Vault", itemRoll: "Key", level
     });
   }
-  for (let i = 1; i <= 100; i++) {
-    if (keyRoll < i) { keyDropsAt = i; break; }
-  }
 
-  return { items, nextSeed: rng.range(0, 2147483648), keyRoll, keyDropsAt };
+  return { items, nextSeed: rng.range(0, 2147483648), keyRoll, keyDropsAt: keyRoll + 1 };
 }
 
 // Walk one chest forward `count` times, chaining seed -> nextSeed.
 export function predictChain(seed, cardId, count, opts = {}) {
+  validateSeed(seed);
+  validateCardId(cardId);
+  validateInteger(count, "count");
+  if (cardId.startsWith("adventure_")) {
+    validateLevel(opts.level ?? 1);
+    validateVaultPercentage(opts.vaultPercentage ?? 0);
+  }
   const out = [];
   let current = seed;
 
@@ -130,13 +141,12 @@ export function predictChain(seed, cardId, count, opts = {}) {
     } else if (cardId.startsWith("adventure_")) {
       const eventType = cardId.slice(10);
       result = simulateAdventureChestOpening(
-        current, opts.level ?? 1, eventType, opts.vaultPercentage ?? 0, cardId
+        current, opts.level ?? 1, eventType, opts.vaultPercentage ?? 0
       );
     } else if (cardId.startsWith("event_")) {
       result = simulateChestOpening(current, LOOT_TABLES.event, cardId.slice(6));
     } else {
       const config = LOOT_TABLES[cardId];
-      if (!config) throw new Error(`unknown chest type: ${cardId}`);
       result = simulateChestOpening(current, config);
     }
 
