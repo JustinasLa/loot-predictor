@@ -29,7 +29,9 @@ function renderOpen(open, cardId, position, onOpen) {
   const box = el("div", "open-box");
 
   const head = el("div", "open-head");
-  head.append(el("span", "open-title", `${cardId} · open #${open.open}`));
+  const level = open.level ?? open.items.find((item) => item.level != null)?.level;
+  const levelLabel = cardId.startsWith("adventure_") && level != null ? ` · level ${level}` : "";
+  head.append(el("span", "open-title", `${cardId} · open #${open.open}${levelLabel}`));
 
   const seedText =
     open.keyRoll !== undefined
@@ -92,7 +94,8 @@ export function renderXpPath(container, solution, baseline, freeOpenings, onOpen
   container.textContent = "";
 
   if (!solution || solution.xp < 0 || solution.path.length === 0) {
-    container.append(el("p", "empty-text", "no path found bro"));
+    container.append(el("p", "empty-text",
+      solution?.stopped ? "search stopped before a path was found" : "no path found bro"));
     return;
   }
 
@@ -100,13 +103,17 @@ export function renderXpPath(container, solution, baseline, freeOpenings, onOpen
   summary.append(el("span", "xp-total", `${solution.xp} XP`));
 
   const delta = solution.xp - baseline.xp;
-  const pct = baseline.xp > 0 ? Math.round((delta / baseline.xp) * 100) : 0;
+  const pct = baseline.xp > 0 ? Math.round((delta / baseline.xp) * 100) : null;
+  const percentLabel = pct == null ? "" : ` (${delta > 0 ? "+" : ""}${pct}%)`;
+  const baselineLabel = `(${baseline.xp} xp in ${baseline.opens} opens)`;
   const cmp = el("span", "xp-delta");
-  cmp.dataset.sign = delta > 0 ? "up" : "flat";
+  cmp.dataset.sign = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
   cmp.textContent =
     delta > 0
-      ? `+${delta} xp (+${pct}%) vs always max level fr (${baseline.xp} xp in ${baseline.opens} opens)`
-      : `same as always max level ngl (${baseline.xp} xp in ${baseline.opens} opens)`;
+      ? `+${delta} xp${percentLabel} vs always max level fr ${baselineLabel}`
+      : delta < 0
+        ? `${-delta} xp less${percentLabel} than always max level ${baselineLabel}`
+        : `same as always max level ngl ${baselineLabel}`;
   summary.append(cmp);
 
   // Keys refund an opening, so a path can be longer than the free openings.
@@ -122,7 +129,11 @@ export function renderXpPath(container, solution, baseline, freeOpenings, onOpen
 
   if (solution.truncated) {
     summary.append(el("span", "xp-warn",
-      `hit your ${solution.maxOpens}-open limit bro, keys kept refunding tho`));
+      `search reached the ${solution.maxOpens}-open limit`));
+  }
+
+  if (solution.stopped) {
+    summary.append(el("span", "xp-warn", "search stopped early; showing the best path found"));
   }
 
   if (doneCount > 0) {
@@ -235,11 +246,28 @@ function renderFindPath(path, label, note, onOpen) {
 export function renderFindResult(container, result, targets, onOpen) {
   container.textContent = "";
 
+  const incomplete = result.complete === false || result.stopped || result.truncated;
+  if (incomplete) {
+    const reason = result.stopped
+      ? "search stopped before completion"
+      : result.truncated
+        ? `search reached ${result.maxNodes == null ? "its node limit" : `the ${result.maxNodes.toLocaleString()}-node limit`} before completion`
+        : "search ended before completion";
+    const notice = el("p", "empty-text", result.found
+      ? `${reason}; routes shown are the best found so far`
+      : `${reason}; continue searching to find a route`);
+    notice.setAttribute("role", "status");
+    container.append(notice);
+    if (!result.found) return;
+  }
+
   if (!result.found) {
     const msg = result.missing
       ? `didnt find it in ${result.opens} opens, still missing: ${result.missing.join(", ")}`
       : `no route found within ${result.maxDepth} opens rip`;
-    container.append(el("p", "error-box", msg));
+    const failure = el("p", "error-box", msg);
+    failure.setAttribute("role", "alert");
+    container.append(failure);
     return;
   }
 
@@ -259,19 +287,21 @@ export function renderFindResult(container, result, targets, onOpen) {
   summary.append(el("span", "xp-spend",
     result.same
       ? `costs ${result.cheapest.cost} chest(s), ${result.solutions} route(s) considered`
-      : `fewest opens, cheapest route costs ${result.cheapest.cost} chest(s) in ${result.cheapest.path.length} opens`));
+      : `${incomplete ? "fewest opens found, lowest cost found" : "fewest opens, cheapest route"} costs ${result.cheapest.cost} chest(s) in ${result.cheapest.path.length} opens`));
   container.append(summary);
 
   container.append(renderFindPath(
-    result.shortest.path, "fewest opens",
+    result.shortest.path, incomplete ? "fewest opens found" : "fewest opens",
     `${result.shortest.path.length} opens, ${result.shortest.cost} chest(s) spent`,
     onOpen
   ));
 
   if (!result.same) {
+    const extraOpenNote = result.cheapest.path.length > result.shortest.path.length
+      ? ", key refunds pay for the extra opens" : "";
     container.append(renderFindPath(
-      result.cheapest.path, "cheapest",
-      `${result.cheapest.path.length} opens, ${result.cheapest.cost} chest(s) spent, key refunds pay for the extra opens`,
+      result.cheapest.path, incomplete ? "lowest cost found" : "cheapest",
+      `${result.cheapest.path.length} opens, ${result.cheapest.cost} chest(s) spent${extraOpenNote}`,
       onOpen
     ));
   }
