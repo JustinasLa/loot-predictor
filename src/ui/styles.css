@@ -17,7 +17,6 @@
 
   --color-discord-green: #23a55a;
   --color-discord-red: #f23f42;
-  --color-discord-yellow: #f0b232;
 
   --color-common: #9aa3b0;
   --color-rare: #4fc27a;
@@ -43,7 +42,7 @@
 @layer components {
   /* Sidebar channel category + rows */
   .channel-category-head {
-    @apply flex items-center gap-1 px-1 py-1.5 text-xs font-semibold uppercase tracking-wide
+    @apply flex w-full items-center gap-1 px-1 py-1.5 text-left text-xs font-semibold uppercase tracking-wide
            text-discord-text-muted cursor-pointer select-none hover:text-discord-text;
   }
   .channel-row {
@@ -87,9 +86,6 @@
   }
 
   /* Cards (opens, xp summary, item picker) */
-  .d-card {
-    @apply rounded-lg bg-discord-bg-secondary border border-discord-border p-4;
-  }
   .d-panel-toolbar {
     @apply flex flex-wrap items-end gap-3 rounded-lg bg-discord-bg-secondary
            border border-discord-border p-3;

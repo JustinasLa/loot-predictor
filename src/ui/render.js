@@ -11,18 +11,27 @@ function el(tag, className, text) {
 // Renders one sidebar category's chests as Discord-style channel rows.
 // `activeId` gets the highlighted state; clicking a row calls `onSelect`.
 export function renderChestList(container, cardStates, activeId, onSelect) {
+  const focused = container.ownerDocument.activeElement;
+  const focusedId = container.contains(focused) ? focused.dataset.cardId : null;
+  let focusedRow;
   container.textContent = "";
   for (const [id, st] of Object.entries(cardStates)) {
     const row = el("button", "channel-row");
     row.type = "button";
+    row.dataset.cardId = id;
     row.dataset.on = id === activeId ? "yes" : "no";
-    if (id === activeId) row.classList.add("is-active");
+    if (id === activeId) {
+      row.classList.add("is-active");
+      row.setAttribute("aria-current", "true");
+    }
     row.append(el("span", "hash", "#"));
     row.append(el("span", null, id));
     if (st.level) row.append(el("span", "channel-badge", `lvl ${st.level}`));
     row.addEventListener("click", () => onSelect(id));
     container.append(row);
+    if (id === focusedId) focusedRow = row;
   }
+  focusedRow?.focus({ preventScroll: true });
 }
 
 function renderOpen(open, cardId, position, onOpen) {
@@ -183,6 +192,11 @@ export function renderXpPath(container, solution, baseline, freeOpenings, onOpen
 }
 
 export function renderItemPicker(container, items, selected, onToggle) {
+  const focused = container.ownerDocument.activeElement;
+  const focusedItem = container.contains(focused)
+    ? { baseName: focused.dataset.baseName, rarity: focused.dataset.rarity }
+    : null;
+  let focusedChip;
   container.textContent = "";
   if (items.length === 0) {
     container.append(el("p", "empty-text", "chest got no item pool mapped, idk"));
@@ -191,13 +205,20 @@ export function renderItemPicker(container, items, selected, onToggle) {
 
   for (const item of items) {
     const chip = el("button", "item-chip");
+    chip.type = "button";
+    chip.dataset.baseName = item.baseName;
     chip.dataset.rarity = item.rarity;
     chip.dataset.on = selected.has(item.baseName) ? "yes" : "no";
+    chip.setAttribute("aria-pressed", String(selected.has(item.baseName)));
     chip.append(el("span", null, item.baseName));
     chip.append(el("span", "item-rarity", item.rarity));
     chip.addEventListener("click", () => onToggle(item.baseName));
     container.append(chip);
+    if (focusedItem && item.baseName === focusedItem.baseName && item.rarity === focusedItem.rarity) {
+      focusedChip = chip;
+    }
   }
+  focusedChip?.focus({ preventScroll: true });
 }
 
 function renderFindPath(path, label, note, onOpen) {
@@ -309,5 +330,7 @@ export function renderFindResult(container, result, targets, onOpen) {
 
 export function renderError(container, message) {
   container.textContent = "";
-  container.append(el("p", "error-box", `bruh error: ${message}`));
+  const error = el("p", "error-box", `bruh error: ${message}`);
+  error.setAttribute("role", "alert");
+  container.append(error);
 }

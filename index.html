@@ -16,15 +16,15 @@
 
         <div class="flex-1 overflow-y-auto scroll-thin px-2 py-3 flex flex-col gap-4">
           <div>
-            <div class="channel-category-head" data-toggle="predict">
-              <span>▾</span><span>predict</span>
-            </div>
+            <button type="button" class="channel-category-head" data-toggle="predict" aria-controls="sidebar-predict-list" aria-expanded="true">
+              <span aria-hidden="true">▾</span><span>predict</span>
+            </button>
             <div id="sidebar-predict-list" class="flex flex-col gap-0.5 mt-0.5"></div>
           </div>
           <div>
-            <div class="channel-category-head" data-toggle="find">
-              <span>▾</span><span>find</span>
-            </div>
+            <button type="button" class="channel-category-head" data-toggle="find" aria-controls="sidebar-find-list" aria-expanded="true">
+              <span aria-hidden="true">▾</span><span>find</span>
+            </button>
             <div id="sidebar-find-list" class="flex flex-col gap-0.5 mt-0.5"></div>
           </div>
         </div>
@@ -36,17 +36,17 @@
           <p class="text-[0.7rem] text-discord-text-muted px-1">
             savegame stays on your machine, we dont upload or write back anything lol
           </p>
-          <label for="save" class="d-btn-ghost text-center cursor-pointer">load savegame</label>
+          <button id="load-save" type="button" class="d-btn-ghost text-center cursor-pointer">load savegame</button>
         </div>
 
         <!-- Logged in: savegame loaded, styled like a Discord user bar -->
         <div id="user-panel-loggedin" class="is-hidden relative shrink-0">
           <!-- Account popover: menu items appear once the bar below is clicked -->
           <div id="user-menu" class="is-hidden absolute bottom-full left-2 right-2 mb-2 rounded-lg bg-discord-bg-float border border-discord-border shadow-lg py-1.5 flex flex-col">
-            <label for="save" class="flex items-center gap-2.5 px-2.5 py-2 text-sm text-discord-text cursor-pointer hover:bg-discord-blurple hover:text-white">
+            <button id="load-save-menu" type="button" class="flex items-center gap-2.5 px-2.5 py-2 text-sm text-discord-text cursor-pointer hover:bg-discord-blurple hover:text-white">
               <svg viewBox="0 0 24 24" class="h-4 w-4 shrink-0 fill-current"><path d="M5 20h14a1 1 0 0 0 1-1v-7a1 1 0 1 0-2 0v6H6v-6a1 1 0 1 0-2 0v7a1 1 0 0 0 1 1Zm6-16.41 3.3 3.3a1 1 0 0 0 1.4-1.42l-5-5a1 1 0 0 0-1.4 0l-5 5a1 1 0 0 0 1.4 1.42L10 3.59V15a1 1 0 1 0 2 0V3.59Z"/></svg>
               load a different savegame
-            </label>
+            </button>
             <button id="reset" class="flex items-center gap-2.5 px-2.5 py-2 text-sm text-discord-text cursor-pointer hover:bg-discord-blurple hover:text-white" disabled>
               <svg viewBox="0 0 24 24" class="h-4 w-4 shrink-0 fill-current"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg>
               reset to savegame lol
@@ -58,7 +58,7 @@
             </button>
           </div>
 
-          <button id="user-menu-trigger" type="button"
+          <button id="user-menu-trigger" type="button" aria-controls="user-menu" aria-expanded="false"
             class="w-full border-t border-discord-border bg-discord-bg-tertiary h-13 px-2 flex items-center gap-2 cursor-pointer hover:bg-discord-bg-float">
             <div class="relative shrink-0">
               <div class="h-8 w-8 rounded-full bg-discord-blurple flex items-center justify-center">
@@ -81,7 +81,7 @@
           <div class="d-panel-toolbar">
             <label class="d-field">seed<input id="seed" type="number" step="1" class="d-input" disabled /></label>
             <label class="d-field">opens<input id="count" type="number" value="5" min="1" max="200" class="d-input" /></label>
-            <label class="d-field">vault %<input id="vault" type="number" value="0" min="0" max="100" class="d-input" /></label>
+            <label class="d-field">vault %<input id="vault" type="number" value="0" min="0" max="100" step="any" class="d-input" /></label>
             <label id="preview-level-field" class="d-field is-hidden">
               level
               <input
@@ -107,14 +107,14 @@
             </div>
 
             <div class="d-field">
-              <span>custom</span>
+              <label for="open-custom">custom</label>
               <div class="flex gap-1">
                 <input id="open-custom" type="number" value="25" min="1" max="10000" class="d-input" />
                 <button id="open-custom-go" class="d-btn-ghost" disabled>open</button>
               </div>
             </div>
 
-            <span id="open-status" class="text-discord-text-muted text-xs font-mono self-center"></span>
+            <span id="open-status" role="status" class="text-discord-text-muted text-xs font-mono self-center"></span>
           </div>
 
           <section id="smart-xp" class="smart is-hidden flex flex-col gap-3">
@@ -129,7 +129,7 @@
             <div class="d-panel-toolbar">
               <label class="d-field">free openings<input id="xp-openings" type="number" value="4" min="1" class="d-input" /></label>
               <label class="d-field">max level<input id="xp-maxlevel" type="number" value="60" min="1" max="100" class="d-input" /></label>
-              <label class="d-field">vault %<input id="xp-vault" type="number" value="0" min="0" max="100" class="d-input" /></label>
+              <label class="d-field">vault %<input id="xp-vault" type="number" value="0" min="0" max="100" step="any" class="d-input" /></label>
               <label class="d-field">max opens<input id="xp-maxopens" type="number" min="1" placeholder="none" class="d-input" /></label>
               <div class="d-field">
                 <span>&nbsp;</span>
@@ -138,7 +138,7 @@
                   <button id="xp-stop" class="d-btn-ghost is-hidden">stop</button>
                 </div>
               </div>
-              <span id="xp-status" class="text-discord-text-muted text-xs font-mono self-center"></span>
+              <span id="xp-status" role="status" class="text-discord-text-muted text-xs font-mono self-center"></span>
               <span id="xp-estimate" class="text-discord-text-muted text-xs font-mono self-center"></span>
             </div>
             <div id="xp-out" class="flex flex-col gap-3"></div>
@@ -173,7 +173,7 @@
             <label class="d-field">max opens<input id="find-maxdepth" type="number" value="10" min="1" class="d-input" /></label>
             <button id="find-run" class="d-btn" disabled>find items</button>
             <button id="find-stop" class="d-btn-ghost is-hidden">stop</button>
-            <span id="find-status" class="text-discord-text-muted text-xs font-mono self-center"></span>
+            <span id="find-status" role="status" class="text-discord-text-muted text-xs font-mono self-center"></span>
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-[22rem_1fr] gap-5">
