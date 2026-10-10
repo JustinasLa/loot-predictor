@@ -44,7 +44,7 @@ const $ = (sel) => document.querySelector(sel);
 
 function numberField(selector, validate, fallback) {
   const field = $(selector);
-  const label = field.labels?.[0]?.textContent.trim() || "this field";
+  const label = field.labels[0].textContent.trim();
   if (field.validity.badInput) throw new Error("enter a valid number for " + label);
   const value = field.value.trim();
   if (value === "" && fallback !== undefined) return fallback;
@@ -679,8 +679,8 @@ function initUserMenu() {
     trigger.setAttribute("aria-expanded", String(!menu.classList.contains("is-hidden")));
   });
   menu.addEventListener("click", (e) => {
-    // Let the load-savegame label and reset button do their thing, then close.
-    if (e.target.closest("label, button")) close();
+    // Let the menu action finish, then close.
+    if (e.target.closest("button")) close();
   });
   document.addEventListener("click", (e) => {
     if (!menu.contains(e.target) && e.target !== trigger) close();
