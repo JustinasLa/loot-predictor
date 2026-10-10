@@ -374,7 +374,7 @@ describe("item hunt UI", () => {
     input("#find-maxlevel", "");
     findModule.findAllPaths.mockReturnValueOnce({ found: false, maxDepth: 10 });
     dispatch("#find-run");
-    await vi.waitFor(() => expect($("#find-status").textContent).toContain("0 opens in"));
+    await vi.waitFor(() => expect($("#find-status").textContent).toContain("0 nodes in"));
     expect(findModule.findAllPaths).toHaveBeenCalledWith(expect.objectContaining({ maxLevel: 1 }));
   });
 

@@ -515,7 +515,7 @@ async function runFind() {
     renderFindResult(out, result, targets, (steps) => openRoute(cardId, steps));
     $("#find-status").textContent =
       `${(result.nodesVisited ?? result.opens ?? 0).toLocaleString()} ` +
-      `${result.nodesVisited ? "nodes" : "opens"} in ${Date.now() - started}ms fr` +
+      `${cardId.startsWith("adventure_") ? "nodes" : "opens"} in ${Date.now() - started}ms fr` +
       (stopFind ? " (stopped early lol)" : "");
   } catch (err) {
     renderError(out, err.message);
