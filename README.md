@@ -53,7 +53,8 @@ reports alongside it. CI runs the same coverage check before building.
 
 Load a savegame, pick a chest, and read forward. "Open" advances the live seed
 so the tool stays in sync with the game; **Reset to savegame** rewinds to the
-file's seed. Both the live seed and the opened history survive a refresh.
+file's seed. The live seed and the most recent 100 openings survive a refresh.
+Loading another save or changing a route's seed or options clears stale routes.
 
 ![Predict tab](docs/screenshots/predict.jpg)
 
@@ -72,6 +73,12 @@ free-openings budget suggests.
 Pick the items you want and search from the current live seed. Adventure chests
 get a full search over levels; everything else has no level to choose, so it
 walks the chain until the items turn up.
+
+Interactive Find searches remain cancellable and stop after 100,000 simulated
+openings. A stopped or limited run explicitly marks its results as incomplete;
+its routes are the best found so far. Library callers can set `maxNodes` on the
+async search APIs, while the synchronous APIs retain an unlimited node budget
+unless one is supplied. Targets match item IDs across all listed rarities.
 
 ![Find tab](docs/screenshots/find.jpg)
 
