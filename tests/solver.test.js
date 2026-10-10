@@ -28,9 +28,9 @@ describe("linear item search", () => {
 
   it("reports only missing targets after reaching the limit and supports a zero limit", () => {
     expect(findItemLinear(42, "egg_Rare", ["Pet_GoldenRetriever", "Never"], { limit: 1 }))
-      .toEqual({ found: false, opens: 1, path: [], missing: ["Never"] });
+      .toMatchObject({ found: false, opens: 1, path: [], missing: ["Never"], complete: true });
     expect(findItemLinear(42, "big", ["Never"], { limit: 0 }))
-      .toEqual({ found: false, opens: 0, path: [], missing: ["Never"] });
+      .toMatchObject({ found: false, opens: 0, path: [], missing: ["Never"], complete: true });
   });
 
   it("forwards adventure options and reports vault keys as hits", () => {
@@ -48,17 +48,17 @@ describe("adventure item search", () => {
     expect(result.shortest.path[0].hits).toContain("Ring_Bronze");
   });
 
-  it("deduplicates candidate levels, bounds depth and honours stop", () => {
+  it("searches every permitted level, bounds depth and honours stop", () => {
     const result = findAllPaths({ ...options, maxLevel: 4, targets: ["Never"], maxDepth: 1 });
-    expect(result).toEqual({ found: false, maxDepth: 1, nodesVisited: 2 });
+    expect(result).toMatchObject({ found: false, maxDepth: 1, nodesVisited: 4, complete: true });
     expect(findAllPaths({ ...options, targets: ["Never"], shouldStop: () => true }))
-      .toEqual({ found: false, maxDepth: 10, nodesVisited: 0 });
+      .toMatchObject({ found: false, maxDepth: 10, nodesVisited: 0, stopped: true, complete: false });
   });
 
-  it("includes a maximum level between the dominant search levels", () => {
+  it("includes intermediate levels as well as the maximum", () => {
     expect(findAllPaths({ ...options, maxLevel: 6, targets: ["Never"], maxDepth: 1 }))
-      .toEqual({ found: false, maxDepth: 1, nodesVisited: 4 });
-    expect(simulateAdventureChestOpening.mock.calls.map(([, level]) => level)).toEqual([1, 4, 5, 6]);
+      .toMatchObject({ found: false, maxDepth: 1, nodesVisited: 6 });
+    expect(simulateAdventureChestOpening.mock.calls.map(([, level]) => level)).toEqual([1, 2, 3, 4, 5, 6]);
   });
 
   it("keeps collected sets distinct when two routes reach the same seed", () => {
@@ -87,7 +87,8 @@ describe("adventure item search", () => {
 
   it("prunes equivalent repeated states and avoids cycles", () => {
     simulateAdventureChestOpening.mockImplementation((seed) => ({ nextSeed: seed, items: [item("Unwanted")] }));
-    expect(findAllPaths({ ...options, targets: ["Never"], maxDepth: 5 })).toEqual({ found: false, maxDepth: 5, nodesVisited: 6 });
+    expect(findAllPaths({ ...options, targets: ["Never"], maxDepth: 5 }))
+      .toMatchObject({ found: false, maxDepth: 5, nodesVisited: 5 });
   });
 
   it("keeps a longer cheaper route to the same state when it can still finish within the depth limit", () => {
@@ -106,6 +107,21 @@ describe("adventure item search", () => {
     expect(result.cheapest.cost).toBe(1);
     expect(branched.cheapest.cost).toBe(0);
     expect(branched.cheapest.path).toHaveLength(3);
+  });
+
+  it("replaces an equal-depth arrival when another branch spends fewer chests", () => {
+    simulateAdventureChestOpening.mockImplementation((seed, level) => {
+      if (seed === 42) return level === 1
+        ? { nextSeed: 1, items: [] }
+        : { nextSeed: 2, items: [item("ZeusKeyIcon")] };
+      if (seed === 1) return { nextSeed: 3, items: [] };
+      if (seed === 2) return { nextSeed: 3, items: [item("ZeusKeyIcon")] };
+      return { nextSeed: 4, items: [item("Target")] };
+    });
+    const result = findAllPaths({ ...options, maxLevel: 2, targets: ["Target"], maxDepth: 3 });
+    expect(result.shortest.path).toHaveLength(3);
+    expect(result.cheapest.path).toHaveLength(3);
+    expect(result.cheapest.cost).toBe(1);
   });
 });
 

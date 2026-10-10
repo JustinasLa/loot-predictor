@@ -6,7 +6,7 @@ import {
 import { getAvailableItemsForChest, splitCardId } from "../src/loot/items.js";
 import {
   LOOT_TABLES, ADVENTURE_LOOT_RATES, ITEM_POOLS, CHEST_ID_MAP, EGG_RARITY_MAP,
-  DOMINANT_ADVENTURE_LEVELS, DOMINANT_ADVENTURE_LEVELS_FOR_ITEMS,
+  DOMINANT_ADVENTURE_LEVELS,
 } from "../src/loot/tables.js";
 
 describe("loot table integrity", () => {
@@ -26,7 +26,7 @@ describe("loot table integrity", () => {
         for (const event of ["Zeus", "Pirate"]) expect(ITEM_POOLS[`${rarity}_${event}`].length).toBeGreaterThan(0);
       }
     }
-    for (const levels of [DOMINANT_ADVENTURE_LEVELS, DOMINANT_ADVENTURE_LEVELS_FOR_ITEMS]) {
+    for (const levels of [DOMINANT_ADVENTURE_LEVELS]) {
       expect(new Set(levels).size).toBe(levels.length);
       expect(levels.every((level) => level >= 1 && level <= 100)).toBe(true);
     }
