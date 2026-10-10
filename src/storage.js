@@ -8,7 +8,7 @@ import { getAvailableItemsForChest } from "./loot/items.js";
 const KEY = "loot-predictor:v1";
 
 // History is only for display, so cap it rather than risk the quota.
-const MAX_HISTORY = 100;
+export const MAX_HISTORY = 100;
 const CARD_IDS = new Set([...Object.values(CHEST_ID_MAP), ...Object.values(EGG_RARITY_MAP)]);
 const RARITIES = new Set(["Common", "Rare", "Epic", "Legendary", "Ultimate", "Mythic", "common"]);
 
