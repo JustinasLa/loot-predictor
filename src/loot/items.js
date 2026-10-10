@@ -14,9 +14,19 @@ export function getAvailableItemsForChest(cardId) {
   const [chestType, eventType] = splitCardId(cardId);
   const available = new Map();
 
+  const addItem = (baseName, rarity, type) => {
+    // Hunts match by base name. Some mapped items occur in multiple rarity
+    // pools, so show all matching rarities instead of promising only one.
+    const rarities = new Set(available.get(baseName)?.rarities);
+    rarities.add(rarity);
+    available.set(baseName, {
+      baseName, rarity: [...rarities].join(" / "), rarities: [...rarities], type
+    });
+  };
+
   const addPool = (poolName, rarity, type) => {
     for (const baseName of ITEM_POOLS[poolName] || []) {
-      available.set(baseName, { baseName, rarity, type });
+      addItem(baseName, rarity, type);
     }
   };
 
@@ -27,15 +37,20 @@ export function getAvailableItemsForChest(cardId) {
   } else if (chestType === "egg") {
     addPool(`${eventType}Pet`, eventType, "Pet");
   } else {
-    const config = LOOT_TABLES[chestType === "event" ? "event" : chestType];
+    const config = Object.hasOwn(LOOT_TABLES, chestType) ? LOOT_TABLES[chestType] : null;
     if (config) {
       for (const entry of config.table) {
         const { type, rarity } = entry.result;
+        if (type === "Pet Food") {
+          addItem("PetFood", "None", type);
+          continue;
+        }
         let poolName = rarity;
         if (type === "Pet Egg") poolName += "Egg";
         if (rarity === "Ultimate" && eventType) poolName += `_${eventType}`;
         addPool(poolName, rarity, type);
       }
+      if (chestType === "pet") addItem("PetFood", "None", "Pet Food");
     }
   }
 
