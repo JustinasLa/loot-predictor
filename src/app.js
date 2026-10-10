@@ -208,7 +208,7 @@ function adoptSave(parsed, filename) {
       id, { seed: st.initialSeed, level: st.level, opened: 0, history: [] }
     ])
   );
-  const firstId = Object.keys(saved)[0] ?? null;
+  const firstId = Object.keys(saved)[0];
   predictChestId = firstId;
   findChestIdState = firstId;
   renderSidebars();

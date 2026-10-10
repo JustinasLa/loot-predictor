@@ -1,9 +1,7 @@
-// Reimplementation of the game engine's PRNG.
-//
-// The engine does NOT use an LCG. It uses C#'s System.Random — Knuth's
-// subtractive (lagged Fibonacci) generator — which is what Mono ships and
-// what a persisted int32 `Seed` per chest is fed into. Ported to match the
-// reference implementation (github.com/1vcian/ev) draw for draw.
+import { validateSeed } from "../validation.js";
+
+// C# System.Random's subtractive generator, initialized from the persisted
+// signed int32 seed for each chest. Draws match the .NET Framework algorithm.
 
 export class UnityRandom {
   #MBIG = 2147483647;
@@ -17,6 +15,7 @@ export class UnityRandom {
   }
 
   initState(seed) {
+    validateSeed(seed);
     let ii, mj, mk;
 
     const subtraction = seed === -2147483648 ? this.#MBIG : Math.abs(seed);

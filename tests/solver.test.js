@@ -10,7 +10,7 @@ vi.mock("../src/loot/simulate.js", async (importOriginal) => {
   return { ...actual, simulateAdventureChestOpening: vi.fn(actual.simulateAdventureChestOpening) };
 });
 const realSimulate = (await vi.importActual("../src/loot/simulate.js")).simulateAdventureChestOpening;
-beforeEach(() => simulateAdventureChestOpening.mockReset().mockImplementation(realSimulate));
+beforeEach(() => { simulateAdventureChestOpening.mockReset().mockImplementation(realSimulate); });
 const options = { startSeed: 42, cardId: "adventure_Zeus", eventType: "Zeus", maxLevel: 5 };
 
 describe("linear item search", () => {

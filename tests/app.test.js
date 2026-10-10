@@ -120,10 +120,10 @@ describe("savegame and prediction UI", () => {
     expect($("#out").textContent).toContain("couldnt read file");
   });
 
-  it("handles a valid save with no mapped chests", async () => {
+  it("rejects a save with no mapped chests", async () => {
     await init();
     await upload('{"GameSavegame":{}}');
-    expect($("#out").textContent).toContain("load a savegame first");
+    expect($("#out").textContent).toContain("no supported chests or eggs");
     expect($("#sidebar-predict-list").children).toHaveLength(0);
   });
 

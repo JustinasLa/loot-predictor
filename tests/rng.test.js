@@ -27,6 +27,13 @@ const vectors = [
 ];
 
 describe("UnityRandom", () => {
+  it.each([undefined, null, "42", NaN, Infinity, 1.5, -2147483649, 2147483648])("rejects invalid seed %s before changing RNG state", (seed) => {
+    expect(() => new UnityRandom(seed)).toThrow("seed must be an integer from -2147483648 to 2147483647");
+    const rng = new UnityRandom(1);
+    expect(() => rng.initState(seed)).toThrow("seed must be an integer");
+    expect(rng.range(0, 2147483647)).toBe(534011718);
+  });
+
   it.each(vectors)("matches C# draws for seed %i", (seed, first, wrapped, last) => {
     const rng = new UnityRandom(seed);
     const values = Array.from({ length: 120 }, () => Math.round(rng.sample() * 2147483647));

@@ -95,20 +95,16 @@ describe("opening simulation", () => {
   it("pet boxes draw only prize types and guarantee 150 food", () => {
     const open = simulateChestOpening(1, LOOT_TABLES.pet);
     expect(open.items.map((item) => item.baseName)).toEqual(["Pet_Egg_Common", "Pet_Egg_Common", "Pet_Egg_Common", "PetFood"]);
-    expect(open.items[3]).toMatchObject({ name: "150 Pet Food", typeRoll: "Guaranteed", itemRoll: "150" });
+    expect(open.items[3]).toMatchObject({ name: "150 Pet Food", typeRoll: "Guaranteed", itemRoll: "150", rarity: "Common" });
     expect(open.nextSeed).toBe(1657007234);
   });
 
-  it("opens pets from eggs and handles an unmapped egg rarity", () => {
+  it("opens pets from eggs and rejects an unmapped egg rarity", () => {
     expect(simulateEggOpening(42, "Rare")).toEqual({
       items: [{ name: "Pet: Pet_GoldenRetriever (Rare)", typeRoll: "N/A", itemRoll: 1, baseName: "Pet_GoldenRetriever", rarity: "Rare" }],
       nextSeed: 302596119,
     });
-    vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(simulateEggOpening(42, "Unknown")).toEqual({
-      items: [{ name: "Pet: undefined (Unknown)", typeRoll: "N/A", itemRoll: 0, baseName: undefined, rarity: "Unknown" }],
-      nextSeed: 1434747710,
-    });
+    expect(() => simulateEggOpening(42, "Unknown")).toThrow("unknown chest type: egg_Unknown");
   });
 
   it("always consumes the vault roll and drops a key strictly above its threshold", () => {
@@ -116,14 +112,37 @@ describe("opening simulation", () => {
     expect(without).toMatchObject({ nextSeed: 1122627734, keyRoll: 12, keyDropsAt: 13 });
     expect(without.items.map((item) => item.baseName)).toEqual(["Ring_Bronze"]);
     expect(simulateAdventureChestOpening(42, 1, "Zeus", 12).items).toHaveLength(1);
-    const withKey = simulateAdventureChestOpening(42, 1, "Zeus", 13, "adventure_Zeus");
+    const withKey = simulateAdventureChestOpening(42, 1, "Zeus", 13);
     expect(withKey.items.at(-1)).toMatchObject({ baseName: "ZeusKeyIcon", typeRoll: "Vault", level: 1 });
     expect(withKey.nextSeed).toBe(without.nextSeed);
     expect(simulateAdventureChestOpening(42, 1, "Pirate", 100).items.at(-1).baseName).toBe("PirateKeyIcon");
+    expect(simulateAdventureChestOpening(42, 1, "Zeus")).toEqual(without);
   });
 
-  it.each([0, -1, 101, NaN])("rejects adventure level %s without advancing the seed", (level) => {
-    expect(simulateAdventureChestOpening(42, level, "Zeus", 0)).toEqual({ items: [], nextSeed: 42, error: "Invalid level" });
+  it.each([0, -1, 1.5, 101, NaN])("rejects adventure level %s", (level) => {
+    expect(() => simulateAdventureChestOpening(42, level, "Zeus", 0)).toThrow("level must be an integer from 1 to 100");
+    expect(() => predictChain(42, "adventure_Zeus", 2, { level })).toThrow("level must be an integer from 1 to 100");
+  });
+
+  it("uses integer rarity boundaries rather than floating-point weight artifacts", () => {
+    const result = simulateAdventureChestOpening(42285, 77, "Zeus", 0);
+    expect(result.items[1]).toMatchObject({ typeRoll: 475200, rarity: "Rare", baseName: "Ring_Plastic" });
+  });
+
+  it.each(["__proto__", "constructor", "event", "egg_Common", "egg_Unknown", "adventure_Unknown", "event_Unknown", null])("rejects unsupported chest %s even for an empty chain", (cardId) => {
+    expect(() => predictChain(12, cardId, 1)).toThrow("unknown chest type:");
+    expect(() => predictChain(12, cardId, 0)).toThrow("unknown chest type:");
+  });
+
+  it.each([-1, 1.1, NaN, Infinity, "2", Number.MAX_SAFE_INTEGER + 1])("rejects invalid chain count %s", (count) => {
+    expect(() => predictChain(1, "big", count)).toThrow("count must be an integer");
+  });
+
+  it("rejects unknown event variants and invalid vault percentages", () => {
+    expect(() => simulateChestOpening(12, LOOT_TABLES.event)).toThrow("unknown chest type: event_null");
+    expect(() => simulateAdventureChestOpening(12, 1, "Unknown", 0)).toThrow("unknown chest type: adventure_Unknown");
+    expect(() => simulateAdventureChestOpening(12, 1, "Zeus", 101)).toThrow("vault percentage");
+    expect(() => predictChain(12, "adventure_Zeus", 0, { vaultPercentage: -1 })).toThrow("vault percentage");
   });
 
   it.each([...Object.values(CHEST_ID_MAP), ...Object.values(EGG_RARITY_MAP)])("chains three %s openings", (cardId) => {
@@ -141,9 +160,9 @@ describe("opening simulation", () => {
 
   it("uses default adventure options and explicit zero without replacing it", () => {
     expect(predictChain(42, "adventure_Zeus", 1)[0]).toMatchObject(simulateAdventureChestOpening(42, 1, "Zeus", 0, "adventure_Zeus"));
-    expect(predictChain(42, "adventure_Zeus", 1, { level: 0 })[0].error).toBe("Invalid level");
+    expect(() => predictChain(42, "adventure_Zeus", 1, { level: 0 })).toThrow("level must be an integer");
     expect(predictChain(1, "big", 0)).toEqual([]);
-    expect(predictChain(1, "big", -1)).toEqual([]);
+    expect(predictChain(1, "adventure_Zeus", 0)).toEqual([]);
     expect(() => predictChain(1, "unknown", 1)).toThrow("unknown chest type: unknown");
   });
 });
