@@ -1,0 +1,4 @@
+/* area:marking-history-savemenu — Save menu sheet. */
+.save-file { display: flex; align-items: center; gap: 10px; font-weight: 800; overflow-wrap: anywhere; }
+.save-file svg { width: 28px; height: 28px; color: var(--primary-lip); flex: none; }
+.save-menu-body .btn { margin-bottom: 6px; }

@@ -1,160 +1,18 @@
 @import "tailwindcss";
-
-@theme {
-  --color-discord-bg: #313338;
-  --color-discord-bg-secondary: #2b2d31;
-  --color-discord-bg-tertiary: #1e1f22;
-  --color-discord-bg-float: #383a40;
-  --color-discord-bg-float-hover: #35373c;
-  --color-discord-border: #26282c;
-
-  --color-discord-blurple: #5865f2;
-  --color-discord-blurple-hover: #4752c4;
-
-  --color-discord-text: #f2f3f5;
-  --color-discord-text-muted: #949ba4;
-  --color-discord-text-faint: #6d6f78;
-
-  --color-discord-green: #23a55a;
-  --color-discord-red: #f23f42;
-
-  --color-common: #9aa3b0;
-  --color-rare: #4fc27a;
-  --color-epic: #b57bf0;
-  --color-legendary: #f2a93b;
-  --color-ultimate: #f0665e;
-  --color-mythic: #57e0d0;
-
-  --font-sans: "gg sans", "Inter", ui-sans-serif, system-ui, sans-serif;
-}
-
-@layer base {
-  * { box-sizing: border-box; }
-  body { @apply bg-discord-bg text-discord-text font-sans text-[15px] leading-normal m-0; }
-  input, select, button { font: inherit; }
-}
-
-/* Unlayered: cascade layers put every @layer rule (including Tailwind's own
-   utilities like `flex`) ahead of anything in @layer, so this has to sit
-   outside @layer entirely to reliably beat `flex`/`grid` on the same element. */
-.is-hidden { display: none !important; }
-
-@layer components {
-  /* Sidebar channel category + rows */
-  .channel-category-head {
-    @apply flex w-full items-center gap-1 px-1 py-1.5 text-left text-xs font-semibold uppercase tracking-wide
-           text-discord-text-muted cursor-pointer select-none hover:text-discord-text;
-  }
-  .channel-row {
-    @apply flex items-center gap-1.5 rounded px-2 py-1.5 text-sm text-discord-text-muted
-           cursor-pointer truncate hover:bg-discord-bg-float-hover hover:text-discord-text;
-  }
-  .channel-row.is-active {
-    @apply bg-discord-bg-float text-discord-text font-medium;
-  }
-  .channel-row .hash { @apply text-discord-text-faint text-base leading-none shrink-0; }
-  .channel-row.is-active .hash { @apply text-discord-text-muted; }
-  .channel-badge {
-    @apply ml-auto shrink-0 rounded-full bg-discord-bg-tertiary px-1.5 py-0.5 text-[10px]
-           font-semibold text-discord-text-muted;
-  }
-
-  /* Form controls */
-  .d-field { @apply flex flex-col gap-1 text-xs text-discord-text-muted; }
-  .d-input {
-    @apply rounded bg-discord-bg-tertiary text-discord-text border border-discord-border
-           px-2.5 py-1.5 text-sm outline-none focus:border-discord-blurple;
-    color-scheme: dark;
-  }
-  .d-input[type="number"] { @apply w-24; }
-
-  .d-btn {
-    @apply rounded px-4 py-1.5 text-sm font-medium bg-discord-blurple text-white
-           hover:bg-discord-blurple-hover disabled:opacity-40 disabled:cursor-not-allowed
-           disabled:hover:bg-discord-blurple cursor-pointer;
-  }
-  .d-btn-ghost {
-    @apply rounded px-4 py-1.5 text-sm font-medium bg-transparent text-discord-text-muted
-           border border-discord-border hover:border-discord-text-muted hover:text-discord-text
-           disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer;
-  }
-  .d-btn-open {
-    @apply min-w-10 rounded px-2.5 py-1.5 text-sm font-medium bg-discord-bg-float
-           text-discord-text-muted hover:bg-discord-blurple hover:text-white
-           disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-discord-bg-float
-           disabled:hover:text-discord-text-muted cursor-pointer tabular-nums;
-  }
-
-  /* Cards (opens, xp summary, item picker) */
-  .d-panel-toolbar {
-    @apply flex flex-wrap items-end gap-3 rounded-lg bg-discord-bg-secondary
-           border border-discord-border p-3;
-  }
-
-  .open-box { @apply rounded-lg bg-discord-bg-secondary border border-discord-border p-3.5; }
-  .open-box.is-past { @apply opacity-60; }
-  .open-head { @apply flex items-center gap-3 mb-2.5; }
-  .open-title { @apply font-semibold text-[0.95rem]; }
-  .seed-text { @apply text-discord-text-muted text-xs font-mono ml-auto; }
-
-  .open-card-btn {
-    @apply shrink-0 rounded px-2.5 py-1 text-xs font-semibold bg-transparent
-           text-discord-text-muted border border-discord-border cursor-pointer
-           hover:bg-discord-blurple hover:border-discord-blurple hover:text-white;
-  }
-
-  .item-row {
-    @apply flex gap-2 items-baseline px-2 py-1.5 rounded bg-discord-bg-tertiary text-sm;
-  }
-  .item-rarity {
-    @apply ml-auto text-[0.7rem] font-bold uppercase tracking-wide text-discord-text-muted;
-  }
-  .item-row[data-rarity="Common"]    .item-rarity { @apply text-common; }
-  .item-row[data-rarity="Rare"]      .item-rarity { @apply text-rare; }
-  .item-row[data-rarity="Epic"]      .item-rarity { @apply text-epic; }
-  .item-row[data-rarity="Legendary"] .item-rarity { @apply text-legendary; }
-  .item-row[data-rarity="Ultimate"]  .item-rarity { @apply text-ultimate; }
-  .item-row[data-rarity="Mythic"]    .item-rarity { @apply text-mythic; }
-  .item-row[data-hit="yes"] { @apply bg-discord-green/10 outline outline-1 outline-discord-green/40; }
-
-  .item-chip {
-    @apply inline-flex items-baseline gap-1.5 rounded px-2 py-1 text-xs bg-discord-bg-tertiary
-           text-discord-text border border-discord-border cursor-pointer
-           hover:border-discord-blurple;
-  }
-  .item-chip[data-on="yes"] {
-    @apply border-discord-blurple bg-discord-blurple/15 font-semibold;
-  }
-  .item-chip .item-rarity { @apply text-discord-text-muted; }
-
-  .col-head {
-    @apply m-0 text-xs uppercase tracking-wide text-discord-text-muted font-semibold;
-  }
-  .empty-text { @apply text-discord-text-muted text-sm; }
-  .error-box {
-    @apply rounded-md p-3 bg-discord-red/10 border border-discord-red text-discord-red text-sm;
-  }
-
-  .xp-summary { @apply flex flex-wrap items-baseline gap-3 rounded-lg bg-discord-bg-secondary border border-discord-border px-4 py-3; }
-  .xp-total { @apply text-xl font-bold text-legendary; }
-  .xp-delta { @apply text-discord-text-muted text-[0.82rem]; }
-  .xp-delta[data-sign="up"] { @apply text-discord-green; }
-  .xp-spend { @apply text-discord-text-muted text-[0.82rem]; }
-  .xp-progress { @apply text-discord-green text-[0.82rem] font-semibold; }
-  .xp-warn { @apply text-legendary text-[0.82rem]; }
-  #xp-estimate[data-heavy="yes"] { @apply text-legendary; }
-
-  .hint-text { @apply max-w-[62ch] text-discord-text-muted text-[0.82rem]; }
-  .hint-text strong { @apply text-discord-text; }
-
-  /* Scrollbars, matched to the dark panel */
-  .scroll-thin { scrollbar-width: thin; scrollbar-color: var(--color-discord-border) transparent; }
-  .scroll-thin::-webkit-scrollbar { width: 10px; }
-  .scroll-thin::-webkit-scrollbar-track { background: transparent; }
-  .scroll-thin::-webkit-scrollbar-thumb {
-    background: var(--color-discord-border);
-    border: 3px solid var(--color-discord-bg-secondary);
-    border-radius: 999px;
-  }
-  .scroll-thin::-webkit-scrollbar-thumb:hover { background: #3d4350; }
-}
+@import "./styles/tokens.css";
+@import "./styles/base.css";
+@import "./styles/components.css";
+@import "./styles/shell.css";
+@import "./styles/welcome.css";
+@import "./styles/box-picker.css";
+@import "./styles/opening-card.css";
+@import "./styles/item-tile.css";
+@import "./styles/history.css";
+@import "./styles/marking.css";
+@import "./styles/save-menu.css";
+@import "./styles/find.css";
+@import "./styles/xp.css";
+@import "./styles/settings.css";
+@import "./styles/help.css";
+@import "./styles/error.css";
+@import "./styles/mobile.css";

@@ -1,0 +1,13 @@
+/* area:xp-planner — XP tab. */
+.smart-xp { display: grid; gap: 16px; }
+.smart-xp .panel-title { margin: 0; text-align: center; }
+.xp-steppers { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px 32px; }
+.xp-action { display: flex; justify-content: center; gap: 12px; }
+.xp-action .btn--go { min-width: 220px; }
+.smart-xp .status-line { text-align: center; }
+.xp-total { font-size: var(--t-display); line-height: 1; }
+.xp-delta, .xp-spend, .xp-warn, .xp-progress { font-size: var(--t-body); }
+
+@media (max-width: 767px) {
+  .xp-action .btn--go { flex: 1; min-width: 0; }
+}

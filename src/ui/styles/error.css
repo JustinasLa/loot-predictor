@@ -1,0 +1,2 @@
+/* area:settings-help-errors — error placement (the .error-box component is in components.css). */
+.workspace-status .error-box, .import-status .error-box { text-align: left; }

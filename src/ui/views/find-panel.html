@@ -1,0 +1,35 @@
+<!-- area:find-item start (Find tab panel) -->
+<section id="panel-find" class="tab-panel find-panel is-hidden" role="tabpanel" aria-labelledby="nav-find">
+  <div class="panel find-picker">
+    <h2 class="panel-title">What do you want?</h2>
+    <div class="find-filters">
+      <label class="search-field" for="item-search">
+        <span class="sr-only">Search items</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M10.5 2a8.5 8.5 0 0 1 6.9 13.5l4 4a2 2 0 1 1-2.9 2.9l-4-4A8.5 8.5 0 1 1 10.5 2Zm0 3.6a4.9 4.9 0 1 0 0 9.8 4.9 4.9 0 0 0 0-9.8Z"/></svg>
+        <input id="item-search" type="search" placeholder="Search items" autocomplete="off" />
+      </label>
+      <div id="rarity-chips" class="chip-row" role="group" aria-label="Rarity">
+        <button type="button" class="chip" data-value="all" aria-pressed="true">All</button>
+        <button type="button" class="chip" data-value="common" data-rarity="Common" aria-pressed="false">Common</button>
+        <button type="button" class="chip" data-value="rare" data-rarity="Rare" aria-pressed="false">Rare</button>
+        <button type="button" class="chip" data-value="epic" data-rarity="Epic" aria-pressed="false">Epic</button>
+        <button type="button" class="chip" data-value="legendary" data-rarity="Legendary" aria-pressed="false">Legendary</button>
+        <button type="button" class="chip" data-value="ultimate" data-rarity="Ultimate" aria-pressed="false">Ultimate</button>
+        <button type="button" class="chip" data-value="mythic" data-rarity="Mythic" aria-pressed="false">Mythic</button>
+      </div>
+      <label class="sr-only" for="rarity-filter">Rarity
+        <select id="rarity-filter" tabindex="-1"><option value="all">All</option><option value="common">Common</option><option value="rare">Rare</option><option value="epic">Epic</option><option value="legendary">Legendary</option><option value="ultimate">Ultimate</option><option value="mythic">Mythic</option></select>
+      </label>
+    </div>
+    <div id="find-items" class="item-picker-grid"><p class="empty">Load a save to pick items.</p></div>
+  </div>
+
+  <div class="find-action action-bar">
+    <button id="find-run" type="button" class="btn btn--go btn--lg" disabled>Find it!</button>
+    <span id="find-selected" class="find-selected"></span>
+    <button id="find-stop" type="button" class="btn btn--ghost is-hidden">Stop</button>
+  </div>
+  <p id="find-status" role="status" class="status-line"></p>
+  <div id="find-out" class="search-results"></div>
+</section>
+<!-- area:find-item end -->
