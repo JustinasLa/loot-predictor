@@ -16,18 +16,39 @@ const opening = (open = 1, extra = {}) => ({ open, seed: 42, nextSeed: 1, items:
 describe("xp-path renderer", () => {
   it.each([null, { xp: -1, path: [step()] }, { xp: 0, path: [] }])("renders missing solution %j", (solution) => {
     renderXpPath(container, solution, {}, 1);
-    expect(container.textContent).toContain("No plan found");
+    expect(container.textContent).toBe("No plan found. Try more keys or a higher level.");
+    expect(container.querySelector(".error-box")).toBeNull();
+    expect(container.querySelector(".box-art")).toBeNull();
+  });
+
+  it("shows the adventure icon in an empty plan", () => {
+    renderXpPath(container, { xp: -1, path: [] }, {}, 1, null, 0, "adventure_Pirate");
+    expect(container.querySelector(".empty .box-art").dataset.box).toBe("pirate");
   });
 
   it("compares XP, displays refunds and cap, and commits only pending steps", () => {
     const path = [step(), step(24, 1, [item("ZeusKeyIcon")]), step(39, 2)];
+    path[2].xp = 1200;
     const open = vi.fn();
-    renderXpPath(container, { xp: 30, path, truncated: true, maxOpens: 3 }, { xp: 20, opens: 2 }, 2, open, 1);
-    expect(container.textContent).toContain("+10 XP (+50%)");
-    expect(container.textContent).toContain("1 bonus opening from key drops");
-    expect(container.textContent).toContain("3-opening limit");
-    expect(container.textContent).toContain("1 of 3 openings recorded");
-    expect(container.querySelector(".xp-delta").dataset.sign).toBe("up");
+    renderXpPath(container, { xp: 1230, path, truncated: true, maxOpens: 3 }, { xp: 1220, opens: 2 }, 2, open, 1, "adventure_Zeus");
+    const delta = container.querySelector(".xp-delta");
+    expect(delta.textContent).toBe("+10 XP");
+    expect(delta.dataset.sign).toBe("up");
+    expect(container.querySelector(".xp-summary").classList.contains("banner--go")).toBe(true);
+    expect(container.querySelector(".xp-versus").textContent).toBe("vs 1,220 XP in 2 openings at top level");
+    expect(container.querySelector(".xp-spend").textContent).toBe("3 opens");
+    expect(container.querySelector(".xp-keys").textContent).toBe("1 bonus key");
+    expect(container.querySelector(".xp-keys img").getAttribute("src")).toContain("ZeusKeyIcon");
+    const warn = container.querySelector(".xp-warn");
+    expect(warn.textContent).toBe("Best so far");
+    expect(warn.title).toBe("Hit the opening limit");
+    const progress = container.querySelector(".xp-progress");
+    expect(progress.querySelector("[aria-hidden]").textContent).toBe("1 of 3 done");
+    expect(progress.querySelector(".sr-only").textContent).toBe(" 1 of 3 openings recorded.");
+    const titles = [...container.querySelectorAll(".open-title")].map((title) => title.textContent);
+    expect(titles).toEqual(["Open at level 24", "Open at level 39"]);
+    expect([...container.querySelectorAll(".xp-pill")].map((pill) => pill.textContent)).toEqual(["+4 XP", "+1,200 XP"]);
+    expect(container.querySelector(".open-subtitle")).toBeNull();
     const buttons = container.querySelectorAll("button");
     expect([...buttons].map((button) => button.textContent)).toEqual(["I opened it!", "Opened up to here"]);
     expect(buttons[0].title).toBe("Marks this box opened");
@@ -41,13 +62,18 @@ describe("xp-path renderer", () => {
     const solution = { xp: 4, path: [step()] };
     renderXpPath(container, solution, { xp: 4, opens: 1 }, 1);
     expect(container.querySelector(".xp-delta").dataset.sign).toBe("flat");
-    expect(container.textContent).toContain("The same XP as always");
-    expect(container.textContent).toContain("No extra keys found");
+    expect(container.querySelector(".xp-delta").textContent).toBe("Same as top level");
+    expect(container.querySelector(".xp-summary").classList.contains("banner--go")).toBe(false);
+    expect(container.querySelector(".xp-keys")).toBeNull();
+    expect(container.textContent).not.toContain("No extra keys");
     expect(container.querySelector("button")).toBeNull();
     renderXpPath(container, solution, { xp: 0, opens: 0 }, 1, null, 1);
-    expect(container.textContent).toContain("+4 XP");
-    expect(container.textContent).not.toContain("(+0%)");
-    expect(container.textContent).toContain("Plan complete");
+    expect(container.querySelector(".xp-delta").textContent).toBe("+4 XP");
+    expect(container.textContent).not.toContain("%");
+    const progress = container.querySelector(".xp-progress");
+    expect(progress.classList.contains("is-done")).toBe(true);
+    expect(progress.querySelector("[aria-hidden]").textContent).toBe("Plan done!");
+    expect(progress.textContent).toContain("Plan complete");
     expect(container.querySelector(".open-box")).toBeNull();
   });
 
@@ -56,16 +82,23 @@ describe("xp-path renderer", () => {
       { xp: 25, path: [step()], truncated: true, maxOpens: 1 },
       { xp: 100, opens: 4 }, 4);
     expect(container.querySelector(".xp-delta").dataset.sign).toBe("down");
-    expect(container.textContent).toContain("75 XP less (-75%)");
-    expect(container.textContent).not.toContain("same as");
-    expect(container.querySelector(".xp-warn").textContent).toBe("Search reached the 1-opening limit. This is the best plan found so far.");
-    expect(container.textContent).not.toContain("keys kept refunding");
+    expect(container.querySelector(".xp-delta").textContent).toBe("75 XP less than top level");
+    expect(container.textContent).not.toContain("Same as");
+    expect(container.querySelector(".xp-warn").textContent).toBe("Best so far");
+    expect(container.querySelector(".xp-keys")).toBeNull();
+  });
+
+  it("titles a step without a level by its number and omits a missing XP pill", () => {
+    renderXpPath(container, { xp: 4, path: [{ ...step(), level: undefined, xp: undefined }] }, { xp: 4, opens: 1 }, 1);
+    expect(container.querySelector(".open-title").textContent).toBe("Step 1");
+    expect(container.querySelector(".xp-pill")).toBeNull();
   });
 
   it("distinguishes cancelled XP searches from a completed search with no path", () => {
     renderXpPath(container, { xp: -1, path: [], stopped: true }, {}, 4);
-    expect(container.textContent).toBe("Search stopped before a plan was found. Try again to find a plan.");
+    expect(container.textContent).toBe("Stopped.");
+    expect(container.querySelector("button")).toBeNull();
     renderXpPath(container, { xp: 4, path: [step()], stopped: true }, { xp: 9, opens: 1 }, 1);
-    expect(container.textContent).toContain("Search stopped early. This is the best plan found so far.");
+    expect([...container.querySelectorAll(".xp-warn")].map((chip) => chip.textContent)).toEqual(["Stopped early"]);
   });
 });

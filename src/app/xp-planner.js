@@ -4,7 +4,8 @@ import { DOMINANT_ADVENTURE_LEVELS } from "../loot/tables.js";
 import { simulateAdventureChestOpening } from "../loot/simulate.js";
 import { getItemXp } from "../loot/xp.js";
 import { validateLevel, validateVaultPercentage } from "../validation.js";
-import { renderXpPath, renderError } from "../ui/render.js";
+import { renderXpPath, renderError, boxArt, el } from "../ui/render.js";
+import { getItemPresentation } from "../ui/presentation.js";
 import { state, currentId, currentState, isAdventure } from "./state.js";
 import { $, numberField, positiveInteger, vaultValue } from "./dom.js";
 import { contextMatches, invalidateChest, replayRoute, commitOpenings, syncSearchControls, SETTINGS_CHANGED } from "./routes.js";
@@ -30,8 +31,33 @@ export function invalidateXp() {
   state.xpRun = null;
   state.xpView = null;
   $("#xp-out").textContent = "";
-  $("#xp-status").textContent = "";
+  $("#xp-actions").textContent = "";
+  setStatus("");
   syncSearchControls();
+}
+
+function setStatus(text, busy = false) {
+  const status = $("#xp-status");
+  status.textContent = text;
+  status.dataset.busy = busy ? "yes" : "no";
+}
+
+// The heading shows the adventure's own icon and the stepper its vault key.
+function syncXpArt(cardId) {
+  $("#xp-icon").replaceChildren(boxArt(cardId));
+  $("#xp-key-art").src = getItemPresentation(cardId === "adventure_Pirate" ? "PirateKeyIcon" : "ZeusKeyIcon").image;
+}
+
+// "Stopped." with no plan gets a Try again button outside #xp-out.
+function syncRetry(show) {
+  const actions = $("#xp-actions");
+  actions.textContent = "";
+  if (!show) return;
+  const retry = el("button", "btn btn--primary btn--lg", "Try again");
+  retry.id = "xp-retry";
+  retry.type = "button";
+  retry.addEventListener("click", runXpSearch);
+  actions.append(retry);
 }
 
 // What you would bank by just replaying the highest level every time. Spends
@@ -96,7 +122,10 @@ export function syncSmartXp() {
   state.xpLevelChestId = cardId;
   if (!adventure) return;
 
-  if (previousChestId !== cardId) $("#xp-maxlevel").value = state.live[cardId].level ?? 1;
+  if (previousChestId !== cardId) {
+    $("#xp-maxlevel").value = state.live[cardId].level ?? 1;
+    syncXpArt(cardId);
+  }
   // One vault rate for the whole app; this field is a hidden mirror of #vault.
   $("#xp-vault").value = $("#vault").value;
   syncXpEstimate();
@@ -146,7 +175,7 @@ async function runXpSearch() {
     invalidateXp();
     state.xpRun = run;
     syncSearchControls();
-    $("#xp-status").textContent = "Planning…";
+    setStatus("Planning…", true);
     const started = Date.now();
     const eventType = cardId.slice("adventure_".length);
     const solution = await findOptimalXpPath({
@@ -158,7 +187,7 @@ async function runXpSearch() {
       openings,
       maxOpens,
       onProgress: (depth) => {
-        if (state.xpRun === run && contextMatches(run, "xp")) $("#xp-status").textContent = `Planning… · ${depth} opens deep`;
+        if (state.xpRun === run && contextMatches(run, "xp")) setStatus(`Planning… · ${depth} opens deep`, true);
       },
       shouldStop: () => run.stopped || state.xpRun !== run || !contextMatches(run, "xp")
     });
@@ -170,16 +199,19 @@ async function runXpSearch() {
       run.seed, cardId, eventType, maxLevel, vaultPercentage, openings,
       Math.min(maxOpens, solution.path.length)
     );
-    state.xpView = { ...run, solution, baseline, openings, done: 0 };
+    // A Stop that lands after the last node still counts as stopped early.
+    const result = run.stopped && !solution.stopped ? { ...solution, stopped: true } : solution;
+    state.xpView = { ...run, solution: result, baseline, openings, done: 0 };
     drawXpPath();
-    $("#xp-status").textContent =
-      `${solution.nodesVisited.toLocaleString()} routes checked in ${((Date.now() - started) / 1000).toFixed(1)} seconds.` +
-      (run.stopped ? " Stopped early; showing the best route found." : "");
+    syncRetry(result.stopped && result.path.length === 0);
+    const checked = `${solution.nodesVisited.toLocaleString("en-US")} routes checked in ${((Date.now() - started) / 1000).toFixed(1)}s`;
+    setStatus(result.stopped ? `Stopped early · ${checked}` : checked);
   } catch (err) {
     if (run && (state.xpRun !== run || !contextMatches(run, "xp"))) return;
     state.xpView = null;
     renderError($("#xp-out"), err.message);
-    $("#xp-status").textContent = "";
+    syncRetry(false);
+    setStatus("");
   } finally {
     if (state.xpRun === run) state.xpRun = null;
     syncSearchControls();
@@ -206,6 +238,6 @@ export function initXpPlanner() {
   $("#xp-stop").addEventListener("click", () => {
     if (!state.xpRun) return;
     state.xpRun.stopped = true;
-    $("#xp-status").textContent = "Stopping…";
+    setStatus("Stopping…", true);
   });
 }
