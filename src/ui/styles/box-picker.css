@@ -1,8 +1,8 @@
 /* area:box-picker — rail, box tiles, box header. Tab styles live in components.css. */
-.rail-title { font-size: var(--t-h2); margin-bottom: 8px; }
-.box-rail-list { display: grid; gap: 14px; }
+.rail-title { font-size: var(--t-h2); line-height: 1.15; margin: 4px 0 12px; }
+.box-rail-list { display: grid; gap: 18px; }
 .box-group { display: grid; gap: 8px; }
-.box-group-title { font-size: var(--t-label); color: var(--ink-muted); }
+.box-group-title { font: 800 18px/1.15 var(--font-ui); color: var(--ink); }
 .box-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 10px; }
 
 .box-tile {
@@ -18,11 +18,13 @@
   transition: var(--ease-press);
 }
 .box-tile:hover { border-color: #bfe5fd; }
+.box-tile:hover .box-art img { transform: translateY(-3px); }
+.box-art img { transition: transform .12s ease-out; }
 .box-tile:active { transform: translateY(5px); box-shadow: 0 0 0 #c3cad2; }
 .box-tile:focus-visible { box-shadow: 0 5px 0 #c3cad2, var(--focus); border-radius: 16px; }
 .box-tile.is-active { border: 4px solid var(--primary); box-shadow: 0 5px 0 var(--primary-lip); padding: 6px 6px 7px; }
 .chest-name {
-  font: 800 var(--t-label)/1.15 var(--font-ui); color: var(--ink);
+  font: 700 var(--t-label)/1.15 var(--font-ui); color: var(--ink);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .box-check {
@@ -39,11 +41,18 @@
 .box-header-art .box-art { width: 96px; }
 .box-header-name { font-size: var(--t-title); flex: 1; min-width: 0; }
 .box-header-level { margin-left: auto; }
+.box-header-art .box-art { box-shadow: inset 0 -6px 0 color-mix(in srgb, var(--box) 75%, #000), 0 5px 0 rgb(0 0 0 / .12); }
+
+@media (prefers-reduced-motion: reduce) {
+  .box-art img { transition: none; }
+  .box-tile:hover .box-art img { transform: none; }
+}
 
 @media (max-width: 767px) {
   .box-rail { padding: 14px 12px; }
   .box-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 8px; }
   .box-header { gap: 12px; padding: 12px; flex-wrap: wrap; }
-  .box-header-art, .box-header-art .box-art { width: 72px; }
-  .box-header-level { margin-left: 0; width: 100%; display: flex; justify-content: center; align-items: center; gap: 12px; }
+  .box-header-art, .box-header-art .box-art { width: 64px; }
+  .box-header-level { margin-left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 4px 0; border-top: 3px solid var(--divider); }
+  .box-header-level > label { font-size: 18px; }
 }

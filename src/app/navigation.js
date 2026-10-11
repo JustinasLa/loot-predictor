@@ -66,14 +66,24 @@ export function enterBoxScreen() {
   setScreen("box");
 }
 
+function scrollToTop() {
+  document.documentElement.scrollTop = 0;
+}
+
+/** Opens the Box screen. Coming from the phone Boxes screen, it starts at the top on the box name. */
 function goToBox() {
+  const fromBoxes = $("#workspace").dataset.screen === "boxes";
   if (location.hash !== "#box") history.pushState(null, "", "#box");
   setScreen("box");
+  if (!fromBoxes) return;
+  scrollToTop();
+  $("#current-chest-name").focus({ preventScroll: true });
 }
 
 function goToBoxes() {
   history.replaceState(null, "", "#boxes");
   setScreen("boxes");
+  scrollToTop();
 }
 
 export function selectChest(id) {

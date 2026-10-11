@@ -123,6 +123,31 @@ describe("phone screens", () => {
     expect(location.hash).toBe("#box");
   });
 
+  it("opens a tapped box at the top with focus on its name, and keeps focus on desktop", async () => {
+    await init(restored());
+    const root = document.documentElement;
+    let top = 0;
+    const scrolls = [];
+    Object.defineProperty(root, "scrollTop", { configurable: true, get: () => top, set: (value) => { top = value; scrolls.push(value); } });
+    top = 400;
+    dispatch("#back-to-boxes");
+    expect(top).toBe(0);
+    top = 400;
+    chest("egg_Rare");
+    expect(top).toBe(0);
+    expect(document.activeElement).toBe($("#current-chest-name"));
+    expect($("#current-chest-name").textContent).toBe("Rare Egg");
+    top = 400;
+    scrolls.length = 0;
+    const tile = $('#box-rail-list [data-card-id="small"]');
+    tile.focus();
+    tile.click();
+    expect(scrolls).toEqual([]);
+    expect(top).toBe(400);
+    expect(document.activeElement.dataset.cardId).toBe("small");
+    delete root.scrollTop;
+  });
+
   it("follows the browser Back and Forward buttons", async () => {
     await init(restored());
     history.replaceState(null, "", "#boxes");
