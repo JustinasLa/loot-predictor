@@ -70,14 +70,32 @@ function enableControls() {
 function clearImportStatus() {
   $("#import-status").textContent = "";
   $("#workspace-status").textContent = "";
+  $("#try-another-file").classList.add("is-hidden");
+}
+
+function showLoading(filename) {
+  clearImportStatus();
+  for (const id of ["#import-status", "#workspace-status"]) {
+    const line = document.createElement("p");
+    line.className = "status-line is-busy load-status";
+    line.textContent = `Reading ${filename}…`;
+    $(id).append(line);
+  }
+}
+
+/** Maps a parser or reader error to the short Start-screen copy. */
+export function importErrorMessage(error) {
+  if (error.message === "savegame contains no supported chests or eggs") return IMPORT_ERRORS.noBoxes;
+  if (error.message === IMPORT_ERRORS.unreadable) return IMPORT_ERRORS.unreadable;
+  return IMPORT_ERRORS.badFile;
 }
 
 function showImportError(error) {
-  const message = error.message === "savegame contains no supported chests or eggs"
-    ? IMPORT_ERRORS.noBoxes
-    : error.message === IMPORT_ERRORS.unreadable ? IMPORT_ERRORS.unreadable : IMPORT_ERRORS.badFile;
+  const message = importErrorMessage(error);
   renderError($("#import-status"), message);
   renderError($("#workspace-status"), message);
+  // Lives outside the status region so it is not swallowed by re-renders.
+  $("#try-another-file").classList.remove("is-hidden");
 }
 
 function adoptSave(parsed, filename) {
@@ -129,7 +147,7 @@ function restore() {
 }
 
 export function initSession() {
-  for (const id of ["#load-save", "#load-save-menu", "#welcome-load-save"]) {
+  for (const id of ["#load-save", "#load-save-menu", "#welcome-load-save", "#try-another-file"]) {
     $(id).addEventListener("click", () => $("#save").click());
   }
   $("#load-demo").addEventListener("click", () => {
@@ -144,10 +162,7 @@ export function initSession() {
     e.target.value = "";
     if (!file) return;
     const token = ++state.saveLoadToken;
-    clearImportStatus();
-    const loading = `Reading ${file.name}…`;
-    $("#import-status").textContent = loading;
-    $("#workspace-status").textContent = loading;
+    showLoading(file.name);
     try {
       const parsed = await readSave(file);
       if (token === state.saveLoadToken) adoptSave(parsed, file.name);
