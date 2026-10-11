@@ -31,7 +31,13 @@
   animation: load-spin .7s linear infinite;
 }
 @keyframes load-spin { to { transform: rotate(360deg); } }
-.try-another { margin-top: -6px; margin-bottom: 4px; }
+.import-status .error-how {
+  display: inline; min-height: 0; padding: 0 2px; margin: 0;
+  background: none; border: 0; border-radius: 6px;
+  color: #0b6fae; font: inherit; font-weight: 800;
+  text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px;
+  cursor: pointer;
+}
 
 .welcome-lock {
   display: flex; align-items: center; justify-content: center; gap: 6px;
@@ -43,7 +49,7 @@
 .welcome-help summary {
   cursor: pointer; list-style: none;
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 48px; color: var(--primary-lip); font-weight: 800; font-size: var(--t-body);
+  min-height: 48px; color: #0b6fae; font-weight: 800; font-size: var(--t-body);
   border-radius: 12px;
 }
 .welcome-help summary::-webkit-details-marker { display: none; }
@@ -53,11 +59,23 @@
   background: var(--primary); color: #fff; font-size: 16px;
   box-shadow: inset 0 -3px 0 var(--primary-lip);
 }
-.welcome-help p {
-  background: var(--panel-row); border-radius: 12px; padding: 10px 12px; margin-top: 8px;
-  font-size: var(--t-body); font-weight: 600; line-height: 1.35;
+/* Picture steps: where the save comes from. */
+.save-steps { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.save-step {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--panel-row); border-radius: 14px; padding: 8px 12px;
+  font: 700 var(--t-body)/1.25 var(--font-ui); color: var(--ink);
 }
-.app-footer { text-align: center; color: #fff; opacity: .8; font-size: var(--t-small); font-weight: 700; }
+.save-step-pic { flex: none; width: 116px; display: grid; place-items: center; }
+.save-step-pic .btn--mini { font-size: 15px; padding: 8px 12px; margin: 0; }
+.save-step-pic--file svg, .save-step-pic--lock svg { width: 36px; height: 36px; }
+.save-step-pic--file { color: var(--primary); }
+.save-step-pic--lock { color: var(--go-lip); }
+
+.app-footer {
+  text-align: center; color: #fff; font-size: var(--t-label); font-weight: 700;
+  text-shadow: 0 1px 0 rgb(0 0 0 / .35), 0 0 6px rgb(0 40 110 / .45);
+}
 
 /* Phone: the panel fills the screen and the buttons sit inside it, near the
    bottom of the viewport. The shared action bar is fixed on phone, so it is
@@ -66,7 +84,9 @@
   body:not([data-loaded="yes"]) { padding-bottom: 0; }
   .welcome { margin: 0 auto; gap: 10px; }
   .welcome-card {
-    min-height: calc(100dvh - var(--hud-h) - 24px);
+    /* Card + footer fill the screen exactly: top gutter (16), gap (10), footer line (~22) and bottom gutter (24). */
+    min-height: calc(100dvh - var(--frame-top) - 76px);
+    box-sizing: border-box;
     padding: 24px 16px 12px; gap: 14px;
   }
   /* Centre the chest and headline in the space above the buttons. */
@@ -80,18 +100,16 @@
   .welcome-help summary { min-height: 44px; }
 }
 
-/* Demo banner: a thin gold strip at the top of the box list. */
+/* Demo banner: a gold "Demo save" pill and a real button, top of the box list. */
 .demo-banner {
-  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px;
-  background: var(--gold); color: var(--gold-ink);
-  border-radius: 14px; padding: 2px 12px; margin-bottom: 14px;
-  box-shadow: 0 4px 0 var(--gold-lip);
-  font-weight: 800; font-size: 16px; line-height: 1.2;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 10px;
+  background: #fff7d6; border: 3px solid var(--gold); border-radius: 16px;
+  padding: 8px 8px 4px 12px; margin-bottom: 14px;
 }
-.demo-banner-link {
-  min-height: 44px; padding: 2px 4px;
-  background: none; border: 0; color: var(--gold-ink);
-  font: inherit; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px;
-  cursor: pointer; border-radius: 8px;
+.demo-banner-text {
+  display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; margin-bottom: 4px;
+  background: var(--gold); color: var(--gold-ink); border-radius: var(--radius-pill);
+  box-shadow: 0 3px 0 var(--gold-lip);
+  font: 800 15px/1 var(--font-ui);
 }
-.demo-banner-link:hover { color: #000; }
+.demo-banner-load { flex: 1 1 auto; }

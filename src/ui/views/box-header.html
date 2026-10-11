@@ -1,15 +1,18 @@
 <!-- area:box-picker start (box header) -->
-<div class="box-header panel">
+<div id="box-header" class="box-header panel">
   <span id="current-chest-art" class="box-header-art" data-box="unknown" aria-hidden="true"></span>
   <h1 id="current-chest-name" class="box-header-name" tabindex="-1">Pick a box</h1>
+  <button id="switch-box" type="button" class="icon-btn btn btn--ghost box-header-switch" aria-label="Change box">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm10 0h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1ZM4 13h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Zm10 0h6a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/></svg>
+  </button>
   <div id="preview-level-field" class="stepper-field box-header-level is-hidden">
     <label for="preview-level">Level</label>
     <div class="stepper">
-      <button type="button" class="icon-btn btn btn--primary" data-step-for="preview-level" data-step="-1" aria-label="Less Level">
+      <button type="button" class="icon-btn btn btn--primary" data-step-for="preview-level" data-step="-1">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect fill="currentColor" x="4" y="9.5" width="16" height="5" rx="2.5"/></svg>
       </button>
       <input id="preview-level" type="number" min="1" max="100" inputmode="numeric" />
-      <button type="button" class="icon-btn btn btn--primary" data-step-for="preview-level" data-step="1" aria-label="More Level">
+      <button type="button" class="icon-btn btn btn--primary" data-step-for="preview-level" data-step="1">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.5a2.5 2.5 0 0 1 2.5 2.5v3.5H18a2.5 2.5 0 0 1 0 5h-3.5V18a2.5 2.5 0 0 1-5 0v-3.5H6a2.5 2.5 0 0 1 0-5h3.5V6A2.5 2.5 0 0 1 12 3.5Z"/></svg>
       </button>
     </div>

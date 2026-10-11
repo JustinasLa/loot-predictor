@@ -58,7 +58,9 @@ describe("numeric controls", () => {
     input("#seed", value);
     expect(stored().live.big.seed).toBe(42);
     expect($("#seed").value).toBe("42");
-    expect($("#out .error-box")).not.toBeNull();
+    // The error stays in the Settings sheet, next to the field.
+    expect($("#settings-error .error-box")).not.toBeNull();
+    expect($("#seed").getAttribute("aria-invalid")).toBe("true");
   });
 
   it("accepts both signed int32 seed boundaries", async () => {

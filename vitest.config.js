@@ -5,6 +5,9 @@ export default defineConfig({
     environment: "node",
     restoreMocks: true,
     unstubGlobals: true,
+    // App tests import the whole app; under coverage with many workers the
+    // first test in a file can pass 5s on a busy machine.
+    testTimeout: 15000,
     coverage: {
       provider: "istanbul",
       include: ["src/**/*.js", "tools/**/*.mjs"],

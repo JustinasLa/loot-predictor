@@ -37,10 +37,10 @@
   --display-stroke: #003c97;
 
   /* buttons: face / lip */
-  --primary: #4bbeff;  --primary-lip: #2c9cdd;
-  --go: #4bc25d;       --go-lip: #2f9a40;
+  --primary: #4bbeff;  --primary-lip: #1a7fc0;
+  --go: #4bc25d;       --go-lip: #23802f;
   --gold: #ffd746;     --gold-lip: #e0a21c;  --gold-ink: #5a3a00;
-  --danger: #ff554b;   --danger-lip: #dd362c;
+  --danger: #ff554b;   --danger-lip: #c42a20;
   --ghost: #ffffff;    --ghost-lip: #b9bfc6;  --ghost-border: #d5d9de;
 
   /* rarity: face / dark lip / light tint */
@@ -55,7 +55,6 @@
   --box-small: #7cc8f0;  --box-big: #ffd76a;     --box-clan: #c9d2e3;  --box-pet: #e9c58f;
   --box-mine: #ff9d6c;   --box-seaport: #5fd6d6; --box-space: #2f4f9e; --box-middleages: #b07a4a;
   --box-alchemist: #5fd39b; --box-zeus: #2f7fe0; --box-pirate: #f2c45a;
-  --box-egg: #ffffff;
   --box-unknown: #a7b0bd;
 
   /* type */
@@ -118,4 +117,10 @@
 [data-box="alchemist"] { --box: var(--box-alchemist); }
 [data-box="zeus"] { --box: var(--box-zeus); }
 [data-box="pirate"] { --box: var(--box-pirate); }
-[data-box="egg"] { --box: var(--box-egg); }
+/* Eggs take the colour of their rarity, like the egg sprites themselves. */
+[data-box="egg-common"] { --box: var(--r-common); }
+[data-box="egg-rare"] { --box: var(--r-rare); }
+[data-box="egg-epic"] { --box: var(--r-epic); }
+[data-box="egg-legendary"] { --box: var(--r-legendary); }
+[data-box="egg-ultimate"] { --box: var(--r-ultimate); }
+[data-box="egg-mythic"] { --box: var(--r-mythic); }

@@ -5,12 +5,19 @@ import { bodyHtml } from "./helpers/html.js";
 const html = bodyHtml();
 import { renderChestList, renderItemPicker, renderResults, renderError } from "../src/ui/render.js";
 import { item } from "./fixtures.js";
+import { initSteppers } from "../src/ui/components/stepper.js";
+
+// Stepper buttons get their names from one rule in stepper.js.
+const mountShell = () => {
+  document.body.innerHTML = html;
+  initSteppers(document);
+};
 
 beforeEach(() => { document.body.innerHTML = ""; });
 
 describe("keyboard-accessible controls", () => {
   it("provides native, focusable save-loading and HUD buttons", () => {
-    document.body.innerHTML = html;
+    mountShell();
 
     for (const id of ["load-save", "load-save-menu", "welcome-load-save", "load-demo", "help-trigger", "settings-trigger", "user-menu-trigger", "back-to-boxes"]) {
       const button = document.getElementById(id);
@@ -34,7 +41,7 @@ describe("keyboard-accessible controls", () => {
   });
 
   it("offers a focusable shortcut past navigation and names every form control", () => {
-    document.body.innerHTML = html;
+    mountShell();
     const skip = document.querySelector('a[href="#main-content"]');
     const main = document.getElementById("main-content");
     expect(skip).not.toBeNull();
@@ -53,7 +60,7 @@ describe("keyboard-accessible controls", () => {
   });
 
   it("keeps accessible labels and control relationships valid throughout the shell", () => {
-    document.body.innerHTML = html;
+    mountShell();
     const ids = [...document.querySelectorAll("[id]")].map((node) => node.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const attribute of ["aria-controls", "aria-labelledby", "aria-describedby"]) {
@@ -75,7 +82,7 @@ describe("keyboard-accessible controls", () => {
   });
 
   it("names every icon button, gives every image an alt and wires the HUD sheet triggers", () => {
-    document.body.innerHTML = html;
+    mountShell();
     const iconButtons = document.querySelectorAll(".icon-btn");
     expect(iconButtons.length).toBeGreaterThan(0);
     for (const button of iconButtons) {

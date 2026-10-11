@@ -1,9 +1,5 @@
 /* area:marking-history-savemenu — "Mark many" in Settings (the toast lives in components.css). */
-.mark-many {
-  display: grid; gap: 12px;
-  padding-top: 14px; margin-top: 4px;
-  border-top: 3px solid var(--divider);
-}
+.mark-many { display: grid; gap: 12px; }
 .mark-many-title {
   display: flex; align-items: center; gap: 10px;
   font-size: var(--t-btn); color: var(--ink);

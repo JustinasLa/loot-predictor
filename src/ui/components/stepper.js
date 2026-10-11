@@ -14,8 +14,10 @@ export function initSteppers(root = document) {
     const input = doc.getElementById(button.dataset.stepFor);
     const step = Number(button.dataset.step);
     if (!button.hasAttribute("aria-label")) {
-      const label = input.labels[0]?.textContent.trim() ?? "";
-      button.setAttribute("aria-label", `${step < 0 ? "Less" : "More"} ${label}`.trim());
+      // "Decrease How many", "Increase Keys I have": the field's own label,
+      // without its trailing question mark or colon.
+      const label = (input.labels[0]?.textContent.trim() ?? "").replace(/[?:]$/, "");
+      button.setAttribute("aria-label", `${step < 0 ? "Decrease" : "Increase"} ${label}`.trim());
     }
     button.addEventListener("click", () => {
       input.value = String(nextValue(input, step));

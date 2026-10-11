@@ -1,19 +1,20 @@
 /* area:xp-planner — XP tab. */
 .smart-xp { display: grid; gap: 16px; }
+.smart-xp, .xp-steppers, .xp-field { min-width: 0; }
 
-/* Heading: the adventure's own icon beside the title. */
+/* Heading: the adventure's own icon beside the title, left like the other tabs. */
 .xp-title {
   margin: 0;
-  display: flex; align-items: center; justify-content: center; gap: 12px;
+  display: flex; align-items: center; gap: 12px;
 }
 .xp-icon { display: inline-flex; flex: none; }
 .xp-icon:empty { display: none; }
-.xp-icon .box-art { width: 56px; }
+.xp-icon .box-art { width: 52px; border-radius: 12px; }
 
-/* Two big stepper cards side by side. */
+/* Two big stepper cards side by side, full width. */
 .xp-steppers {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px; max-width: 560px; width: 100%; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: 12px; width: 100%;
 }
 .xp-field {
   background: var(--panel-row);
@@ -27,20 +28,17 @@
   display: grid; place-items: center;
 }
 .xp-field-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 0 rgb(0 0 0 / .2)); }
-.xp-field-art--level {
-  width: 48px; height: 48px; border-radius: 50%;
-  background: #1a1f26; color: #fff;
-  font: 800 20px/1 var(--font-ui);
-  box-shadow: 0 4px 0 #000;
-}
+.xp-field-art--level .box-art { width: 52px; border-radius: 12px; }
+.xp-field-art--level .box-art img { width: 80%; height: 80%; }
 
 /* The one big green button. */
-.xp-action { display: flex; justify-content: center; gap: 12px; max-width: 560px; width: 100%; margin: 0 auto; }
+.xp-action { display: flex; gap: 12px; width: 100%; }
 .xp-action .btn--go { flex: 1; }
 .xp-action .btn--ghost { flex: none; }
 
 .smart-xp .status-line { text-align: center; margin: 0; }
 .xp-estimate-line { font-size: var(--t-label); font-weight: 700; margin-top: -4px !important; }
+.xp-estimate-line:not(:has(#xp-estimate:not(:empty))) { display: none; }
 #xp-estimate[data-heavy="yes"] { color: var(--gold-ink); }
 
 /* Busy spinner in the button colour. */
@@ -53,18 +51,19 @@
 }
 @keyframes xp-spin { to { transform: rotate(360deg); } }
 
-/* Result */
+/* Result: a banner with its chips inside, then the step cards. */
 .xp-out { display: grid; gap: 16px; }
 .xp-out:empty { display: none; }
-.xp-summary { padding: 16px 16px 18px; margin-bottom: 6px; }
+.xp-summary { padding: 16px 16px 18px; margin-bottom: 6px; gap: 8px; }
 .xp-summary p { margin: 0; }
 .xp-delta { font: 800 var(--t-body)/1.2 var(--font-ui); }
 .xp-delta[data-sign="up"] { font-size: var(--t-display); line-height: 1.05; letter-spacing: .5px; }
-.xp-summary--flat { box-shadow: 0 6px 0 #d3d8de; }
+.xp-summary--flat { background: #fff; box-shadow: 0 6px 0 #d3d8de; }
 .xp-summary--flat .xp-delta { font-size: var(--t-h2); }
-.xp-versus { font: 700 var(--t-body)/1.2 var(--font-ui); opacity: .95; }
+.xp-versus { font: 800 var(--t-body)/1.2 var(--font-ui); }
+.xp-summary--flat .xp-versus { color: var(--ink-muted); }
 
-.xp-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.xp-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 4px; }
 .xp-chip {
   display: inline-flex; align-items: center; gap: 6px;
   min-height: 40px; padding: 6px 14px;
@@ -73,30 +72,18 @@
   box-shadow: 0 4px 0 #c3cad2;
   font: 800 16px/1 var(--font-ui);
   font-variant-numeric: tabular-nums;
+  -webkit-text-stroke: 0; text-shadow: none;
 }
 .xp-keys { padding-left: 6px; }
 .xp-keys .item-art { width: 30px; height: 30px; display: grid; place-items: center; }
 .xp-keys .item-art img { width: 100%; height: 100%; object-fit: contain; }
 .xp-keys .item-fallback { font-size: 12px; }
 .xp-warn { background: var(--gold); color: var(--gold-ink); border-color: var(--gold-lip); box-shadow: 0 4px 0 var(--gold-lip); }
-.xp-progress { background: var(--primary); color: #fff; border-color: var(--primary-lip); box-shadow: 0 4px 0 var(--primary-lip); text-shadow: 0 2px 0 rgb(0 0 0 / .2); }
-.xp-progress.is-done { background: var(--go); border-color: var(--go-lip); box-shadow: 0 4px 0 var(--go-lip); }
+.xp-progress { background: var(--primary); color: #fff; border-color: var(--primary-lip); box-shadow: 0 4px 0 var(--primary-lip); -webkit-text-stroke: 4px var(--primary-lip); paint-order: stroke fill; text-shadow: 0 2px 0 var(--primary-lip); }
+.xp-progress.is-done { background: var(--go); border-color: var(--go-lip); box-shadow: 0 4px 0 var(--go-lip); -webkit-text-stroke-color: var(--go-lip); text-shadow: 0 2px 0 var(--go-lip); }
 
-/* Steps: the level to pick is the title, with an XP pill beside it. */
-.xp-steps { display: grid; gap: 16px; margin-top: 10px; }
+.xp-steps { display: grid; gap: 18px; margin-top: 4px; }
 .xp-steps:empty { display: none; }
-.xp-step .open-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
-.xp-step .open-title { font: 800 var(--t-h2)/1.15 var(--font-ui); margin: 0; }
-.xp-step.is-next .open-heading { justify-content: center; }
-.xp-pill {
-  display: inline-flex; align-items: center;
-  padding: 5px 12px; border-radius: var(--radius-pill);
-  background: var(--go); color: #fff;
-  font: 800 var(--t-label)/1 var(--font-ui);
-  box-shadow: 0 3px 0 var(--go-lip);
-  text-shadow: 0 2px 0 rgb(0 0 0 / .2);
-  font-variant-numeric: tabular-nums;
-}
 
 /* No plan / stopped */
 .xp-empty { display: grid; justify-items: center; gap: 12px; }
@@ -106,17 +93,17 @@
 .xp-actions:empty { display: none; }
 
 @media (max-width: 767px) {
-  .xp-steppers { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .xp-steppers { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .xp-field { padding: 10px 4px 12px; }
-  .xp-field > label { font-size: var(--t-label); }
+  .xp-field > label { font-size: var(--t-label); text-align: center; }
   .xp-field .stepper { gap: 4px; }
   .xp-field .stepper input { width: 52px; }
   .xp-field .icon-btn { width: 44px; height: 44px; min-height: 44px; padding: 0; }
-  .xp-action { max-width: none; margin: 0; }
-  .xp-step .open-title { font-size: var(--t-btn); }
+}
+@media (max-width: 374px) {
+  .xp-steppers { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .xp-status[data-busy="yes"]::before { animation: none; }
 }
-.xp-summary--flat .xp-versus { color: var(--ink-muted); }

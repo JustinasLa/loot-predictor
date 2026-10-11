@@ -2,7 +2,7 @@
 import { parseSavegame } from "../save/parse.js";
 import * as storage from "../storage.js";
 import { createDemoSave, DEMO_FILENAME } from "../ui/demo.js";
-import { renderError } from "../ui/render.js";
+import { renderError, el } from "../ui/render.js";
 import { state, currentId } from "./state.js";
 import { $, $$, vaultValue } from "./dom.js";
 import { previewCount, refresh } from "./predict.js";
@@ -70,7 +70,13 @@ function enableControls() {
 function clearImportStatus() {
   $("#import-status").textContent = "";
   $("#workspace-status").textContent = "";
-  $("#try-another-file").classList.add("is-hidden");
+}
+
+/** Opens the Start screen's "What's a save file?" picture steps. */
+export function showSaveHelp() {
+  const help = $(".welcome-help");
+  help.open = true;
+  help.querySelector("summary").focus();
 }
 
 function showLoading(filename) {
@@ -94,8 +100,13 @@ function showImportError(error) {
   const message = importErrorMessage(error);
   renderError($("#import-status"), message);
   renderError($("#workspace-status"), message);
-  // Lives outside the status region so it is not swallowed by re-renders.
-  $("#try-another-file").classList.remove("is-hidden");
+  // "Load my save" sits right above; a wrong file gets a "How?" to the steps.
+  if (message === IMPORT_ERRORS.badFile) {
+    const how = el("button", "error-how", "How?");
+    how.type = "button";
+    how.addEventListener("click", showSaveHelp);
+    $("#import-status .error-reason").append(" ", how);
+  }
 }
 
 function adoptSave(parsed, filename) {
@@ -147,7 +158,7 @@ function restore() {
 }
 
 export function initSession() {
-  for (const id of ["#load-save", "#load-save-menu", "#welcome-load-save", "#try-another-file"]) {
+  for (const id of ["#load-save", "#load-save-menu", "#welcome-load-save"]) {
     $(id).addEventListener("click", () => $("#save").click());
   }
   $("#load-demo").addEventListener("click", () => {

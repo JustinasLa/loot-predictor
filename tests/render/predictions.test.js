@@ -72,7 +72,7 @@ describe("predictions renderer", () => {
     const open = vi.fn();
     renderResults(container, "big", [opening(), opening(2, { keyRoll: 12 })], open);
     const buttons = container.querySelectorAll("button");
-    expect([...buttons].map((button) => button.textContent)).toEqual(["I opened it!", "Opened up to here"]);
+    expect([...buttons].map((button) => button.textContent)).toEqual(["I opened it!", "I opened up to #2"]);
     expect(buttons[0].title).toBe("Marks this box opened");
     expect(buttons[1].title).toBe("Marks 2 boxes opened");
     buttons[0].click();

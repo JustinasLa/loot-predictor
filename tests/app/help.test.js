@@ -25,8 +25,12 @@ describe("help sheet", () => {
       "Pick a box.",
       "See what comes out, in order.",
       "I opened it! Opened it in the game? Tap I opened it!",
+      "Find shows when your item comes.",
+      "XP plans the most XP for your keys.",
       "Your save stays on this device.",
     ]);
+    // The button name never breaks over two lines.
+    expect($(".help-nowrap").textContent).toBe("I opened it!");
     expect($("#help-sheet button:not(.sheet-close)")).toBeNull();
     trigger.click();
     expect($("#help-sheet").classList.contains("is-hidden")).toBe(true);
@@ -41,8 +45,10 @@ describe("help sheet", () => {
     expect(trigger.getAttribute("aria-expanded")).toBe("true");
     expect($("#help-sheet").contains(document.activeElement)).toBe(true);
     const sprites = $$("#help-sheet img").map((img) => img.getAttribute("src").split("/").pop());
-    expect(sprites).toEqual(["BigChestIcon.webp", "Ring_Silver.webp", "Ring_Snake.webp"]);
-    expect($$("#help-sheet .item-tile").map((tile) => tile.dataset.rarity)).toEqual(["Rare", "Legendary"]);
+    expect(sprites).toEqual(["BigChestIcon.webp", "Ring_Silver.webp", "Ring_Snake.webp", "Pet_Penguin.webp", "GreekAdventureIcon.webp"]);
+    expect($$("#help-sheet .item-tile").map((tile) => tile.dataset.rarity)).toEqual(["Rare", "Legendary", "Epic"]);
+    // Every row has a picture in the same fixed column.
+    expect($$(".help-row").every((row) => row.firstElementChild.classList.contains("help-pic"))).toBe(true);
     expect($("#help-sheet ol")).toBeNull();
     expect($("#help-sheet .help-rows").textContent).not.toMatch(/\d/);
     expect($("#help-sheet .btn--mini").getAttribute("aria-hidden")).toBe("true");

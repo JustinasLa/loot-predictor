@@ -46,7 +46,8 @@ describe("box rail", () => {
     expect($("#current-chest-art").dataset.box).toBe("big");
     expect($("#current-chest-art img").getAttribute("src")).toBe("/assets/items/BigChestIcon.webp");
     chest("egg_Rare");
-    expect($("#current-chest-art").dataset.box).toBe("egg");
+    // Eggs take their rarity colour.
+    expect($("#current-chest-art").dataset.box).toBe("egg-rare");
     expect($("#current-chest-name").textContent).toBe("Rare Egg");
   });
 

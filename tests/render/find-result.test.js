@@ -50,7 +50,7 @@ describe("find-result renderer", () => {
     expect(titles()).toEqual(["Next box", "#2", "#3", "#4"]);
     expect(container.querySelectorAll(".open-title")[1].getAttribute("aria-label")).toBe("Opening 2");
     const fold = container.querySelector("details.find-skip");
-    expect(fold.querySelector("summary").textContent).toBe("+2 opens");
+    expect(fold.querySelector("summary").textContent).toBe("Show 2 more boxes");
     expect(fold.querySelectorAll(".open-box")).toHaveLength(2);
     const yours = container.querySelectorAll('[data-hit="yes"]');
     expect(yours).toHaveLength(1);
@@ -58,7 +58,7 @@ describe("find-result renderer", () => {
     const buttons = container.querySelectorAll("button");
     expect(buttons).toHaveLength(4);
     expect(buttons[0].textContent).toBe("I opened it!");
-    expect(buttons[1].textContent).toBe("Opened up to here");
+    expect(buttons[1].textContent).toBe("I opened up to #2");
     buttons[0].click();
     buttons[3].click();
     expect(open.mock.calls).toEqual([[path.slice(0, 1)], [path]]);
@@ -84,7 +84,8 @@ describe("find-result renderer", () => {
     expect(radios[0].name).toBe(radios[1].name);
     const blocks = container.querySelectorAll(".route-block");
     expect(blocks[1].classList.contains("is-hidden")).toBe(true);
-    expect(titles()).toEqual(["Open at level 12", "Open at level 3", "Open at level 5"]);
+    expect(titles()).toEqual(["Next box", "Next box", "#2"]);
+    expect([...container.querySelectorAll(".open-level")].map((node) => node.textContent)).toEqual(["Lv 12", "Lv 3", "Lv 5"]);
     expect(container.querySelector("button").textContent).toBe("I opened it!");
     radios[1].checked = true;
     radios[1].dispatchEvent(new Event("change"));
@@ -105,6 +106,7 @@ describe("find-result renderer", () => {
     expect(container.querySelectorAll(".route-block > h3")).toHaveLength(1);
     expect(container.querySelector(".route-toggle")).toBeNull();
     expect(titles()).toEqual(["Next box"]);
+    expect(container.querySelector(".open-level")).toBeNull();
   });
 
   it("labels key costs and keeps negative costs at zero keys", () => {

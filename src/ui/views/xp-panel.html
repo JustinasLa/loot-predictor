@@ -7,18 +7,18 @@
         <span class="xp-field-art" aria-hidden="true"><img id="xp-key-art" src="{{BASE}}assets/items/ZeusKeyIcon.webp" width="44" height="44" alt="" /></span>
         <label for="xp-openings">Keys I have</label>
         <div class="stepper">
-          <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-openings" data-step="-1" aria-label="Less Keys I have"><svg viewBox="0 0 24 24" aria-hidden="true"><rect fill="currentColor" x="4" y="9.5" width="16" height="5" rx="2.5"/></svg></button>
+          <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-openings" data-step="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect fill="currentColor" x="4" y="9.5" width="16" height="5" rx="2.5"/></svg></button>
           <input id="xp-openings" type="number" value="4" min="1" inputmode="numeric" />
-          <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-openings" data-step="1" aria-label="More Keys I have"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.5a2.5 2.5 0 0 1 2.5 2.5v3.5H18a2.5 2.5 0 0 1 0 5h-3.5V18a2.5 2.5 0 0 1-5 0v-3.5H6a2.5 2.5 0 0 1 0-5h3.5V6A2.5 2.5 0 0 1 12 3.5Z"/></svg></button>
+          <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-openings" data-step="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.5a2.5 2.5 0 0 1 2.5 2.5v3.5H18a2.5 2.5 0 0 1 0 5h-3.5V18a2.5 2.5 0 0 1-5 0v-3.5H6a2.5 2.5 0 0 1 0-5h3.5V6A2.5 2.5 0 0 1 12 3.5Z"/></svg></button>
         </div>
       </div>
       <div class="stepper-field xp-field">
-        <span class="xp-field-art xp-field-art--level" aria-hidden="true">Lv</span>
+        <span id="xp-level-art" class="xp-field-art xp-field-art--level" aria-hidden="true"></span>
         <label for="xp-maxlevel">My top level</label>
         <div class="stepper">
-          <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-maxlevel" data-step="-1" aria-label="Less My top level"><svg viewBox="0 0 24 24" aria-hidden="true"><rect fill="currentColor" x="4" y="9.5" width="16" height="5" rx="2.5"/></svg></button>
+          <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-maxlevel" data-step="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect fill="currentColor" x="4" y="9.5" width="16" height="5" rx="2.5"/></svg></button>
           <input id="xp-maxlevel" type="number" value="60" min="1" max="100" inputmode="numeric" />
-          <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-maxlevel" data-step="1" aria-label="More My top level"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.5a2.5 2.5 0 0 1 2.5 2.5v3.5H18a2.5 2.5 0 0 1 0 5h-3.5V18a2.5 2.5 0 0 1-5 0v-3.5H6a2.5 2.5 0 0 1 0-5h3.5V6A2.5 2.5 0 0 1 12 3.5Z"/></svg></button>
+          <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-maxlevel" data-step="1"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.5a2.5 2.5 0 0 1 2.5 2.5v3.5H18a2.5 2.5 0 0 1 0 5h-3.5V18a2.5 2.5 0 0 1-5 0v-3.5H6a2.5 2.5 0 0 1 0-5h3.5V6A2.5 2.5 0 0 1 12 3.5Z"/></svg></button>
         </div>
       </div>
     </div>
@@ -28,8 +28,8 @@
     </div>
     <p class="status-line xp-estimate-line"><span id="xp-estimate"></span></p>
     <p id="xp-status" role="status" class="status-line xp-status"></p>
-    <div id="xp-out" class="search-results xp-out"></div>
-    <div id="xp-actions" class="xp-actions"></div>
   </div>
+  <div id="xp-out" class="search-results xp-out"></div>
+  <div id="xp-actions" class="xp-actions"></div>
 </section>
 <!-- area:xp-planner end -->

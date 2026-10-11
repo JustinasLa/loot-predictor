@@ -58,7 +58,12 @@ describe("items renderer", () => {
     expect(container.querySelector(".item-rarity").textContent).toBe("Resource");
     const quantity = container.querySelector(".item-quantity");
     expect(quantity?.textContent ?? null).toBe(expected);
-    if (quantity) expect(quantity.getAttribute("aria-label")).toBe(`Quantity: ${expected.slice(1)}`);
+    if (quantity) {
+      // A plain span cannot carry a name: the amount is read from sr-only text.
+      expect(quantity.getAttribute("aria-hidden")).toBe("true");
+      expect(quantity.nextElementSibling.classList.contains("sr-only")).toBe(true);
+      expect(quantity.nextElementSibling.textContent).toBe(`Quantity ${expected.slice(1)}`);
+    }
   });
 
   it("does not mislabel equipment pool indices or item-picker entries as quantities", () => {

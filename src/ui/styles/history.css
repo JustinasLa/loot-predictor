@@ -27,16 +27,24 @@
 #history .empty { display: grid; justify-items: center; gap: 8px; padding: 12px; }
 #history .empty-art { width: 72px; height: 72px; object-fit: contain; opacity: .55; filter: grayscale(.3); }
 
-/* Past cards: flat, sunk and compact, with 64px tiles. */
+/* Past cards: flat, sunk and compact. 68px tiles in columns that span the
+   card, so names have room and never break mid-word. */
 #history .open-box.is-past {
   background: var(--panel-sunk); box-shadow: none; border: 3px solid var(--divider);
   padding: 12px; gap: 10px;
 }
 #history .is-past .open-title { font-size: var(--t-btn); color: var(--ink-muted); }
 #history .is-past .item-grid {
-  grid-template-columns: repeat(auto-fill, 64px); justify-content: start; gap: 10px 8px;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px 8px;
 }
-#history .is-past .item-tile { --lip-tile: 3px; border-width: 2px; filter: saturate(.75); }
+#history .is-past .item-tile {
+  width: min(100%, 68px); justify-self: center;
+  --lip-tile: 3px; border-width: 2px; filter: saturate(.6);
+}
 #history .is-past .item-tile::before { animation: none; }
-#history .is-past .item-name { font-size: var(--t-small); }
+#history .is-past .item-name { font-size: var(--t-label); overflow-wrap: normal; word-break: normal; hyphens: none; }
 #history .is-past .item-quantity { font-size: 15px; -webkit-text-stroke-width: 4px; }
+
+@media (max-width: 767px) {
+  #history .is-past .item-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

@@ -56,9 +56,24 @@ describe("item-picker renderer", () => {
     const combined = { ...item("Pet_RedPanda", "Legendary / Ultimate"), rarities: ["Legendary", "Ultimate"] };
     const combinedLabel = item("Pet_Panda", "Epic / Legendary");
     renderItemPicker(container, [common, combined, combinedLabel], new Set(), vi.fn(), { rarity: "LEGENDARY" });
-    expect([...container.querySelectorAll("button")].map((button) => button.dataset.baseName)).toEqual(["Pet_RedPanda", "Pet_Panda"]);
+    expect([...container.querySelectorAll("button")].map((button) => button.dataset.baseName)).toEqual(["Pet_Panda", "Pet_RedPanda"]);
     renderItemPicker(container, [common, combined], new Set(), vi.fn(), { query: "common", rarity: "common" });
     expect(container.querySelector("button").dataset.baseName).toBe("Ring_Bronze");
+  });
+
+  it("orders tiles by game rarity (Common, Rare, Epic, Legendary, Ultimate, Mythic), then by name", async () => {
+    const { byRarity } = await import("../../src/ui/render/item-picker.js");
+    const items = [
+      item("Hat_Cashier", "Legendary"), item("Ring_Bronze", "Epic"), item("Tool_Hammer", "Rare"),
+      item("Hat_Barista", "Common"), item("PetFood", "None"), item("Tool_Knife", "Rare"),
+      item("Tool_LaserGun", "Mythic"), item("Pet_Mole", "Ultimate"),
+    ];
+    renderItemPicker(container, items, new Set(), vi.fn());
+    expect([...container.querySelectorAll("button")].map((button) => button.dataset.baseName)).toEqual([
+      "Hat_Barista", "Tool_Knife", "Tool_Hammer", "Ring_Bronze", "Hat_Cashier", "Pet_Mole", "Tool_LaserGun", "PetFood",
+    ]);
+    expect(byRarity(items)).not.toBe(items);
+    expect(items[0].baseName).toBe("Hat_Cashier");
   });
 
   it("explains an empty filtered list and restores items when filters are cleared", () => {

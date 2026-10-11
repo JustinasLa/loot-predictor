@@ -15,8 +15,8 @@ describe("stepper component", () => {
     const events = vi.fn();
     input.addEventListener("input", () => events("input"));
     input.addEventListener("change", () => events("change"));
-    expect(less.getAttribute("aria-label")).toBe("Less Level");
-    expect(more.getAttribute("aria-label")).toBe("More Level");
+    expect(less.getAttribute("aria-label")).toBe("Decrease Level");
+    expect(more.getAttribute("aria-label")).toBe("Increase Level");
     more.click();
     more.click();
     expect(input.value).toBe("3");
@@ -30,6 +30,17 @@ describe("stepper component", () => {
     expect(input.value).toBe("1");
   });
 
+  it("drops a trailing question mark or colon from the label", () => {
+    document.body.innerHTML = `
+      <label for="n">How many?</label><input id="n" type="number" />
+      <button data-step-for="n" data-step="1"></button>
+      <label for="m">Keys:</label><input id="m" type="number" />
+      <button data-step-for="m" data-step="-1"></button>`;
+    initSteppers();
+    expect([...document.querySelectorAll("button")].map((b) => b.getAttribute("aria-label")))
+      .toEqual(["Increase How many", "Decrease Keys"]);
+  });
+
   it("works without limits, keeps given labels and handles unlabelled inputs", () => {
     document.body.innerHTML = `
       <div id="root">
@@ -40,7 +51,7 @@ describe("stepper component", () => {
     initSteppers(document.getElementById("root"));
     const [up, down] = document.querySelectorAll("button");
     expect(up.getAttribute("aria-label")).toBe("Up");
-    expect(down.getAttribute("aria-label")).toBe("Less");
+    expect(down.getAttribute("aria-label")).toBe("Decrease");
     up.click();
     expect(document.getElementById("free").value).toBe("0");
     up.click();

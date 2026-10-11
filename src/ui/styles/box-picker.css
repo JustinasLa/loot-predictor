@@ -34,11 +34,21 @@
   border: 3px solid #fff; box-shadow: 0 3px 0 var(--go-lip);
 }
 .box-badges { position: absolute; left: 4px; bottom: 6px; display: flex; flex-wrap: wrap; gap: 3px; z-index: 1; }
-.box-badges .badge { font-size: 12px; padding: 3px 6px; }
+.box-badges .badge { font-size: 13px; font-weight: 800; padding: 3px 6px; }
+
+/* Pets group: a peek at the pets each egg hatches. */
+.box-pets { display: flex; justify-content: center; gap: 2px; margin-top: -2px; }
+.box-pets .item-art { width: 26px; height: 26px; display: grid; place-items: center; }
+.box-pets img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 0 rgb(0 0 0 / .18)); }
+.box-pets .item-fallback { font: 800 11px/1 var(--font-ui); color: var(--ink-muted); }
 
 .box-header { display: flex; align-items: center; gap: 16px; }
-.box-header-art { flex: none; width: 96px; }
-.box-header-art .box-art { width: 96px; }
+@media (min-width: 768px) { .box-header { padding: 12px 20px; } }
+.box-header-art { flex: none; width: 72px; }
+.box-header-art .box-art { width: 72px; }
+.box-header-switch { display: none; }
+/* Find and XP have their own level fields; the header only names the box. */
+.box-header.is-compact .box-header-level { display: none; }
 .box-header-name { font-size: var(--t-title); flex: 1; min-width: 0; }
 .box-header-level { margin-left: auto; }
 .box-header-art .box-art { box-shadow: inset 0 -6px 0 color-mix(in srgb, var(--box) 75%, #000), 0 5px 0 rgb(0 0 0 / .12); }
@@ -48,6 +58,22 @@
   .box-tile:hover .box-art img { transform: none; }
 }
 
+/* Desktop rail: the list scrolls inside the sticky panel and fades out at the
+   bottom, so the groups below the fold read as "more to scroll". */
+@media (min-width: 768px) {
+  .box-rail { display: flex; flex-direction: column; overflow: hidden; }
+  .box-rail > :not(.box-rail-list) { flex: none; }
+  .box-rail-list {
+    flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+    margin: -14px -14px -20px; padding: 14px 14px 48px;
+    scrollbar-width: thin; scrollbar-color: #c3cad2 transparent;
+    -webkit-mask-image: linear-gradient(#000 calc(100% - 56px), transparent);
+    mask-image: linear-gradient(#000 calc(100% - 56px), transparent);
+  }
+  /* Two or three tabs never need the full column. */
+  .box-main > .seg-tabs { justify-self: start; width: min(100%, 520px); box-sizing: border-box; }
+}
+
 @media (max-width: 767px) {
   .box-rail { padding: 14px 12px; }
   .box-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 8px; }
@@ -55,4 +81,13 @@
   .box-header-art, .box-header-art .box-art { width: 64px; }
   .box-header-level { margin-left: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 4px 0; border-top: 3px solid var(--divider); }
   .box-header-level > label { font-size: 18px; }
+  .box-header-switch { display: inline-flex; margin-left: auto; --lip: 4px; margin-bottom: 4px; }
+  .box-header-switch svg { color: var(--primary-lip); }
+  .box-header-name { font-size: 24px; }
+  /* Find and XP: a slim header leaves room for one more row of items. */
+  .box-header.is-compact { padding: 8px 12px; }
+  .box-header.is-compact .box-header-art,
+  .box-header.is-compact .box-header-art .box-art { width: 44px; }
+  .box-header.is-compact .box-header-art .box-art { border-radius: 10px; }
+  .box-header.is-compact .box-header-name { font-size: 22px; }
 }

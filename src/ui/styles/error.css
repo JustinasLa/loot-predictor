@@ -1,9 +1,13 @@
-/* area:settings-help-errors — error placement and the two-tone line
-   (the base .error-box component is in components.css). */
+/* area:settings-help-errors — the error box (DESIGN §3.12): a lead line
+   and a muted reason. */
 .error-box {
   position: relative;
   margin: 0;
-  padding-left: 48px;
+  background: var(--r-ultimate-tint);
+  border: 3px solid var(--danger);
+  border-radius: 14px;
+  padding: 10px 14px 10px 48px;
+  color: var(--ink);
   font: 600 var(--t-body)/1.35 var(--font-ui);
   text-align: left;
 }
@@ -16,5 +20,5 @@
   color: #fff; font: 800 18px/1 var(--font-ui);
 }
 .error-lead { color: var(--ink); font-weight: 800; }
-.error-reason { color: var(--ink-muted); font-weight: 600; }
+.error-reason { color: var(--ink-muted); font-weight: 600; font-size: var(--t-label); }
 #out > .error-box, #find-out > .error-box, #xp-out > .error-box { grid-column: 1 / -1; }
