@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import html from "../index.html?raw";
 import { parseSavegame } from "../src/save/parse.js";
 import { predictChain } from "../src/loot/simulate.js";
+import { CHEST_ID_MAP, EGG_RARITY_MAP } from "../src/loot/tables.js";
+import { createDemoSave, DEMO_FILENAME } from "../src/ui/demo.js";
 import { savegame, item, step } from "./fixtures.js";
 
 vi.mock("../src/solver/xp-path.js", async (importOriginal) => {
@@ -23,11 +25,10 @@ const stored = () => JSON.parse(localStorage.getItem(KEY));
 const dispatch = (selector, type = "click") => $(selector).dispatchEvent(new Event(type, { bubbles: true }));
 function input(selector, value, type = "change") { $(selector).value = String(value); dispatch(selector, type); }
 function chest(id, tab = "predict") {
-  const button = [...$(`#sidebar-${tab}-list`).children].find((button) => button.querySelectorAll("span")[1].textContent === id);
-  button.click();
+  $(`#sidebar-${tab}-list [data-card-id="${id}"]`).click();
 }
 function target(baseName) {
-  [...$("#find-items").children].find((chip) => chip.firstElementChild.textContent === baseName).click();
+  $(`#find-items [data-base-name="${baseName}"]`).click();
 }
 async function init(state) {
   if (state !== undefined) localStorage.setItem(KEY, JSON.stringify(state));
@@ -36,7 +37,7 @@ async function init(state) {
 async function upload(text = JSON.stringify(savegame()), name = "synthetic.json") {
   Object.defineProperty($("#save"), "files", { configurable: true, value: [new File([text], name, { type: "application/json" })] });
   dispatch("#save", "change");
-  await vi.waitFor(() => expect($("#user-filename").textContent === name || $("#out .error-box")).toBeTruthy());
+  await vi.waitFor(() => expect($("#user-filename").textContent === name || $("#import-status .error-box")).toBeTruthy());
 }
 function restored(overrides = {}) {
   const saved = parseSavegame(JSON.stringify(savegame()));
@@ -63,7 +64,7 @@ describe("savegame and prediction UI", () => {
     dispatch("#save", "change");
     expect(stored()).toBeNull();
     dispatch("#count", "change");
-    expect($("#out").textContent).toContain("load a savegame first");
+    expect($("#out").textContent).toContain("Load a save file");
   });
 
   it("loads a save, advances the live seed, resets it and persists the baseline", async () => {
@@ -71,7 +72,7 @@ describe("savegame and prediction UI", () => {
     await upload();
     expect($("#user-panel-guest").classList.contains("is-hidden")).toBe(true);
     expect($("#user-filename").title).toBe("synthetic.json");
-    expect($("#out .open-title").textContent).toContain("big");
+    expect($("#current-chest-name").textContent).toBe("Big Box");
     const expected = predictChain(42, "big", 2);
     dispatch('.open-btn[data-open="2"]');
     expect(stored().live.big.seed).toBe(expected[1].nextSeed);
@@ -108,25 +109,25 @@ describe("savegame and prediction UI", () => {
     expect(stored().live.egg_Rare.opened).toBe(10000);
     expect(stored().live.egg_Rare.history).toHaveLength(100);
     expect($("#history").querySelectorAll(".open-box")).toHaveLength(100);
-    expect($("#history .open-title").textContent).toContain("open #10000");
+    expect($("#history .open-title").textContent).toContain("Opened 10000");
     expect(stored().live.egg_Rare.seed).toBe(predictChain(42, "egg_Rare", 10000).at(-1).nextSeed);
   });
 
   it("reports parsing and file-reader errors", async () => {
     await init();
     await upload("{}");
-    expect($("#out").textContent).toContain("not a valid savegame");
+    expect($("#import-status").textContent).toContain("Choose a valid save file");
     class UnreadableFile { readAsText() { this.onerror(); } }
     vi.stubGlobal("FileReader", UnreadableFile);
     await upload("{}", "unreadable.json");
-    expect($("#out").textContent).toContain("couldnt read file");
+    expect($("#import-status").textContent).toContain("Could not read this file");
   });
 
   it("rejects a save with no mapped chests", async () => {
     await init();
     await upload('{"GameSavegame":{}}');
-    expect($("#out").textContent).toContain("no supported chests or eggs");
-    expect($("#sidebar-predict-list").children).toHaveLength(0);
+    expect($("#import-status").textContent).toContain("no supported boxes, chests, or eggs");
+    expect($("#sidebar-predict-list").querySelectorAll("[data-card-id]")).toHaveLength(0);
   });
 
   it("restores selected chests, seeds, targets and UI values", async () => {
@@ -143,14 +144,14 @@ describe("savegame and prediction UI", () => {
 
   it.each([undefined, { cardId: "gone", findCardId: "gone" }, { cardId: "", findCardId: "", count: "", vault: "", filename: "" }])("falls back from incomplete UI preferences: %j", async (ui) => {
     await init(restored({ ui }));
-    expect($("#out .open-title").textContent).toContain("big");
+    expect($("#current-chest-name").textContent).toBe("Big Box");
     expect($("#user-filename").textContent).toBe("savegame");
   });
 
   it("rejects an empty cached session and can unload storage", async () => {
     await init({ saved: {}, live: {}, ui: {} });
     expect($("#seed").disabled).toBe(true);
-    expect($("#sidebar-predict-list").children).toHaveLength(0);
+    expect($("#sidebar-predict-list").querySelectorAll("[data-card-id]")).toHaveLength(0);
     const reload = vi.fn();
     vi.stubGlobal("location", { reload });
     dispatch("#unload");
@@ -163,6 +164,9 @@ describe("savegame and prediction UI", () => {
     const menu = $("#user-menu");
     dispatch("#user-menu-trigger");
     expect(menu.classList.contains("is-hidden")).toBe(false);
+    dispatch("#user-menu-trigger");
+    expect(menu.classList.contains("is-hidden")).toBe(true);
+    dispatch("#user-menu-trigger");
     menu.dispatchEvent(new Event("click", { bubbles: true }));
     expect(menu.classList.contains("is-hidden")).toBe(false);
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "x", bubbles: true }));
@@ -227,12 +231,12 @@ describe("adventure preview and XP UI", () => {
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out button")).not.toBeNull());
     expect($("#xp-search").disabled).toBe(false);
-    expect($("#xp-status").textContent).toContain("paths in");
+    expect($("#xp-status").textContent).toContain("routes checked in");
     $("#xp-out button").click();
     expect(stored().live.adventure_Zeus.opened).toBe(1);
-    expect($("#xp-out").textContent).toContain("1 of 2 opened");
+    expect($("#xp-out").textContent).toContain("1 of 2 openings recorded");
     $("#xp-out button").click();
-    expect($("#xp-out").textContent).toContain("path done");
+    expect($("#xp-out").textContent).toContain("Plan complete");
     chest("big");
     expect($("#xp-out").textContent).toBe("");
     expect($("#xp-status").textContent).toBe("");
@@ -242,13 +246,13 @@ describe("adventure preview and XP UI", () => {
     await init(restored({ ui: { cardId: "adventure_Zeus" } }));
     xpModule.findOptimalXpPath.mockImplementationOnce(async (opts) => {
       opts.onProgress(2);
-      expect($("#xp-status").textContent).toContain("depth 2");
+      expect($("#xp-status").textContent).toContain("through 2 openings");
       dispatch("#xp-stop");
       expect(opts.shouldStop()).toBe(true);
       return { path: [], xp: 0, nodesVisited: 2 };
     });
     dispatch("#xp-search");
-    await vi.waitFor(() => expect($("#xp-status").textContent).toContain("stopped early"));
+    await vi.waitFor(() => expect($("#xp-status").textContent).toContain("Stopped early"));
     xpModule.findOptimalXpPath.mockRejectedValueOnce(new Error("search failed"));
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out").textContent).toContain("search failed"));
@@ -278,8 +282,8 @@ describe("adventure preview and XP UI", () => {
     input("#xp-maxopens", 2);
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out button")).not.toBeNull());
-    expect($("#xp-out").textContent).toContain("2-open limit");
-    expect($("#xp-out").textContent).toContain("key(s) refunded");
+    expect($("#xp-out").textContent).toContain("2-opening limit");
+    expect($("#xp-out").textContent).toContain("bonus openings from key drops");
   });
 
   it("handles stale XP actions after switching chests and replacing the save", async () => {
@@ -314,10 +318,10 @@ describe("item hunt UI", () => {
     chest("egg_Rare", "find");
     dispatch("#find-run");
     await vi.waitFor(() => expect($("#find-out button")).not.toBeNull());
-    expect($("#find-status").textContent).toContain("opens in");
+    expect($("#find-status").textContent).toContain("possibilities checked in");
     $("#find-out button").click();
     expect(stored().live.egg_Rare.seed).toBe(302596119);
-    expect($("#find-out").textContent).toContain("got all targets");
+    expect($("#find-out").textContent).toContain("All selected items are marked as collected");
     expect($("#find-selected").textContent).toBe("");
   });
 
@@ -331,7 +335,7 @@ describe("item hunt UI", () => {
     await vi.waitFor(() => expect($("#find-out button")).not.toBeNull());
     expect(stored().targets.egg_Rare).toEqual(["Pet_HouseCat"]);
     $("#find-out button").click();
-    expect($("#find-out").textContent).toContain("got all targets");
+    expect($("#find-out").textContent).toContain("All selected items are marked as collected");
   });
 
   it("searches an adventure route and forwards stopping and fallback options", async () => {
@@ -357,10 +361,10 @@ describe("item hunt UI", () => {
   it("reports missing state, missing targets and solver errors", async () => {
     await init();
     dispatch("#find-run");
-    expect($("#find-out").textContent).toContain("load a savegame first");
+    expect($("#find-out").textContent).toContain("Load a save file");
     await upload();
     dispatch("#find-run");
-    expect($("#find-out").textContent).toContain("pick at least one item");
+    expect($("#find-out").textContent).toContain("Choose at least one item");
     target("Hat_Cashier");
     findModule.findItemLinearAsync.mockImplementationOnce(() => { throw new Error("hunt failed"); });
     dispatch("#find-run");
@@ -377,7 +381,7 @@ describe("item hunt UI", () => {
     input("#find-maxlevel", "");
     findModule.findAllPathsAsync.mockReturnValueOnce({ found: false, maxDepth: 10 });
     dispatch("#find-run");
-    await vi.waitFor(() => expect($("#find-status").textContent).toContain("0 nodes in"));
+    await vi.waitFor(() => expect($("#find-status").textContent).toContain("0 possibilities checked"));
     expect(findModule.findAllPathsAsync).toHaveBeenCalledWith(expect.objectContaining({ maxLevel: 1 }));
   });
 
@@ -447,7 +451,7 @@ describe("search lifecycle and route safety", () => {
     if (action === "switch") chest("big", "find");
     if (action === "import") await upload();
     const before = stored().live;
-    expect($("#find-out").textContent).toBe("");
+    expect($("#find-out .find-guidance")).not.toBeNull();
     obsolete.click();
     expect(stored().live).toEqual(before);
   });
@@ -460,7 +464,7 @@ describe("search lifecycle and route safety", () => {
     first.click();
     first.click();
     expect(stored().live.adventure_Zeus.opened).toBe(1);
-    expect($("#xp-out").textContent).toContain("1 of 2 opened");
+    expect($("#xp-out").textContent).toContain("1 of 2 openings recorded");
     $("#xp-out button").click();
     expect(stored().live.adventure_Zeus.opened).toBe(2);
   });
@@ -475,8 +479,8 @@ describe("search lifecycle and route safety", () => {
     expect(stored().live.adventure_Zeus.seed).toBe(chain.at(-1).nextSeed);
     expect(stored().live.adventure_Zeus.history).toHaveLength(100);
     expect($("#history").querySelectorAll(".open-box")).toHaveLength(100);
-    expect($("#history .open-title").textContent).toContain("open #101");
-    expect($("#xp-out").textContent).toContain("path done");
+    expect($("#history .open-title").textContent).toContain("Opened 101");
+    expect($("#xp-out").textContent).toContain("Plan complete");
   });
 
   it("rejects an XP batch atomically when a later step has the wrong seed", async () => {
@@ -485,7 +489,7 @@ describe("search lifecycle and route safety", () => {
     await xpRoute();
     $("#xp-out").querySelectorAll("button")[1].click();
     expect(stored().live.adventure_Zeus).toMatchObject({ seed: 42, opened: 0, history: [] });
-    expect($("#xp-out").textContent).toContain("out of date");
+    expect($("#xp-out").textContent).toContain("settings changed");
   });
 
   it("checks the current vault even when a route's change event has not fired", async () => {
@@ -494,7 +498,7 @@ describe("search lifecycle and route safety", () => {
     $("#vault").value = "100";
     $("#find-out button").click();
     expect(stored().live.egg_Rare.opened).toBe(0);
-    expect($("#find-out").textContent).toContain("out of date");
+    expect($("#find-out").textContent).toContain("settings changed");
   });
 
   it("ignores detached Upcoming actions after switching the selected chest", async () => {
@@ -524,7 +528,7 @@ describe("search lifecycle and route safety", () => {
     $("#xp-maxlevel").value = String(level);
     $("#xp-out button").click();
     expect(stored().live.adventure_Zeus.opened).toBe(0);
-    expect($("#xp-out").textContent).toContain("out of date");
+    expect($("#xp-out").textContent).toContain("settings changed");
   });
 
   it("rejects a route whose recorded next seed differs from replay before advancing history", async () => {
@@ -533,7 +537,7 @@ describe("search lifecycle and route safety", () => {
     await xpRoute();
     $("#xp-out button").click();
     expect(stored().live.adventure_Zeus.opened).toBe(0);
-    expect($("#xp-out").textContent).toContain("out of date");
+    expect($("#xp-out").textContent).toContain("settings changed");
   });
 
   it("ignores obsolete XP errors after switching chests", async () => {
@@ -557,7 +561,7 @@ describe("search lifecycle and route safety", () => {
     chest("big", "find");
     pending.resolve({ found: false, opens: 0, missing: ["Pet_GoldenRetriever"] });
     await Promise.resolve();
-    expect($("#find-out").textContent).toBe("");
+    expect($("#find-out .find-guidance")).not.toBeNull();
   });
 
   it("reports a bounded Find search as incomplete and forwards current progress", async () => {
@@ -565,11 +569,11 @@ describe("search lifecycle and route safety", () => {
     target("Ring_Bronze");
     findModule.findAllPathsAsync.mockImplementationOnce(async (options) => {
       options.onProgress(12);
-      expect($("#find-status").textContent).toContain("12 nodes");
+      expect($("#find-status").textContent).toContain("12 checked");
       return { found: false, maxDepth: 10, nodesVisited: 12, truncated: true };
     });
     dispatch("#find-run");
-    await vi.waitFor(() => expect($("#find-status").textContent).toContain("search limit reached"));
+    await vi.waitFor(() => expect($("#find-status").textContent).toContain("Search limit reached"));
   });
 
   it("ignores late Stop actions when no run is active", async () => {
@@ -583,11 +587,11 @@ describe("search lifecycle and route safety", () => {
   it("rejects an XP action on a non-adventure chest and mismatched vault views", async () => {
     await init(restored());
     dispatch("#xp-search");
-    expect($("#xp-out").textContent).toContain("choose an adventure chest");
+    expect($("#xp-out").textContent).toContain("Choose an adventure chest");
     chest("adventure_Zeus");
     $("#xp-vault").value = "10";
     dispatch("#xp-search");
-    expect($("#xp-out").textContent).toContain("vault percentages must match");
+    expect($("#xp-out").textContent).toContain("Key drop chance must match");
     expect(xpModule.findOptimalXpPath).not.toHaveBeenCalled();
   });
 
@@ -613,7 +617,7 @@ describe("search lifecycle and route safety", () => {
     expect($("#xp-search").disabled).toBe(true);
     expect($("#xp-stop").classList.contains("is-hidden")).toBe(false);
     second.resolve({ path: [], xp: 0, nodesVisited: 99 });
-    await vi.waitFor(() => expect($("#xp-status").textContent).toContain("99 paths"));
+    await vi.waitFor(() => expect($("#xp-status").textContent).toContain("99 routes checked"));
     expect($("#xp-search").disabled).toBe(false);
   });
 
@@ -674,7 +678,7 @@ describe("search lifecycle and route safety", () => {
     input("#xp-maxopens", 1);
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out button")).not.toBeNull());
-    expect($("#xp-out").textContent).toContain("in 1 opens");
+    expect($("#xp-out").textContent).toContain("in 1 opening");
   });
 
   it("bounds a stopped search's baseline by its partial path instead of the requested budget", async () => {
@@ -694,8 +698,8 @@ describe("search lifecycle and route safety", () => {
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out button")).not.toBeNull());
     expect(baselineCalls).toHaveBeenCalledTimes(1);
-    expect($("#xp-out").textContent).toContain("in 1 opens");
-    expect($("#xp-status").textContent).toContain("stopped early");
+    expect($("#xp-out").textContent).toContain("in 1 opening");
+    expect($("#xp-status").textContent).toContain("Stopped early");
   });
 });
 
@@ -706,7 +710,7 @@ describe("numeric controls", () => {
     Object.defineProperty($("#xp-vault"), "validity", { configurable: true, value: { badInput: true } });
     dispatch("#xp-vault", "change");
     expect($("#vault").value).toBe("25");
-    expect($("#out").textContent).toContain("enter a valid number");
+    expect($("#out").textContent).toContain("Enter a valid number");
     expect(stored().ui.vault).toBe("25");
   });
 
@@ -730,7 +734,7 @@ describe("numeric controls", () => {
     Object.defineProperty($("#xp-maxopens"), "validity", { configurable: true, value: { badInput: true } });
     dispatch("#xp-search");
     expect(xpModule.findOptimalXpPath).not.toHaveBeenCalled();
-    expect($("#xp-out").textContent).toContain("enter a valid number");
+    expect($("#xp-out").textContent).toContain("Enter a valid number");
   });
 
   it.each(["", 1.5, -2147483649, 2147483648, 9007199254740992])("rejects seed %s without changing the live seed", async (value) => {
@@ -784,6 +788,188 @@ describe("numeric controls", () => {
   });
 });
 
+describe("demo data", () => {
+  it("creates a fresh, deterministic example covering every supported chest and egg", () => {
+    const demo = createDemoSave();
+    expect(Object.keys(demo)[0]).toBe("big");
+    expect(Object.keys(demo).sort()).toEqual([...Object.values(CHEST_ID_MAP), ...Object.values(EGG_RARITY_MAP)].sort());
+    expect(createDemoSave()).toEqual(demo);
+    for (const [cardId, state] of Object.entries(demo)) {
+      expect(Number.isInteger(state.initialSeed)).toBe(true);
+      expect(predictChain(state.initialSeed, cardId, 1, { level: state.level })[0].items.length).toBeGreaterThan(0);
+      if (cardId.startsWith("adventure_")) expect(state.level).toBe(25);
+    }
+    demo.big.initialSeed = 0;
+    expect(createDemoSave().big.initialSeed).not.toBe(0);
+  });
+});
+
+describe("guided onboarding and item discovery", () => {
+  it("starts with a private demo and keeps tracked openings separate from its baseline", async () => {
+    await init();
+    expect($("#welcome-screen").classList.contains("is-hidden")).toBe(false);
+    expect($("#workspace").classList.contains("is-hidden")).toBe(true);
+    dispatch("#load-demo");
+    expect($("#welcome-screen").classList.contains("is-hidden")).toBe(true);
+    expect($("#workspace").classList.contains("is-hidden")).toBe(false);
+    expect($("#session-label").dataset.demo).toBe("true");
+    expect($("#session-label").textContent).toContain("example data");
+    expect($("#user-filename").textContent).toBe(DEMO_FILENAME);
+    expect($("#current-chest-name").textContent).toBe("Big Box");
+    expect(document.activeElement).toBe($("#current-chest-name"));
+    expect(stored().saved).toEqual(createDemoSave());
+    expect($("#out .open-box").querySelectorAll(".item-row")).toHaveLength(6);
+    const seed = stored().saved.big.initialSeed;
+    dispatch('.open-btn[data-open="1"]');
+    expect(stored().saved.big.initialSeed).toBe(seed);
+    expect(stored().live.big.seed).toBe(predictChain(seed, "big", 1)[0].nextSeed);
+    expect($("#open-status").textContent).toContain("1 opening tracked");
+    dispatch('.open-btn[data-open="1"]');
+    expect($("#open-status").textContent).toContain("2 openings tracked");
+  });
+
+  it("restores the demo label and active tool, preserving each tool's chosen chest", async () => {
+    await init(restored({ ui: { filename: DEMO_FILENAME, tab: "find", cardId: "big", findCardId: "egg_Rare" } }));
+    expect($("#session-label").dataset.demo).toBe("true");
+    expect($("#panel-find").classList.contains("is-hidden")).toBe(false);
+    expect($("#current-chest-name").textContent).toBe("Rare Egg");
+    const tabKey = new KeyboardEvent("keydown", { key: "Tab", bubbles: true, cancelable: true });
+    $("#nav-find").dispatchEvent(tabKey);
+    expect(tabKey.defaultPrevented).toBe(false);
+    expect(stored().ui.tab).toBe("find");
+    const description = $("#current-chest-description").textContent;
+    dispatch("#nav-predict");
+    expect(stored().ui.tab).toBe("predict");
+    expect($("#current-chest-name").textContent).toBe("Big Box");
+    expect($("#sidebar-find-list").parentElement.classList.contains("is-hidden")).toBe(true);
+    dispatch("#nav-find");
+    expect(stored().ui.tab).toBe("find");
+    expect($("#current-chest-name").textContent).toBe("Rare Egg");
+    expect($("#current-chest-description").textContent).toBe(description);
+    expect(stored().ui).toMatchObject({ cardId: "big", findCardId: "egg_Rare" });
+  });
+
+  it.each(["success", "error"])("keeps a newly selected demo when an older file read ends with %s", async (result) => {
+    const readers = [];
+    vi.stubGlobal("FileReader", class {
+      constructor() { readers.push(this); }
+      readAsText() {}
+    });
+    await init();
+    Object.defineProperty($("#save"), "files", { configurable: true, value: [new File([""], "pending.json")] });
+    dispatch("#save", "change");
+    expect($("#import-status").textContent).toContain("Reading pending.json");
+    dispatch("#load-demo");
+    if (result === "success") readers[0].onload({ target: { result: JSON.stringify(savegame()) } });
+    else readers[0].onerror();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(stored().saved).toEqual(createDemoSave());
+    expect($("#user-filename").textContent).toBe(DEMO_FILENAME);
+    expect($("#session-label").dataset.demo).toBe("true");
+    expect($("#import-status").textContent).toBe("");
+    expect($("#workspace-status").textContent).toBe("");
+  });
+
+  it("keeps an existing preview and tracked progress when a replacement file is invalid", async () => {
+    await init(restored());
+    dispatch('.open-btn[data-open="1"]');
+    const session = stored();
+    const preview = $("#out").innerHTML;
+    await upload("{}", "invalid.json");
+    expect($("#workspace-status .error-box").textContent).toContain("Choose a valid save file");
+    expect($("#out").innerHTML).toBe(preview);
+    expect(stored()).toEqual(session);
+    expect($("#save").value).toBe("");
+    await upload(JSON.stringify(savegame()), "fixed.json");
+    expect($("#workspace-status").textContent).toBe("");
+    expect($("#session-label").dataset.demo).toBe("false");
+    expect(stored().live.big.opened).toBe(0);
+  });
+
+  it("filters by friendly item name and rarity without losing selected targets", async () => {
+    await init(restored());
+    chest("egg_Rare", "find");
+    target("Pet_GoldenRetriever");
+    input("#item-search", "cat", "input");
+    expect($("#find-items").querySelectorAll(".item-chip")).toHaveLength(1);
+    expect($("#find-items .item-chip").dataset.baseName).toBe("Pet_HouseCat");
+    expect(stored().targets.egg_Rare).toEqual(["Pet_GoldenRetriever"]);
+    expect($("#find-run").disabled).toBe(false);
+    input("#item-search", "", "input");
+    expect($('#find-items [data-base-name="Pet_GoldenRetriever"]').getAttribute("aria-pressed")).toBe("true");
+    chest("big", "find");
+    input("#rarity-filter", "common");
+    expect($("#find-items").querySelectorAll(".item-chip").length).toBeGreaterThan(0);
+    expect([...$("#find-items").querySelectorAll(".item-chip")].every((chip) => chip.dataset.rarity === "Common")).toBe(true);
+    input("#item-search", "no such item", "input");
+    expect($("#find-items").querySelectorAll(".item-chip")).toHaveLength(0);
+    chest("egg_Rare", "find");
+    expect($("#item-search").value).toBe("");
+    expect($("#rarity-filter").value).toBe("all");
+    expect($('#find-items [data-base-name="Pet_GoldenRetriever"]').getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("keeps an in-progress search and its completed route when only display filters change", async () => {
+    await init(restored({ ui: { findCardId: "egg_Rare" } }));
+    target("Pet_GoldenRetriever");
+    const pending = deferred();
+    findModule.findItemLinearAsync.mockReturnValueOnce(pending.promise);
+    dispatch("#find-run");
+    const options = findModule.findItemLinearAsync.mock.calls[0][3];
+    input("#item-search", "cat", "input");
+    expect(options.shouldStop()).toBe(false);
+    expect($("#find-run").disabled).toBe(true);
+    pending.resolve(await realFind.findItemLinearAsync(42, "egg_Rare", ["Pet_GoldenRetriever"], { vaultPercentage: 0 }));
+    await vi.waitFor(() => expect($("#find-out button")).not.toBeNull());
+    const action = $("#find-out button");
+    input("#item-search", "retriever", "input");
+    expect($("#find-out button")).toBe(action);
+    expect(stored().targets.egg_Rare).toEqual(["Pet_GoldenRetriever"]);
+    action.click();
+    expect(stored().live.egg_Rare.opened).toBeGreaterThan(0);
+  });
+
+  it("clears prior selections and filters when replacing a demo with a real save", async () => {
+    await init();
+    dispatch("#load-demo");
+    chest("egg_Rare", "find");
+    target("Pet_GoldenRetriever");
+    input("#item-search", "retriever", "input");
+    input("#rarity-filter", "epic");
+    await upload();
+    expect(stored().targets).toEqual({});
+    expect($("#item-search").value).toBe("");
+    expect($("#rarity-filter").value).toBe("all");
+    expect($("#session-label").dataset.demo).toBe("false");
+    expect(stored().ui.tab).toBe("predict");
+    expect($("#current-chest-name").textContent).toBe("Big Box");
+  });
+
+  it("resets the visible Find chest while preserving the other tool's progress", async () => {
+    const state = restored({ ui: { tab: "find", cardId: "big", findCardId: "egg_Rare" } });
+    state.live.big = { seed: 123, opened: 1, history: [] };
+    state.live.egg_Rare = { seed: 456, opened: 2, history: [] };
+    await init(state);
+    dispatch("#reset");
+    expect(stored().live.egg_Rare).toMatchObject({ seed: 42, opened: 0, history: [] });
+    expect(stored().live.big).toMatchObject({ seed: 123, opened: 1 });
+    expect($("#current-chest-name").textContent).toBe("Rare Egg");
+    expect($("#find-out .find-guidance")).not.toBeNull();
+  });
+
+  it("leaves guest state intact when navigation or filters are used before loading", async () => {
+    await init();
+    dispatch("#nav-find");
+    input("#item-search", "cat", "input");
+    input("#rarity-filter", "rare");
+    dispatch("#reset");
+    expect($("#find-out").textContent).toContain("Load a save file");
+    expect(stored()).toBeNull();
+    expect($("#workspace").classList.contains("is-hidden")).toBe(true);
+  });
+});
+
 describe("account and import controls", () => {
   it.each(["success", "error"])("uses only the latest selected file when an older read finishes with %s", async (result) => {
     const readers = [];
@@ -810,22 +996,17 @@ describe("account and import controls", () => {
   });
 
   it("wires native load buttons and synchronizes expanded state and menu focus", async () => {
-    for (const id of ["load-save", "load-save-menu"]) {
-      if (!document.getElementById(id)) {
-        const button = document.createElement("button");
-        button.id = id;
-        (id.endsWith("menu") ? $("#user-menu") : document.body).append(button);
-      }
-    }
     await init(restored());
     const fileClick = vi.spyOn($("#save"), "click").mockImplementation(() => {});
-    $("#load-save").click();
+    $("#welcome-load-save").click();
     expect(fileClick).toHaveBeenCalledTimes(1);
+    $("#load-save").click();
+    expect(fileClick).toHaveBeenCalledTimes(2);
     $("#user-menu-trigger").click();
     expect($("#user-menu-trigger").getAttribute("aria-expanded")).toBe("true");
     $("#load-save-menu").focus();
     $("#load-save-menu").click();
-    expect(fileClick).toHaveBeenCalledTimes(2);
+    expect(fileClick).toHaveBeenCalledTimes(3);
     expect($("#user-menu-trigger").getAttribute("aria-expanded")).toBe("false");
     expect(document.activeElement).toBe($("#user-menu-trigger"));
     $("#user-menu-trigger").click();

@@ -191,7 +191,7 @@ describe("session persistence", () => {
     await expect(import("../src/app.js")).resolves.toBeDefined();
     expect(document.querySelector("#seed").value).toBe(String(state.live.big.seed));
     expect(document.querySelector("#find-selected").textContent).toBe("");
-    expect(document.querySelector("#history").textContent).toContain("nothing opened yet");
+    expect(document.querySelector("#history").textContent).toContain("No openings recorded yet");
   });
 
   it("leaves the real app in the guest view when the cached core is invalid", async () => {

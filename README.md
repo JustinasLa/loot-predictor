@@ -1,14 +1,17 @@
-# Loot Predictor
+# Loot Lookout
 
-Reverse-engineered Unity PRNG + loot tables: predict chest drops before you open them.
+An Eatventure loot predictor: see what is coming in your next box, find an
+item you want, and plan adventure replays. Item pictures, readable names, and
+rarity labels make the drops easy to recognize.
 
-The game persists one int32 seed per chest and advances it on every open. Rebuild
-the generator and the draw order, and the whole future chain becomes readable:
-what the next open contains, what the one after that contains, and which
-adventure level to replay so the chain lands on the loot you want.
+1. Select **Load save file** or **Try the demo** to explore with sample data.
+2. **Choose a box or egg** to see its next drops.
+3. Open it in Eatventure, then select **Mark 1 opened** here to keep your tracker
+   in step with the game.
 
-Savegames are parsed entirely in the browser. Nothing is uploaded, nothing is
-written back to the save.
+Marking an opening only updates this browser's tracker. It does not open
+anything in Eatventure or change your save file. Savegames are parsed entirely
+in the browser; nothing is uploaded or written back to the save.
 
 ## How it works
 
@@ -49,16 +52,26 @@ reports alongside it. CI runs the same coverage check before building.
 
 ## Web UI
 
-### Predict: walk the chain
+### Next drops
 
-Load a savegame, pick a chest, and read forward. "Open" advances the live seed
-so the tool stays in sync with the game; **Reset to savegame** rewinds to the
-file's seed. The live seed and the most recent 100 openings survive a refresh.
+The demo uses a synthetic save, so you can explore without a real save file.
+Load your own save to see predictions for your boxes and eggs. Drop cards show
+item pictures, names, and rarities. The layout adapts to phones, and controls
+have keyboard focus states and text labels.
+
+After opening a box in Eatventure, mark it as opened here. A batch action marks
+the first N openings in order. Your current position and the most recent 100
+openings survive a refresh. **Reset this box to your save** returns the selected
+box to its position in the loaded save and clears that box's tracked history.
+
+The browser stores extracted box data, tracked openings, selected items,
+preferences, and the file name. **Remove save from this device** clears the
+saved tracker data.
+
+**Advanced settings** expose the prediction seed and vault key chance.
 Loading another save or changing a route's seed or options clears stale routes.
 
-![Predict tab](docs/screenshots/predict.jpg)
-
-### Smart XP: pick the replay order
+### Plan your best XP path
 
 Adventure chests let you choose a level per open, and the level you pick for
 open #1 changes every draw after it. So the best route is a search, not a
@@ -66,21 +79,19 @@ per-open choice: a weak first open at a low level can set up a much better
 second one. Vault keys refund an opening, so a path can run deeper than the
 free-openings budget suggests.
 
-![Smart XP search](docs/screenshots/smart-xp.jpg)
+### Find an item
 
-### Find: hunt specific items
-
-Pick the items you want and search from the current live seed. Adventure chests
-get a full search over levels; everything else has no level to choose, so it
-walks the chain until the items turn up.
+Search item names, filter by rarity, and select the items you want. Select
+**Find my items** to search for a route that collects **all selected items**,
+starting from your current tracked position. Adventure chests get a full search
+over levels; everything else has no level to choose, so it walks the chain
+until the items turn up.
 
 Interactive Find searches remain cancellable and stop after 100,000 simulated
 openings. A stopped or limited run explicitly marks its results as incomplete;
 its routes are the best found so far. Library callers can set `maxNodes` on the
 async search APIs, while the synchronous APIs retain an unlimited node budget
 unless one is supplied. Targets match item IDs across all listed rarities.
-
-![Find tab](docs/screenshots/find.jpg)
 
 ## CLI
 
@@ -165,5 +176,9 @@ Chest ids: `small`, `big`, `clan`, `pet`, `adventure_Zeus`, `adventure_Pirate`,
 
 ## Notes
 
-Screenshots use a synthetic savegame, so the seeds and drops shown are examples,
-not anyone's real save.
+The demo and screenshots use a synthetic savegame; their seeds and drops are
+examples, not anyone's real save.
+
+This is an unofficial Eatventure companion. The bundled game artwork belongs
+to Lessmore GmbH and its respective rights holders. See
+[asset sources and attribution](docs/ASSETS.md).

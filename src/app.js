@@ -8,6 +8,8 @@ import { getItemXp } from "./loot/xp.js";
 import { findAllPathsAsync, findItemLinearAsync } from "./solver/find-items.js";
 import { getAvailableItemsForChest } from "./loot/items.js";
 import { validateInteger, validateSeed, validateLevel, validateVaultPercentage } from "./validation.js";
+import { getChestPresentation } from "./ui/presentation.js";
+import { createDemoSave, DEMO_FILENAME } from "./ui/demo.js";
 import {
   renderChestList, renderResults, renderHistory,
   renderXpPath, renderItemPicker, renderFindResult, renderError
@@ -28,6 +30,7 @@ let predictChestId = null;
 let findChestIdState = null;
 // The uploaded file's name, shown in the sidebar's user panel once loaded.
 let savegameFilename = "";
+let activeTab = "predict";
 // Which chest the level field was last shown/reset for, so switching chests
 // snaps it back to that chest's real level without stomping on an edit
 // you're still making on the same chest.
@@ -45,10 +48,10 @@ const $ = (sel) => document.querySelector(sel);
 function numberField(selector, validate, fallback) {
   const field = $(selector);
   const label = field.labels[0].textContent.trim();
-  if (field.validity.badInput) throw new Error("enter a valid number for " + label);
+  if (field.validity.badInput) throw new Error("Enter a valid number for " + label + ".");
   const value = field.value.trim();
   if (value === "" && fallback !== undefined) return fallback;
-  if (value === "") throw new Error("enter a value for " + label);
+  if (value === "") throw new Error("Enter a value for " + label + ".");
   return validate(Number(value));
 }
 
@@ -74,7 +77,7 @@ function invalidateXp() {
 function invalidateFind() {
   findRun = null;
   findView = null;
-  $("#find-out").textContent = "";
+  showFindGuidance();
   $("#find-status").textContent = "";
   syncSearchControls();
 }
@@ -121,7 +124,7 @@ function readSave(file) {
       try { resolve(parseSavegame(e.target.result)); }
       catch (err) { reject(err); }
     };
-    reader.onerror = () => reject(new Error("couldnt read file bruh"));
+    reader.onerror = () => reject(new Error("Could not read this file. Please choose it again."));
     reader.readAsText(file);
   });
 }
@@ -130,12 +133,32 @@ function currentId() {
   return predictChestId;
 }
 
-// Which panel is on screen. Picking a chest in either sidebar category
-// switches to that category's panel, same as clicking a Discord channel
-// jumps you to that channel.
+// Each tool remembers its selected chest, while only its chest list is shown.
 function showTab(tab) {
-  $("#panel-predict").classList.toggle("is-hidden", tab !== "predict");
-  $("#panel-find").classList.toggle("is-hidden", tab !== "find");
+  activeTab = tab;
+  for (const name of ["predict", "find"]) {
+    const selected = name === tab;
+    $("#panel-" + name).classList.toggle("is-hidden", !selected);
+    const button = $("#nav-" + name);
+    button.classList.toggle("is-active", selected);
+    button.setAttribute("aria-selected", String(selected));
+    button.tabIndex = selected ? 0 : -1;
+    $("#sidebar-" + name + "-list").parentElement.classList.toggle("is-hidden", !selected);
+  }
+  syncChestHeading();
+}
+
+function syncChestHeading() {
+  const cardId = activeTab === "find" ? findChestId() : currentId();
+  if (!cardId) return;
+  const chest = getChestPresentation(cardId);
+  $("#current-chest-name").textContent = chest.name;
+  $("#current-chest-description").textContent = chest.description;
+}
+
+function resetItemFilters() {
+  $("#item-search").value = "";
+  $("#rarity-filter").value = "all";
 }
 
 // Redraws both sidebar categories so the active row matches current state.
@@ -153,7 +176,10 @@ function selectPredictChest(id) {
 }
 
 function selectFindChest(id) {
-  if (findChestIdState !== id) invalidateFind();
+  if (findChestIdState !== id) {
+    invalidateFind();
+    resetItemFilters();
+  }
   findChestIdState = id;
   showTab("find");
   renderSidebars();
@@ -162,7 +188,7 @@ function selectFindChest(id) {
 
 function currentState() {
   const state = live[currentId()];
-  if (!state) throw new Error("load a savegame first bro");
+  if (!state) throw new Error("Load a save file or try the demo to see your next drops.");
   return state;
 }
 
@@ -197,7 +223,8 @@ function persist() {
       findCardId: findChestId(),
       count,
       vault,
-      filename: savegameFilename
+      filename: savegameFilename,
+      tab: activeTab
     }
   });
 }
@@ -212,13 +239,17 @@ function unloadSave() {
 function enableControls() {
   for (const id of ["#seed", "#reset", "#open-custom-go"]) $(id).disabled = false;
   for (const btn of document.querySelectorAll(".open-btn")) btn.disabled = false;
-  // Swap the sidebar's user panel from "load a savegame" to a logged-in bar,
-  // like signing into Discord.
+  $("#welcome-screen").classList.add("is-hidden");
+  $("#workspace").classList.remove("is-hidden");
   $("#user-panel-guest").classList.add("is-hidden");
   $("#user-panel-loggedin").classList.remove("is-hidden");
   const nameEl = $("#user-filename");
   nameEl.textContent = savegameFilename;
   nameEl.title = savegameFilename;
+  const session = $("#session-label");
+  const isDemo = savegameFilename === DEMO_FILENAME;
+  session.textContent = isDemo ? "Demo · example data" : "Your save · on this device";
+  session.dataset.demo = String(isDemo);
 }
 
 // Advance the live seed by `times` opens, recording what each one produced.
@@ -254,12 +285,15 @@ function syncPreviewLevelField(cardId, state) {
 }
 
 function resetChest() {
-  invalidateChest(currentId());
-  const state = currentState();
-  state.seed = saved[currentId()].initialSeed;
+  const cardId = activeTab === "find" ? findChestId() : currentId();
+  const state = live[cardId];
+  if (!state) throw new Error("Load a save file or try the demo first.");
+  invalidateChest(cardId);
+  state.seed = saved[cardId].initialSeed;
   state.opened = 0;
   state.history = [];
   refresh();
+  syncFindPanel();
 }
 
 // Redraw everything that depends on the live seed, then checkpoint.
@@ -273,8 +307,8 @@ function refresh() {
     $("#seed").value = state.seed;
     $("#history-count").textContent = state.opened ? `(${state.opened})` : "";
     $("#open-status").textContent = state.opened
-      ? `${state.opened} open(s) ahead of the savegame fr`
-      : "at savegame seed lol";
+      ? `${state.opened} ${state.opened === 1 ? "opening" : "openings"} tracked since this save. Your game is unchanged.`
+      : "Showing the next opening in this save.";
 
     syncPreviewLevelField(cardId, state);
     renderHistory($("#history"), cardId, state.history);
@@ -304,6 +338,8 @@ function adoptSave(parsed, filename) {
   invalidateFind();
   saved = parsed;
   savegameFilename = filename;
+  findTargets.clear();
+  resetItemFilters();
   previewLevelChestId = null;
   xpLevelChestId = null;
   findLevelChestId = null;
@@ -315,10 +351,13 @@ function adoptSave(parsed, filename) {
   const firstId = Object.keys(saved)[0];
   predictChestId = firstId;
   findChestIdState = firstId;
+  showTab("predict");
   renderSidebars();
   enableControls();
   refresh();
   syncFindPanel();
+  clearImportStatus();
+  $("#current-chest-name").focus({ preventScroll: true });
 }
 
 function restore() {
@@ -335,6 +374,7 @@ function restore() {
   predictChestId = state.ui?.cardId && live[state.ui.cardId] ? state.ui.cardId : firstId;
   findChestIdState = state.ui?.findCardId && live[state.ui.findCardId] ? state.ui.findCardId : firstId;
   savegameFilename = state.ui?.filename || "savegame";
+  showTab(state.ui?.tab === "find" ? "find" : "predict");
   renderSidebars();
   if (state.ui?.count) $("#count").value = state.ui.count;
   if (state.ui?.vault) $("#vault").value = state.ui.vault;
@@ -399,9 +439,8 @@ function syncXpEstimate() {
       : seconds < 3600 ? `~${Math.round(seconds / 60)}min`
       : `~${(seconds / 3600).toFixed(1)}h`;
 
-  // Key refunds extend the path, so this is a floor, not a ceiling.
-  label.textContent =
-    `≥ ${branches}^${openings} = ${paths.toExponential(1)} paths · ${cost}`;
+  // Key refunds extend the path, so this is only an estimate.
+  label.textContent = `Estimated search time: ${cost}. Key drops may make it take longer.`;
   label.dataset.heavy = seconds > 20 ? "yes" : "no";
 }
 
@@ -428,15 +467,15 @@ async function runXpSearch() {
   try {
     const cardId = currentId();
     const state = currentState();
-    if (!cardId.startsWith("adventure_")) throw new Error("choose an adventure chest");
+    if (!cardId.startsWith("adventure_")) throw new Error("Choose an adventure chest to plan for more XP.");
     const options = xpOptions();
     const { openings, maxLevel, vaultPercentage, maxOpens } = options;
-    if (vaultPercentage !== vaultValue()) throw new Error("vault percentages must match");
+    if (vaultPercentage !== vaultValue()) throw new Error("Key drop chance must match your preview settings.");
     run = { cardId, state, seed: state.seed, vaultPercentage, optionsKey: JSON.stringify(options), stopped: false };
     invalidateXp();
     xpRun = run;
     syncSearchControls();
-    $("#xp-status").textContent = "searching… lol";
+    $("#xp-status").textContent = "Finding a route with more XP…";
     const started = Date.now();
     const eventType = cardId.slice("adventure_".length);
     const solution = await findOptimalXpPath({
@@ -448,7 +487,7 @@ async function runXpSearch() {
       openings,
       maxOpens,
       onProgress: (depth) => {
-        if (xpRun === run && contextMatches(run, "xp")) $("#xp-status").textContent = `searching… depth ${depth}`;
+        if (xpRun === run && contextMatches(run, "xp")) $("#xp-status").textContent = `Comparing routes through ${depth} openings…`;
       },
       shouldStop: () => run.stopped || xpRun !== run || !contextMatches(run, "xp")
     });
@@ -463,8 +502,8 @@ async function runXpSearch() {
     xpView = { ...run, solution, baseline, openings, done: 0 };
     drawXpPath();
     $("#xp-status").textContent =
-      `${solution.nodesVisited.toLocaleString()} paths in ${Date.now() - started}ms fr` +
-      (run.stopped ? " (stopped early lol)" : "");
+      `${solution.nodesVisited.toLocaleString()} routes checked in ${((Date.now() - started) / 1000).toFixed(1)} seconds.` +
+      (run.stopped ? " Stopped early; showing the best route found." : "");
   } catch (err) {
     if (run && (xpRun !== run || !contextMatches(run, "xp"))) return;
     xpView = null;
@@ -487,8 +526,19 @@ function targetsFor(cardId) {
   return findTargets.get(cardId);
 }
 
+function showFindGuidance() {
+  const selected = targetsFor(findChestId());
+  const note = document.createElement("p");
+  note.className = "empty-text find-guidance";
+  note.textContent = selected.size
+    ? "Ready when you are. Select Find my items to see your route."
+    : "Choose the items you want, then select Find my items. Your step-by-step route will appear here.";
+  $("#find-out").replaceChildren(note);
+}
+
 function syncFindPanel() {
   const cardId = findChestId();
+  if (!live[cardId]) return;
 
   const selected = targetsFor(cardId);
   const items = getAvailableItemsForChest(cardId);
@@ -498,13 +548,15 @@ function syncFindPanel() {
     if (selected.has(baseName)) selected.delete(baseName);
     else selected.add(baseName);
     syncFindPanel();
-  });
+  }, { query: $("#item-search").value, rarity: $("#rarity-filter").value });
 
   $("#find-selected").textContent = selected.size ? `(${selected.size})` : "";
+  if (!findRun && !findView) showFindGuidance();
   syncSearchControls();
   persist();
 
   const isAdventure = cardId.startsWith("adventure_");
+  $("#find-maxlevel").closest(".find-search-options").classList.toggle("is-hidden", !isAdventure);
   $("#find-maxlevel").closest("label").classList.toggle("is-hidden", !isAdventure);
   $("#find-maxdepth").closest("label").classList.toggle("is-hidden", !isAdventure);
   if (isAdventure && findLevelChestId !== cardId) $("#find-maxlevel").value = live[cardId].level ?? 1;
@@ -517,7 +569,7 @@ function drawXpPath() {
   const view = xpView;
   const { solution, baseline, openings, done } = view;
   renderXpPath($("#xp-out"), solution, baseline, openings,
-    (steps) => { if (view.done === done) openXpRoute(view, steps); }, done);
+    (steps) => { if (view.done === done) openXpRoute(view, steps); }, done, view.cardId);
 }
 
 // Validate the whole batch before changing any live state. Detached buttons
@@ -525,12 +577,12 @@ function drawXpPath() {
 function replayRoute(view, steps) {
   let seed = view.state.seed;
   return steps.map((step) => {
-    if ((step.usedSeed ?? step.seed) !== seed) throw new Error("route is out of date; search again");
+    if ((step.usedSeed ?? step.seed) !== seed) throw new Error("Your chest settings changed. Search again to update the steps.");
     const [open] = predictChain(seed, view.cardId, 1, {
       level: step.level ?? view.state.level ?? 1,
       vaultPercentage: view.vaultPercentage
     });
-    if (step.nextSeed !== undefined && step.nextSeed !== open.nextSeed) throw new Error("route is out of date; search again");
+    if (step.nextSeed !== undefined && step.nextSeed !== open.nextSeed) throw new Error("Your chest settings changed. Search again to update the steps.");
     seed = open.nextSeed;
     return open;
   });
@@ -551,7 +603,7 @@ function openXpRoute(view, steps) {
   if (xpView !== view || steps.length === 0) return;
   try {
     if (!contextMatches(view, "xp") || steps.some((step, i) => step !== view.solution.path[view.done + i])) {
-      throw new Error("route is out of date; search again");
+      throw new Error("Your chest settings changed. Search again to update the steps.");
     }
     const openings = replayRoute(view, steps);
     invalidateChest(view.cardId, true);
@@ -572,7 +624,7 @@ function openRoute(view, steps) {
     const result = view.result;
     const paths = result.path ? [result.path] : [result.shortest.path, result.cheapest.path];
     if (!contextMatches(view, "find") || !paths.some((path) => steps.every((step, i) => step === path[i]))) {
-      throw new Error("route is out of date; search again");
+      throw new Error("Your chest settings changed. Search again to update the steps.");
     }
     const openings = replayRoute(view, steps);
     const selected = targetsFor(view.cardId);
@@ -584,9 +636,9 @@ function openRoute(view, steps) {
     if (selected.size > 0) {
       runFind();
     } else {
-      $("#find-out").append(Object.assign(document.createElement("p"), {
-        className: "empty",
-        textContent: "got all targets, seed saved, pick new items to hunt lol"
+      $("#find-out").replaceChildren(Object.assign(document.createElement("p"), {
+        className: "empty-text",
+        textContent: "All selected items are marked as collected. Choose more items to find."
       }));
     }
   } catch (err) {
@@ -603,19 +655,20 @@ async function runFind() {
     const cardId = findChestId();
     const state = live[cardId];
     const targets = [...targetsFor(cardId)];
-    if (!state) throw new Error("load a savegame first bro");
-    if (targets.length === 0) throw new Error("pick at least one item lol");
+    if (!state) throw new Error("Load a save file or try the demo first.");
+    if (targets.length === 0) throw new Error("Choose at least one item to find.");
     const options = findOptions(cardId);
     run = { cardId, state, seed: state.seed, vaultPercentage: options.vaultPercentage, optionsKey: JSON.stringify(options), targetsKey: JSON.stringify(targets), stopped: false };
     invalidateFind();
     findRun = run;
     syncSearchControls();
-    $("#find-status").textContent = "searching… lol";
+    out.textContent = "";
+    $("#find-status").textContent = "Looking for your items…";
     const started = Date.now();
     const controls = {
       shouldStop: () => run.stopped || findRun !== run || !contextMatches(run, "find"),
       onProgress: (nodes) => {
-        if (findRun === run && contextMatches(run, "find")) $("#find-status").textContent = `searching… ${nodes.toLocaleString()} nodes`;
+        if (findRun === run && contextMatches(run, "find")) $("#find-status").textContent = `Checking possible openings… ${nodes.toLocaleString()} checked.`;
       }
     };
     const result = cardId.startsWith("adventure_")
@@ -632,12 +685,12 @@ async function runFind() {
     if (findRun !== run || !contextMatches(run, "find")) return;
     const view = { ...run, result };
     findView = view;
-    renderFindResult(out, result, targets, (steps) => openRoute(view, steps));
+    renderFindResult(out, result, targets, (steps) => openRoute(view, steps), cardId);
     $("#find-status").textContent =
       `${(result.nodesVisited ?? result.opens ?? 0).toLocaleString()} ` +
-      `${cardId.startsWith("adventure_") ? "nodes" : "opens"} in ${Date.now() - started}ms fr` +
-      (run.stopped || result.stopped ? " (stopped early lol)" : "") +
-      (result.truncated ? " (search limit reached)" : "");
+      `possibilities checked in ${((Date.now() - started) / 1000).toFixed(1)} seconds.` +
+      (run.stopped || result.stopped ? " Search stopped early." : "") +
+      (result.truncated ? " Search limit reached." : "");
   } catch (err) {
     if (run && (findRun !== run || !contextMatches(run, "find"))) return;
     renderError(out, err.message);
@@ -648,7 +701,7 @@ async function runFind() {
   }
 }
 
-// Category headers collapse their channel list, like a Discord category.
+// Category headers collapse their chest list.
 function initSidebarToggles() {
   for (const head of document.querySelectorAll(".channel-category-head")) {
     const list = head.nextElementSibling;
@@ -660,8 +713,7 @@ function initSidebarToggles() {
   }
 }
 
-// The user bar's account popover: opens on click, closes on an outside
-// click or Escape, same as Discord's own account menu.
+// The save menu closes on an outside click or Escape and restores focus.
 function initUserMenu() {
   const menu = $("#user-menu");
   const trigger = $("#user-menu-trigger");
@@ -676,7 +728,9 @@ function initUserMenu() {
   trigger.addEventListener("click", (e) => {
     e.stopPropagation();
     menu.classList.toggle("is-hidden");
-    trigger.setAttribute("aria-expanded", String(!menu.classList.contains("is-hidden")));
+    const isOpen = !menu.classList.contains("is-hidden");
+    trigger.setAttribute("aria-expanded", String(isOpen));
+    if (isOpen) $("#load-save-menu").focus();
   });
   menu.addEventListener("click", (e) => {
     // Let the menu action finish, then close.
@@ -690,27 +744,80 @@ function initUserMenu() {
   });
 }
 
+function clearImportStatus() {
+  $("#import-status").textContent = "";
+  $("#workspace-status").textContent = "";
+}
+
+function showImportError(error) {
+  const message = error.message === "savegame contains no supported chests or eggs"
+    ? "This save has no supported boxes, chests, or eggs. Please choose another Eatventure save file."
+    : error.message === "Could not read this file. Please choose it again."
+      ? error.message
+      : "This file could not be read as an Eatventure save. Choose a valid save file and try again.";
+  renderError($("#import-status"), message);
+  renderError($("#workspace-status"), message);
+}
+
+function initTabs() {
+  const tabs = ["predict", "find"];
+  const activate = (tab) => {
+    showTab(tab);
+    if (live[currentId()]) persist();
+  };
+  for (const [index, tab] of tabs.entries()) {
+    const button = $("#nav-" + tab);
+    button.addEventListener("click", () => activate(tab));
+    button.addEventListener("keydown", (event) => {
+      let next;
+      if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+      else if (event.key === "ArrowLeft") next = (index + tabs.length - 1) % tabs.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      activate(tabs[next]);
+      $("#nav-" + tabs[next]).focus();
+    });
+  }
+}
+
 function init() {
   initSidebarToggles();
   initUserMenu();
-  for (const id of ["#load-save", "#load-save-menu"]) {
-    $(id)?.addEventListener("click", () => $("#save").click());
+  initTabs();
+  for (const id of ["#load-save", "#load-save-menu", "#welcome-load-save"]) {
+    $(id).addEventListener("click", () => $("#save").click());
   }
+  $("#load-demo").addEventListener("click", () => {
+    // A late file read must not replace a demo selected more recently.
+    saveLoadToken++;
+    adoptSave(createDemoSave(), DEMO_FILENAME);
+  });
+  $("#item-search").addEventListener("input", syncFindPanel);
+  $("#rarity-filter").addEventListener("change", syncFindPanel);
 
   const predictAction = (action) => {
     try { action(); }
-    catch (err) { renderError($("#out"), err.message); }
+    catch (err) { renderError($(activeTab === "find" ? "#find-out" : "#out"), err.message); }
   };
 
   $("#save").addEventListener("change", async (e) => {
     const file = e.target.files[0];
+    // Keep the File reference, then allow the same file to be chosen again,
+    // even when a newer demo or import supersedes this pending read.
+    e.target.value = "";
     if (!file) return;
     const token = ++saveLoadToken;
+    clearImportStatus();
+    const loading = `Reading ${file.name} on your device…`;
+    $("#import-status").textContent = loading;
+    $("#workspace-status").textContent = loading;
     try {
       const parsed = await readSave(file);
       if (token === saveLoadToken) adoptSave(parsed, file.name);
     } catch (err) {
-      if (token === saveLoadToken) renderError($("#out"), err.message);
+      if (token === saveLoadToken) showImportError(err);
     }
   });
 
@@ -782,17 +889,17 @@ function init() {
   $("#find-stop").addEventListener("click", () => {
     if (!findRun) return;
     findRun.stopped = true;
-    $("#find-status").textContent = "stopping… bruh";
+    $("#find-status").textContent = "Stopping the search…";
   });
 
   $("#xp-search").addEventListener("click", runXpSearch);
   $("#xp-stop").addEventListener("click", () => {
     if (!xpRun) return;
     xpRun.stopped = true;
-    $("#xp-status").textContent = "stopping… bruh";
+    $("#xp-status").textContent = "Stopping the search…";
   });
 
-  restore();
+  if (!restore()) showTab("predict");
 }
 
 init();
