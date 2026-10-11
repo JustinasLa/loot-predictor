@@ -3,7 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const root = new URL("../", import.meta.url);
-const read = (path) => readFileSync(new URL(path, root), "utf8");
+// Normalise line endings so checks pass on Windows checkouts with autocrlf.
+const read = (path) => readFileSync(new URL(path, root), "utf8").replace(/\r\n/g, "\n");
 const head = read("index.html").match(/<head>([\s\S]*)<\/head>/)[1];
 const PNG = [0x89, 0x50, 0x4e, 0x47];
 
