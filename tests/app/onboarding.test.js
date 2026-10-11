@@ -43,7 +43,12 @@ describe("Start screen", () => {
       "No file? Tap Try demo.",
     ]);
     expect($(".app-footer").textContent).toBe("Fan-made. Not affiliated with Eatventure or Lessmore.");
-    expect(welcome.querySelector('[class*="orbit"], [class*="spark"], [class*="featured"], [class*="steps"], [class*="eyebrow"]')).toBeNull();
+    // Only the listed parts: no decorative extras.
+    expect([...welcome.children].map((node) => node.className)).toEqual(["welcome-card panel", "app-footer"]);
+    expect([...welcome.querySelector(".welcome-card").children].map((node) => node.className)).toEqual([
+      "welcome-hero", "welcome-title", "welcome-actions action-bar", "import-status",
+      "btn btn--primary btn--sm try-another is-hidden", "welcome-lock", "welcome-help",
+    ]);
   });
 });
 
