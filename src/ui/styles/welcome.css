@@ -1,28 +1,50 @@
 /* area:start-and-loading — Start screen and demo banner. */
-.welcome { max-width: 520px; margin: 8px auto 0; display: grid; gap: 16px; }
-.welcome-card { display: grid; gap: 16px; justify-items: center; text-align: center; padding: 28px 24px 24px; }
+.welcome { max-width: 520px; margin: 8px auto 0; display: grid; gap: 14px; }
+.welcome-card {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  text-align: center; padding: 28px 24px 20px;
+}
 .welcome-hero {
+  flex: none;
   width: 200px; height: 200px; border-radius: 50%;
   display: grid; place-items: center;
-  background: radial-gradient(circle at 50% 40%, #fff1b8 0%, var(--box-big) 62%, #f2b632 100%);
+  background: radial-gradient(circle at 50% 38%, #fff1b8 0%, var(--box-big) 58%, #f5bf3c 100%);
   border: 4px solid var(--gold-lip);
-  box-shadow: 0 8px 0 var(--gold-lip), var(--shadow-ambient);
-  animation: hero-bounce .5s ease-out .1s 1;
+  box-shadow: 0 6px 0 var(--gold-lip), var(--shadow-ambient);
+  animation: hero-bounce .5s ease-out .15s 1;
 }
 .welcome-hero img { width: 168px; height: 168px; object-fit: contain; filter: drop-shadow(0 6px 0 rgb(0 0 0 / .22)); }
 @keyframes hero-bounce { 50% { transform: translateY(-8px); } }
-.welcome-title { font-size: var(--t-title); max-width: 14ch; }
+.welcome-title { font-size: var(--t-title); line-height: 1.15; max-width: 14ch; margin-top: 4px; }
+
 .welcome-actions { display: grid; gap: 12px; width: 100%; }
 .welcome-actions .btn { margin-bottom: 6px; }
-.welcome-lock { display: flex; align-items: center; gap: 6px; color: var(--ink-muted); }
-.welcome-lock svg { width: 20px; height: 20px; color: var(--go-lip); }
+.welcome-actions svg { width: 28px; height: 28px; flex: none; }
+
+/* Loading line and errors sit right under the buttons. */
 .import-status { width: 100%; }
 .import-status:empty { display: none; }
+.load-status { display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; }
+.load-status.is-busy::before {
+  content: ""; flex: none; width: 20px; height: 20px; border-radius: 50%;
+  border: 3px solid var(--primary); border-right-color: transparent;
+  animation: load-spin .7s linear infinite;
+}
+@keyframes load-spin { to { transform: rotate(360deg); } }
+.try-another { margin-top: -6px; margin-bottom: 4px; }
+
+.welcome-lock {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  color: var(--ink-muted); font-size: var(--t-body); font-weight: 600;
+}
+.welcome-lock svg { width: 20px; height: 20px; flex: none; color: var(--go-lip); }
+
 .welcome-help { width: 100%; text-align: left; }
 .welcome-help summary {
   cursor: pointer; list-style: none;
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 48px; color: var(--primary-lip); font-weight: 800;
+  min-height: 48px; color: var(--primary-lip); font-weight: 800; font-size: var(--t-body);
+  border-radius: 12px;
 }
 .welcome-help summary::-webkit-details-marker { display: none; }
 .welcome-help summary::before {
@@ -31,23 +53,45 @@
   background: var(--primary); color: #fff; font-size: 16px;
   box-shadow: inset 0 -3px 0 var(--primary-lip);
 }
-.welcome-help p { background: var(--panel-row); border-radius: 12px; padding: 10px 12px; margin-top: 8px; }
-.app-footer { text-align: center; color: #fff; font-size: var(--t-small); text-shadow: 0 1px 0 rgb(0 0 0 / .25); }
+.welcome-help p {
+  background: var(--panel-row); border-radius: 12px; padding: 10px 12px; margin-top: 8px;
+  font-size: var(--t-body); font-weight: 600; line-height: 1.35;
+}
+.app-footer { text-align: center; color: #fff; opacity: .8; font-size: var(--t-small); font-weight: 700; }
 
+/* Phone: the panel fills the screen and the buttons sit inside it, near the
+   bottom of the viewport. The shared action bar is fixed on phone, so it is
+   put back in the panel flow here; the ids are never duplicated. */
 @media (max-width: 767px) {
-  .welcome-card { padding: 20px 16px; }
-  .welcome-hero { width: 168px; height: 168px; }
-  .welcome-hero img { width: 136px; height: 136px; }
-  .welcome-actions.action-bar { display: flex; }
-  .welcome-actions.action-bar .btn--go { flex: 1.5; padding: 12px 14px; font-size: 20px; }
-  .welcome-actions.action-bar .btn--primary { flex: 1; min-height: 64px; padding: 12px; }
+  body:not([data-loaded="yes"]) { padding-bottom: 0; }
+  .welcome { margin: 0 auto; gap: 10px; }
+  .welcome-card {
+    min-height: calc(100dvh - var(--hud-h) - 24px);
+    padding: 24px 16px 12px; gap: 14px;
+  }
+  /* Centre the chest and headline in the space above the buttons. */
+  .welcome-hero { margin-top: auto; }
+  .welcome-title { margin-bottom: auto; }
+  .welcome-actions.action-bar {
+    position: static; display: grid; gap: 12px;
+    background: none; box-shadow: none; border-radius: 0; padding: 0;
+    margin-top: 8px;
+  }
+  .welcome-help summary { min-height: 44px; }
 }
 
+/* Demo banner: a thin gold strip at the top of the box list. */
 .demo-banner {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px;
   background: var(--gold); color: var(--gold-ink);
-  border-radius: 16px; padding: 8px 8px 8px 14px; margin-bottom: 14px;
-  box-shadow: 0 5px 0 var(--gold-lip);
-  font-weight: 800;
+  border-radius: 14px; padding: 2px 12px; margin-bottom: 14px;
+  box-shadow: 0 4px 0 var(--gold-lip);
+  font-weight: 800; font-size: 16px; line-height: 1.2;
 }
-.demo-banner .btn { margin-bottom: 4px; }
+.demo-banner-link {
+  min-height: 44px; padding: 2px 4px;
+  background: none; border: 0; color: var(--gold-ink);
+  font: inherit; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px;
+  cursor: pointer; border-radius: 8px;
+}
+.demo-banner-link:hover { color: #000; }

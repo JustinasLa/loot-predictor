@@ -29,6 +29,27 @@ describe("Start screen", () => {
     expect($("#help-trigger").closest(".is-hidden")).toBeNull();
     expect($("#user-panel-loggedin").classList.contains("is-hidden")).toBe(true);
   });
+
+  it("uses the real chest art, short help copy and no decorations", async () => {
+    await init();
+    const welcome = $("#welcome-screen");
+    expect(welcome.querySelector(".welcome-hero img").getAttribute("src")).toMatch(/assets\/items\/BigChestIcon\.webp$/);
+    expect($("#welcome-load-save").className).toContain("btn--go");
+    expect($("#load-demo").className).toContain("btn--primary");
+    expect(welcome.querySelectorAll("#welcome-load-save, #load-demo")).toHaveLength(2);
+    expect(welcome.querySelector(".welcome-help summary").textContent).toBe("What's a save file?");
+    expect([...welcome.querySelectorAll(".welcome-help p")].map((p) => p.textContent)).toEqual([
+      "It's your Eatventure save (.json). It's read here, never uploaded.",
+      "No file? Tap Try demo.",
+    ]);
+    expect($(".app-footer").textContent).toBe("Fan-made. Not affiliated with Eatventure or Lessmore.");
+    // Only the listed parts: no decorative extras.
+    expect([...welcome.children].map((node) => node.className)).toEqual(["welcome-card panel", "app-footer"]);
+    expect([...welcome.querySelector(".welcome-card").children].map((node) => node.className)).toEqual([
+      "welcome-hero", "welcome-title", "welcome-actions action-bar", "import-status",
+      "btn btn--primary btn--sm try-another is-hidden", "welcome-lock", "welcome-help",
+    ]);
+  });
 });
 
 describe("demo flow", () => {
