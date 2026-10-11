@@ -37,12 +37,17 @@ describe("adventure preview and XP UI", () => {
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out button")).not.toBeNull());
     expect($("#xp-search").disabled).toBe(false);
-    expect($("#xp-status").textContent).toContain("routes checked in");
+    expect($("#xp-status").textContent).toMatch(/^\d[\d,]* routes checked in \d+\.\ds$/);
+    expect($("#xp-status").dataset.busy).toBe("no");
+    expect($("#xp-out .xp-delta")).not.toBeNull();
+    expect($("#xp-out .open-title").textContent).toMatch(/^Open at level \d+$/);
     $("#xp-out button").click();
     expect(stored().live.adventure_Zeus.opened).toBe(1);
     expect($("#xp-out").textContent).toContain("1 of 2 openings recorded");
+    expect($("#xp-out .xp-progress [aria-hidden]").textContent).toBe("1 of 2 done");
     $("#xp-out button").click();
     expect($("#xp-out").textContent).toContain("Plan complete");
+    expect($("#xp-out .xp-progress [aria-hidden]").textContent).toBe("Plan done!");
     chest("big");
     expect($("#xp-out").textContent).toBe("");
     expect($("#xp-status").textContent).toBe("");
@@ -51,14 +56,25 @@ describe("adventure preview and XP UI", () => {
   it("stops a running XP search and restores controls after a search error", async () => {
     await init(restored({ ui: { cardId: "adventure_Zeus" } }));
     xpModule.findOptimalXpPath.mockImplementationOnce(async (opts) => {
+      expect($("#xp-status").textContent).toBe("Planning…");
+      expect($("#xp-status").dataset.busy).toBe("yes");
       opts.onProgress(2);
       expect($("#xp-status").textContent).toBe("Planning… · 2 opens deep");
       dispatch("#xp-stop");
+      expect($("#xp-status").textContent).toBe("Stopping…");
       expect(opts.shouldStop()).toBe(true);
       return { path: [], xp: 0, nodesVisited: 2 };
     });
     dispatch("#xp-search");
-    await vi.waitFor(() => expect($("#xp-status").textContent).toContain("Stopped early"));
+    await vi.waitFor(() => expect($("#xp-out").textContent).toBe("Stopped."));
+    expect($("#xp-out button")).toBeNull();
+    expect($("#xp-actions #xp-retry").textContent).toBe("Try again");
+    expect($("#xp-status").textContent).toMatch(/^Stopped early · 2 routes checked in /);
+    xpModule.findOptimalXpPath.mockResolvedValueOnce({ path: [], xp: 0, nodesVisited: 1 });
+    dispatch("#xp-retry");
+    await vi.waitFor(() => expect($("#xp-out").textContent).toBe("No plan found. Try more keys or a higher level."));
+    expect(xpModule.findOptimalXpPath).toHaveBeenCalledTimes(2);
+    expect($("#xp-retry")).toBeNull();
     xpModule.findOptimalXpPath.mockRejectedValueOnce(new Error("search failed"));
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out").textContent).toContain("search failed"));
@@ -88,8 +104,9 @@ describe("adventure preview and XP UI", () => {
     input("#xp-maxopens", 2);
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out button")).not.toBeNull());
-    expect($("#xp-out").textContent).toContain("2-opening limit");
-    expect($("#xp-out").textContent).toContain("bonus openings from key drops");
+    expect($("#xp-out .xp-warn").textContent).toBe("Best so far");
+    expect($("#xp-out .xp-warn").title).toBe("Hit the opening limit");
+    expect($("#xp-out .xp-keys").textContent).toMatch(/^\d+ bonus keys?$/);
   });
 
   it("handles stale XP actions after switching chests and replacing the save", async () => {
@@ -107,5 +124,31 @@ describe("adventure preview and XP UI", () => {
     pendingAction.click();
     expect(stored().live.big.seed).toBe(99);
     expect(stored().live.adventure_Zeus).toBeUndefined();
+  });
+
+  it("shows the adventure's own art and keeps the vault mirror hidden", async () => {
+    await init(restored({ ui: { cardId: "adventure_Zeus" } }));
+    expect($("#xp-icon .box-art").dataset.box).toBe("zeus");
+    expect($("#xp-key-art").getAttribute("src")).toContain("ZeusKeyIcon");
+    chest("adventure_Pirate");
+    expect($("#xp-icon .box-art").dataset.box).toBe("pirate");
+    expect($("#xp-key-art").getAttribute("src")).toContain("PirateKeyIcon");
+    expect($("#xp-vault").closest(".is-hidden")).not.toBeNull();
+    input("#vault", 30);
+    expect($("#xp-vault").value).toBe("30");
+  });
+
+  it("clears the Try again button when a later search fails validation", async () => {
+    await init(restored({ ui: { cardId: "adventure_Zeus" } }));
+    xpModule.findOptimalXpPath.mockImplementationOnce(async () => {
+      dispatch("#xp-stop");
+      return { path: [], xp: -1, nodesVisited: 0, stopped: true };
+    });
+    dispatch("#xp-search");
+    await vi.waitFor(() => expect($("#xp-retry")).not.toBeNull());
+    $("#xp-openings").value = "0";
+    dispatch("#xp-retry");
+    expect($("#xp-out .error-box")).not.toBeNull();
+    expect($("#xp-retry")).toBeNull();
   });
 });

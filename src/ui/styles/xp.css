@@ -1,13 +1,122 @@
 /* area:xp-planner — XP tab. */
 .smart-xp { display: grid; gap: 16px; }
-.smart-xp .panel-title { margin: 0; text-align: center; }
-.xp-steppers { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px 32px; }
-.xp-action { display: flex; justify-content: center; gap: 12px; }
-.xp-action .btn--go { min-width: 220px; }
-.smart-xp .status-line { text-align: center; }
-.xp-total { font-size: var(--t-display); line-height: 1; }
-.xp-delta, .xp-spend, .xp-warn, .xp-progress { font-size: var(--t-body); }
+
+/* Heading: the adventure's own icon beside the title. */
+.xp-title {
+  margin: 0;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.xp-icon { display: inline-flex; flex: none; }
+.xp-icon:empty { display: none; }
+.xp-icon .box-art { width: 56px; }
+
+/* Two big stepper cards side by side. */
+.xp-steppers {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px; max-width: 560px; width: 100%; margin: 0 auto;
+}
+.xp-field {
+  background: var(--panel-row);
+  border-radius: 18px;
+  padding: 12px 10px 14px;
+  gap: 8px;
+}
+.xp-field > label { font-size: var(--t-body); }
+.xp-field-art {
+  width: 52px; height: 52px;
+  display: grid; place-items: center;
+}
+.xp-field-art img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 0 rgb(0 0 0 / .2)); }
+.xp-field-art--level {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: #1a1f26; color: #fff;
+  font: 800 20px/1 var(--font-ui);
+  box-shadow: 0 4px 0 #000;
+}
+
+/* The one big green button. */
+.xp-action { display: flex; justify-content: center; gap: 12px; max-width: 560px; width: 100%; margin: 0 auto; }
+.xp-action .btn--go { flex: 1; }
+.xp-action .btn--ghost { flex: none; }
+
+.smart-xp .status-line { text-align: center; margin: 0; }
+.xp-estimate-line { font-size: var(--t-label); font-weight: 700; margin-top: -4px !important; }
+#xp-estimate[data-heavy="yes"] { color: var(--gold-ink); }
+
+/* Busy spinner in the button colour. */
+.xp-status[data-busy="yes"] { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--ink); font-weight: 700; }
+.xp-status[data-busy="yes"]::before {
+  content: ""; width: 20px; height: 20px; flex: none; border-radius: 50%;
+  border: 3px solid color-mix(in srgb, var(--go) 30%, #fff);
+  border-top-color: var(--go);
+  animation: xp-spin .8s linear infinite;
+}
+@keyframes xp-spin { to { transform: rotate(360deg); } }
+
+/* Result */
+.xp-out { display: grid; gap: 16px; }
+.xp-out:empty { display: none; }
+.xp-summary { padding: 16px 16px 18px; margin-bottom: 6px; }
+.xp-summary p { margin: 0; }
+.xp-delta { font: 800 var(--t-body)/1.2 var(--font-ui); }
+.xp-delta[data-sign="up"] { font-size: var(--t-display); line-height: 1.05; letter-spacing: .5px; }
+.xp-summary--flat { box-shadow: 0 6px 0 #d3d8de; }
+.xp-summary--flat .xp-delta { font-size: var(--t-h2); }
+.xp-versus { font: 700 var(--t-body)/1.2 var(--font-ui); opacity: .95; }
+
+.xp-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.xp-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 40px; padding: 6px 14px;
+  background: #fff; color: var(--ink);
+  border: 3px solid #d5d9de; border-radius: var(--radius-pill);
+  box-shadow: 0 4px 0 #c3cad2;
+  font: 800 16px/1 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+.xp-keys { padding-left: 6px; }
+.xp-keys .item-art { width: 30px; height: 30px; display: grid; place-items: center; }
+.xp-keys .item-art img { width: 100%; height: 100%; object-fit: contain; }
+.xp-keys .item-fallback { font-size: 12px; }
+.xp-warn { background: var(--gold); color: var(--gold-ink); border-color: var(--gold-lip); box-shadow: 0 4px 0 var(--gold-lip); }
+.xp-progress { background: var(--primary); color: #fff; border-color: var(--primary-lip); box-shadow: 0 4px 0 var(--primary-lip); text-shadow: 0 2px 0 rgb(0 0 0 / .2); }
+.xp-progress.is-done { background: var(--go); border-color: var(--go-lip); box-shadow: 0 4px 0 var(--go-lip); }
+
+/* Steps: the level to pick is the title, with an XP pill beside it. */
+.xp-steps { display: grid; gap: 16px; margin-top: 10px; }
+.xp-steps:empty { display: none; }
+.xp-step .open-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.xp-step .open-title { font: 800 var(--t-h2)/1.15 var(--font-ui); margin: 0; }
+.xp-step.is-next .open-heading { justify-content: center; }
+.xp-pill {
+  display: inline-flex; align-items: center;
+  padding: 5px 12px; border-radius: var(--radius-pill);
+  background: var(--go); color: #fff;
+  font: 800 var(--t-label)/1 var(--font-ui);
+  box-shadow: 0 3px 0 var(--go-lip);
+  text-shadow: 0 2px 0 rgb(0 0 0 / .2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* No plan / stopped */
+.xp-empty { display: grid; justify-items: center; gap: 12px; }
+.xp-empty .box-art { width: 72px; opacity: .55; filter: grayscale(.3); }
+.xp-empty-text { margin: 0; }
+.xp-actions { display: flex; justify-content: center; }
+.xp-actions:empty { display: none; }
 
 @media (max-width: 767px) {
-  .xp-action .btn--go { flex: 1; min-width: 0; }
+  .xp-steppers { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .xp-field { padding: 10px 4px 12px; }
+  .xp-field > label { font-size: var(--t-label); }
+  .xp-field .stepper { gap: 4px; }
+  .xp-field .stepper input { width: 52px; }
+  .xp-field .icon-btn { width: 44px; height: 44px; min-height: 44px; padding: 0; }
+  .xp-action { max-width: none; margin: 0; }
+  .xp-step .open-title { font-size: var(--t-btn); }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-status[data-busy="yes"]::before { animation: none; }
+}
+.xp-summary--flat .xp-versus { color: var(--ink-muted); }

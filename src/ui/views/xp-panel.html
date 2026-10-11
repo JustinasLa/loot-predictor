@@ -1,9 +1,10 @@
 <!-- area:xp-planner start (XP tab panel, adventure boxes only) -->
 <section id="panel-xp" class="tab-panel xp-panel is-hidden" role="tabpanel" aria-labelledby="nav-xp">
   <div id="smart-xp" class="panel smart-xp is-hidden">
-    <h2 class="panel-title">Get the most XP</h2>
+    <h2 class="panel-title xp-title"><span id="xp-icon" class="xp-icon" aria-hidden="true"></span>Get the most XP</h2>
     <div class="xp-steppers">
-      <div class="stepper-field">
+      <div class="stepper-field xp-field">
+        <span class="xp-field-art" aria-hidden="true"><img id="xp-key-art" src="{{BASE}}assets/items/ZeusKeyIcon.webp" width="44" height="44" alt="" /></span>
         <label for="xp-openings">Keys I have</label>
         <div class="stepper">
           <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-openings" data-step="-1" aria-label="Less Keys I have"><svg viewBox="0 0 24 24" aria-hidden="true"><rect fill="currentColor" x="4" y="9.5" width="16" height="5" rx="2.5"/></svg></button>
@@ -11,7 +12,8 @@
           <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-openings" data-step="1" aria-label="More Keys I have"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.5a2.5 2.5 0 0 1 2.5 2.5v3.5H18a2.5 2.5 0 0 1 0 5h-3.5V18a2.5 2.5 0 0 1-5 0v-3.5H6a2.5 2.5 0 0 1 0-5h3.5V6A2.5 2.5 0 0 1 12 3.5Z"/></svg></button>
         </div>
       </div>
-      <div class="stepper-field">
+      <div class="stepper-field xp-field">
+        <span class="xp-field-art xp-field-art--level" aria-hidden="true">Lv</span>
         <label for="xp-maxlevel">My top level</label>
         <div class="stepper">
           <button type="button" class="icon-btn btn btn--primary" data-step-for="xp-maxlevel" data-step="-1" aria-label="Less My top level"><svg viewBox="0 0 24 24" aria-hidden="true"><rect fill="currentColor" x="4" y="9.5" width="16" height="5" rx="2.5"/></svg></button>
@@ -21,12 +23,13 @@
       </div>
     </div>
     <div class="xp-action action-bar">
-      <button id="xp-search" type="button" class="btn btn--go btn--lg" disabled>Plan XP</button>
-      <button id="xp-stop" type="button" class="btn btn--ghost is-hidden">Stop</button>
+      <button id="xp-search" type="button" class="btn btn--go btn--lg btn--block" disabled>Plan XP</button>
+      <button id="xp-stop" type="button" class="btn btn--ghost btn--lg is-hidden">Stop</button>
     </div>
-    <p class="status-line"><span id="xp-estimate"></span></p>
-    <p id="xp-status" role="status" class="status-line"></p>
-    <div id="xp-out" class="search-results"></div>
+    <p class="status-line xp-estimate-line"><span id="xp-estimate"></span></p>
+    <p id="xp-status" role="status" class="status-line xp-status"></p>
+    <div id="xp-out" class="search-results xp-out"></div>
+    <div id="xp-actions" class="xp-actions"></div>
   </div>
 </section>
 <!-- area:xp-planner end -->
