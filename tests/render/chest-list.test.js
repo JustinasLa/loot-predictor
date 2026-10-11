@@ -56,5 +56,8 @@ describe("chest-list renderer", () => {
     expect(["big", "adventure_Zeus", "event_Mine", "egg_Epic"].map(boxGroup))
       .toEqual(["boxes", "adventures", "events", "eggs"]);
     expect(boxTone("adventure_Pirate")).toBe("pirate");
+    expect(mystery.querySelector(".chest-fallback").textContent).toBe("M");
+    expect(big.querySelector(".chest-name").textContent).toBe("Big Box");
+    expect(big.textContent).toBe("3 openedBig Box");
   });
 });
