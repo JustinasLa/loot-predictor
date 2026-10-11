@@ -1,14 +1,14 @@
 <!-- area:find-item start (Find tab panel) -->
 <section id="panel-find" class="tab-panel find-panel is-hidden" role="tabpanel" aria-labelledby="nav-find">
-  <div class="panel find-picker">
-    <h2 class="panel-title">What do you want?</h2>
+  <div id="find-picker" class="panel find-picker">
+    <h2 id="find-heading" class="panel-title" tabindex="-1">What do you want?</h2>
     <div class="find-filters">
       <label class="search-field" for="item-search">
         <span class="sr-only">Search items</span>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M10.5 2a8.5 8.5 0 0 1 6.9 13.5l4 4a2 2 0 1 1-2.9 2.9l-4-4A8.5 8.5 0 1 1 10.5 2Zm0 3.6a4.9 4.9 0 1 0 0 9.8 4.9 4.9 0 0 0 0-9.8Z"/></svg>
         <input id="item-search" type="search" placeholder="Search items" autocomplete="off" />
       </label>
-      <div id="rarity-chips" class="chip-row" role="group" aria-label="Rarity">
+      <div id="rarity-chips" class="chip-row find-chips" role="group" aria-label="Rarity">
         <button type="button" class="chip" data-value="all" aria-pressed="true">All</button>
         <button type="button" class="chip" data-value="common" data-rarity="Common" aria-pressed="false">Common</button>
         <button type="button" class="chip" data-value="rare" data-rarity="Rare" aria-pressed="false">Rare</button>
@@ -22,14 +22,24 @@
       </label>
     </div>
     <div id="find-items" class="item-picker-grid"><p class="empty">Load a save to pick items.</p></div>
+    <div id="find-no-match" class="find-no-match is-hidden">
+      <button id="find-show-all" type="button" class="btn btn--primary btn--sm">Show all</button>
+    </div>
+  </div>
+
+  <div id="find-picked" class="panel find-picked">
+    <span id="find-picked-art" class="find-picked-art"></span>
+    <button id="find-change" type="button" class="chip">Change items</button>
   </div>
 
   <div class="find-action action-bar">
-    <button id="find-run" type="button" class="btn btn--go btn--lg" disabled>Find it!</button>
+    <span id="find-stack" class="find-stack" aria-hidden="true"></span>
     <span id="find-selected" class="find-selected"></span>
-    <button id="find-stop" type="button" class="btn btn--ghost is-hidden">Stop</button>
+    <button id="find-run" type="button" class="btn btn--go btn--lg" disabled>Pick an item</button>
+    <button id="find-stop" type="button" class="btn btn--ghost btn--lg is-hidden">Stop</button>
   </div>
-  <p id="find-status" role="status" class="status-line"></p>
+  <p id="find-status" role="status" class="status-line find-status"></p>
   <div id="find-out" class="search-results"></div>
+  <div id="find-actions" class="find-actions"></div>
 </section>
 <!-- area:find-item end -->
