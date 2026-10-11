@@ -10,7 +10,7 @@ vi.mock("../../src/solver/find-items.js", async (importOriginal) => {
   return { ...actual, findAllPathsAsync: vi.fn(actual.findAllPathsAsync), findItemLinearAsync: vi.fn(actual.findItemLinearAsync) };
 });
 
-import { $, stored, dispatch, input, markOpened, init, upload, restored, setupApp } from "../helpers/app-harness.js";
+import { $, $$, stored, dispatch, input, markOpened, init, upload, restored, setupApp } from "../helpers/app-harness.js";
 import { predictChain } from "../../src/loot/simulate.js";
 
 setupApp();
@@ -29,10 +29,45 @@ describe("marking openings", () => {
     expect(stored().live.big.history.map((open) => open.open)).toEqual([2, 1]);
     expect($("#history-count").textContent).toBe("(2)");
     expect($("#history .open-title").textContent).toBe("Opened #2");
+    dispatch("#user-menu-trigger");
+    dispatch("#reset-ask");
+    expect($("#reset-confirm").textContent).toContain("Back to your save? Opened list clears.");
     dispatch("#reset");
     expect(stored().live.big).toMatchObject({ seed: 42, opened: 0, history: [] });
+    expect($("#toast-region").textContent).toBe("Box reset.");
     expect($("#history-count").textContent).toBe("");
     expect($("#history").textContent).toBe("Nothing opened yet.");
+    expect($("#history .empty img").getAttribute("src")).toContain("SmallChestIcon");
+  });
+
+  it("marks many from Settings, then closes the sheet to show the cards and the toast", async () => {
+    await init(restored());
+    const trigger = $("#settings-trigger");
+    const sheet = $("#settings-sheet");
+    expect($("#mark-many-title").textContent).toBe("Mark many opened");
+    expect($("#open-custom").labels[0].textContent).toBe("How many?");
+    for (const button of document.querySelectorAll(".open-btn")) {
+      expect(button.textContent).toMatch(/mark/i);
+      expect(button.textContent).toContain(button.dataset.open);
+    }
+    trigger.click();
+    expect(sheet.classList.contains("is-hidden")).toBe(false);
+    dispatch('.open-btn[data-open="5"]');
+    expect(sheet.classList.contains("is-hidden")).toBe(true);
+    expect(document.activeElement).toBe(trigger);
+    expect($("#toast-region").textContent).toBe("Got it! 5 opened.");
+    expect($("#history-count").textContent).toBe("(5)");
+    expect($("#open-status").textContent).toBe("5 opened so far.");
+
+    trigger.click();
+    dispatch('[data-step-for="open-custom"][data-step="1"]');
+    expect($("#open-custom").value).toBe("26");
+    dispatch("#open-custom-go");
+    expect(sheet.classList.contains("is-hidden")).toBe(true);
+    expect($("#toast-region").textContent).toBe("Got it! 26 opened.");
+    expect(stored().live.big.opened).toBe(31);
+    expect($$("#history .open-box.is-past")).toHaveLength(31);
+    expect($("#history .open-title").textContent).toBe("Opened #31");
   });
 
   it("confirms each mark with a toast that hides itself", async () => {

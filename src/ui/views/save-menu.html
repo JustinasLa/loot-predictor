@@ -8,13 +8,29 @@
       <button type="button" class="icon-btn btn btn--danger sheet-close" data-sheet-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5.6 5.6a2 2 0 0 1 2.8 0L12 9.2l3.6-3.6a2 2 0 1 1 2.8 2.8L14.8 12l3.6 3.6a2 2 0 1 1-2.8 2.8L12 14.8l-3.6 3.6a2 2 0 1 1-2.8-2.8L9.2 12 5.6 8.4a2 2 0 0 1 0-2.8Z"/></svg></button>
     </div>
     <div class="sheet-body save-menu-body">
-      <p class="save-file panel-row">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h8.2L20 7.8V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm7 1.8V9h5.2L13 3.8Z"/></svg>
+      <p class="save-file">
+        <span class="save-file-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h8.2L20 7.8V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm7 1.8V9h5.2L13 3.8Z"/></svg></span>
         <span id="user-filename" class="save-filename" title=""></span>
       </p>
-      <button id="load-save-menu" type="button" class="btn btn--go btn--block" data-sheet-action>Load another save</button>
-      <button id="reset" type="button" class="btn btn--primary btn--block" data-sheet-action disabled>Reset this box</button>
-      <button id="unload" type="button" class="btn btn--danger btn--block" data-sheet-action>Remove from this device</button>
+      <div id="save-menu-actions" class="save-menu-actions">
+        <button id="load-save-menu" type="button" class="btn btn--primary btn--block save-menu-btn" data-sheet-action><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.6a2 2 0 0 1 1.4.6l4.6 4.6a2 2 0 1 1-2.8 2.8L14 9.4V15a2 2 0 0 1-4 0V9.4l-1.2 1.2A2 2 0 1 1 6 7.8l4.6-4.6a2 2 0 0 1 1.4-.6ZM4 15a2 2 0 0 1 2 2v1h12v-1a2 2 0 1 1 4 0v2a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-2a2 2 0 0 1 2-2Z"/></svg>Load another save</button>
+        <button id="reset-ask" type="button" class="btn btn--ghost btn--block save-menu-btn" aria-controls="reset-confirm" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 1-8.5 12 2 2 0 1 1 3.8-1.3A5 5 0 1 0 8.6 8.3l1.2 1.2A1 1 0 0 1 9.1 11H4a1 1 0 0 1-1-1V4.9a1 1 0 0 1 1.7-.7l1.1 1.1A9 9 0 0 1 12 3Z"/></svg>Reset this box</button>
+        <button id="unload-ask" type="button" class="btn btn--danger btn--block save-menu-btn" aria-controls="unload-confirm" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9 2h6a2 2 0 0 1 2 2v1h3a1.5 1.5 0 0 1 0 3h-.2l-.9 12.2A2 2 0 0 1 16.9 22H7.1a2 2 0 0 1-2-1.8L4.2 8H4a1.5 1.5 0 0 1 0-3h3V4a2 2 0 0 1 2-2Zm1 3h4V4.5h-4V5Zm-.5 5.5a1.2 1.2 0 0 0-1.2 1.3l.4 6a1.2 1.2 0 0 0 2.4-.2l-.4-6a1.2 1.2 0 0 0-1.2-1.1Zm5 0a1.2 1.2 0 0 0-1.2 1.1l-.4 6a1.2 1.2 0 0 0 2.4.2l.4-6a1.2 1.2 0 0 0-1.2-1.3Z"/></svg>Remove from this device</button>
+      </div>
+      <div id="reset-confirm" class="save-confirm save-confirm--reset is-hidden" role="group" aria-labelledby="reset-confirm-text">
+        <p id="reset-confirm-text" class="save-confirm-text">Back to your save? Opened list clears.</p>
+        <div class="save-confirm-buttons">
+          <button id="reset" type="button" class="btn btn--go" data-sheet-action disabled>Reset</button>
+          <button id="reset-cancel" type="button" class="btn btn--ghost">Cancel</button>
+        </div>
+      </div>
+      <div id="unload-confirm" class="save-confirm save-confirm--remove is-hidden" role="group" aria-labelledby="unload-confirm-text">
+        <p id="unload-confirm-text" class="save-confirm-text">Remove your save from this device?</p>
+        <div class="save-confirm-buttons">
+          <button id="unload" type="button" class="btn btn--danger">Remove</button>
+          <button id="unload-cancel" type="button" class="btn btn--ghost">Cancel</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

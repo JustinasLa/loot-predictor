@@ -1,1 +1,18 @@
-/* area:marking-history-savemenu — marking feedback (toast lives in components.css). */
+/* area:marking-history-savemenu — "Mark many" in Settings (the toast lives in components.css). */
+.mark-many {
+  display: grid; gap: 12px;
+  padding-top: 14px; margin-top: 4px;
+  border-top: 3px solid var(--divider);
+}
+.mark-many-title {
+  display: flex; align-items: center; gap: 10px;
+  font-size: var(--t-btn); color: var(--ink);
+}
+.mark-many-title img { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 3px 0 rgb(0 0 0 / .18)); }
+.mark-many-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mark-many-presets .btn { margin-bottom: 4px; padding-inline: 10px; }
+.mark-many-custom {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 12px 16px;
+  padding: 12px;
+}
+.mark-many-custom .btn { margin-bottom: 8px; flex: 1 1 120px; max-width: 220px; }

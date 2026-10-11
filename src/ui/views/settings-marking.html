@@ -1,13 +1,20 @@
 <!-- area:marking-history-savemenu start (Settings rows for marking many boxes) -->
-<div class="setting-group">
-  <div class="setting-buttons">
+<section class="mark-many" aria-labelledby="mark-many-title">
+  <h3 id="mark-many-title" class="mark-many-title"><img src="{{BASE}}assets/items/BigChestIcon.webp" width="40" height="40" alt="" />Mark many opened</h3>
+  <div class="mark-many-presets">
     <button type="button" class="open-btn btn btn--primary btn--sm" data-open="5" disabled>Mark 5 opened</button>
     <button type="button" class="open-btn btn btn--primary btn--sm" data-open="10" disabled>Mark 10 opened</button>
   </div>
-  <div class="setting-row panel-row">
-    <label for="open-custom">How many?</label>
-    <input id="open-custom" type="number" value="25" min="1" max="10000" class="field" />
-    <button id="open-custom-go" type="button" class="btn btn--primary btn--sm" disabled>Mark opened</button>
+  <div class="mark-many-custom panel-row">
+    <div class="stepper-field">
+      <label for="open-custom">How many?</label>
+      <div class="stepper">
+        <button type="button" class="icon-btn btn btn--primary" data-step-for="open-custom" data-step="-1" aria-label="Less How many?"><svg viewBox="0 0 24 24" aria-hidden="true"><rect fill="currentColor" x="4" y="9.5" width="16" height="5" rx="2.5"/></svg></button>
+        <input id="open-custom" type="number" value="25" min="1" max="10000" inputmode="numeric" />
+        <button type="button" class="icon-btn btn btn--primary" data-step-for="open-custom" data-step="1" aria-label="More How many?"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.5a2.5 2.5 0 0 1 2.5 2.5v3.5H18a2.5 2.5 0 0 1 0 5h-3.5V18a2.5 2.5 0 0 1-5 0v-3.5H6a2.5 2.5 0 0 1 0-5h3.5V6A2.5 2.5 0 0 1 12 3.5Z"/></svg></button>
+      </div>
+    </div>
+    <button id="open-custom-go" type="button" class="btn btn--go btn--sm" disabled>Mark opened</button>
   </div>
-</div>
+</section>
 <!-- area:marking-history-savemenu end -->

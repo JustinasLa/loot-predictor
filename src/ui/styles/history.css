@@ -1,20 +1,42 @@
 /* area:marking-history-savemenu — Opened history. */
+.history { padding: 12px 16px; }
 .history-summary {
   cursor: pointer; list-style: none;
-  display: flex; align-items: center; justify-content: space-between;
-  min-height: 48px; font-size: var(--t-h2); font-weight: 800;
+  display: flex; align-items: center; gap: 12px;
+  min-height: 56px; font-size: var(--t-h2); font-weight: 800; color: var(--ink);
+  border-radius: 14px;
 }
 .history-summary::-webkit-details-marker { display: none; }
+.history-summary:focus-visible { outline: none; box-shadow: var(--focus); }
+.history-icon {
+  width: 44px; height: 44px; object-fit: contain; flex: none;
+  filter: drop-shadow(0 3px 0 rgb(0 0 0 / .18));
+}
+.history-label { flex: 1; min-width: 0; }
+.history-count { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
 .history-summary::after {
-  content: ""; width: 36px; height: 36px; border-radius: 10px; flex: none;
+  content: ""; width: 40px; height: 40px; border-radius: 12px; flex: none;
   background: var(--primary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M3.9 9.4a2 2 0 0 1 2.8 0L12 14.7l5.3-5.3a2 2 0 1 1 2.8 2.8l-6.7 6.7a2 2 0 0 1-2.8 0L3.9 12.2a2 2 0 0 1 0-2.8Z'/%3E%3C/svg%3E") center/70% no-repeat;
-  box-shadow: inset 0 -4px 0 var(--primary-lip);
+  border: 3px solid var(--primary-lip);
+  box-shadow: 0 4px 0 var(--primary-lip);
+  transition: transform .15s ease-out;
 }
 .history[open] .history-summary::after { transform: rotate(180deg); }
-.history-count { color: var(--ink-muted); }
-.history-results { display: grid; gap: 12px; margin-top: 12px; }
 
-.open-box.is-past { background: var(--panel-sunk); box-shadow: none; padding: 12px; gap: 10px; }
-.open-box.is-past .item-grid { grid-template-columns: repeat(auto-fill, 64px); gap: 10px; }
-.open-box.is-past .item-tile { filter: saturate(.75); --lip-tile: 3px; border-width: 2px; }
-.open-box.is-past .item-name { font-size: var(--t-small); }
+.history-results { display: grid; gap: 12px; margin: 12px 0 4px; }
+#history .empty { display: grid; justify-items: center; gap: 8px; padding: 12px; }
+#history .empty-art { width: 72px; height: 72px; object-fit: contain; opacity: .55; filter: grayscale(.3); }
+
+/* Past cards: flat, sunk and compact, with 64px tiles. */
+#history .open-box.is-past {
+  background: var(--panel-sunk); box-shadow: none; border: 3px solid var(--divider);
+  padding: 12px; gap: 10px;
+}
+#history .is-past .open-title { font-size: var(--t-btn); color: var(--ink-muted); }
+#history .is-past .item-grid {
+  grid-template-columns: repeat(auto-fill, 64px); justify-content: start; gap: 10px 8px;
+}
+#history .is-past .item-tile { --lip-tile: 3px; border-width: 2px; filter: saturate(.75); }
+#history .is-past .item-tile::before { animation: none; }
+#history .is-past .item-name { font-size: var(--t-small); }
+#history .is-past .item-quantity { font-size: 15px; -webkit-text-stroke-width: 4px; }
