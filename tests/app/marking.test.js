@@ -55,7 +55,7 @@ describe("marking openings", () => {
     dispatch('.open-btn[data-open="5"]');
     expect(sheet.classList.contains("is-hidden")).toBe(true);
     expect(document.activeElement).toBe(trigger);
-    expect($("#toast-region").textContent).toBe("Got it! 5 opened.");
+    expect($("#toast-region").textContent).toBe("Marked 5 openedUndo");
     expect($("#history-count").textContent).toBe("(5)");
     expect($("#open-status").textContent).toBe("5 opened so far.");
 
@@ -64,7 +64,7 @@ describe("marking openings", () => {
     expect($("#open-custom").value).toBe("26");
     dispatch("#open-custom-go");
     expect(sheet.classList.contains("is-hidden")).toBe(true);
-    expect($("#toast-region").textContent).toBe("Got it! 26 opened.");
+    expect($("#toast-region").textContent).toBe("Marked 26 openedUndo");
     expect(stored().live.big.opened).toBe(31);
     expect($$("#history .open-box.is-past")).toHaveLength(31);
     expect($("#history .open-title").textContent).toBe("Opened #31");
@@ -75,15 +75,41 @@ describe("marking openings", () => {
     try {
       await init(restored());
       markOpened(1);
-      expect($("#toast-region").textContent).toBe("Got it! 1 opened.");
+      expect($("#toast-region").textContent).toBe("Marked 1 openedUndo");
       dispatch('.open-btn[data-open="5"]');
-      expect($("#toast-region").textContent).toBe("Got it! 5 opened.");
+      expect($("#toast-region").textContent).toBe("Marked 5 openedUndo");
       expect($("#toast-region").children).toHaveLength(1);
-      vi.advanceTimersByTime(2500);
+      // Toasts with Undo stay up long enough to reach the button.
+      vi.advanceTimersByTime(4999);
+      expect($("#toast-region").textContent).not.toBe("");
+      vi.advanceTimersByTime(1);
       expect($("#toast-region").textContent).toBe("");
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("undoes the last mark from the toast, restoring seed, count and history", async () => {
+    await init(restored());
+    markOpened(1);
+    const before = stored().live.big;
+    dispatch('.open-btn[data-open="5"]');
+    expect(stored().live.big.opened).toBe(6);
+    expect($("#toast-region .toast-art").getAttribute("src")).toMatch(/BigChestIcon\.webp$/);
+    $("#toast-region .toast-undo").click();
+    expect(stored().live.big).toEqual(before);
+    expect($("#history-count").textContent).toBe("(1)");
+    expect($("#toast-region").textContent).toBe("Undone.");
+  });
+
+  it("ignores a stale Undo once the box has moved on", async () => {
+    await init(restored());
+    markOpened(1);
+    const undo = $("#toast-region .toast-undo");
+    markOpened(1);
+    const after = stored().live.big;
+    undo.click();
+    expect(stored().live.big).toEqual(after);
   });
 
   it("opens through an upcoming card, accepts integer seeds and validates custom counts", async () => {

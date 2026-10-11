@@ -17,7 +17,7 @@
         <button type="button" class="chip" data-value="ultimate" data-rarity="Ultimate" aria-pressed="false">Ultimate</button>
         <button type="button" class="chip" data-value="mythic" data-rarity="Mythic" aria-pressed="false">Mythic</button>
       </div>
-      <label class="sr-only" for="rarity-filter">Rarity
+      <label class="sr-only" for="rarity-filter" aria-hidden="true">Rarity
         <select id="rarity-filter" tabindex="-1"><option value="all">All</option><option value="common">Common</option><option value="rare">Rare</option><option value="epic">Epic</option><option value="legendary">Legendary</option><option value="ultimate">Ultimate</option><option value="mythic">Mythic</option></select>
       </label>
     </div>
@@ -29,7 +29,8 @@
 
   <div id="find-picked" class="panel find-picked">
     <span id="find-picked-art" class="find-picked-art"></span>
-    <button id="find-change" type="button" class="chip">Change items</button>
+    <span id="find-picked-names" class="sr-only"></span>
+    <button id="find-change" type="button" class="btn btn--primary btn--sm">Change items</button>
   </div>
 
   <div class="find-action action-bar">
@@ -39,6 +40,7 @@
     <button id="find-stop" type="button" class="btn btn--ghost btn--lg is-hidden">Stop</button>
   </div>
   <p id="find-status" role="status" class="status-line find-status"></p>
+  <h2 class="sr-only">Results</h2>
   <div id="find-out" class="search-results"></div>
   <div id="find-actions" class="find-actions"></div>
 </section>

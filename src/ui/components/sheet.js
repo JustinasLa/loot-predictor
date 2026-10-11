@@ -8,6 +8,23 @@ const FOCUSABLE = [
 // Open sheets, newest last. Holds elements, not ids, so a replaced document
 // never acts on another instance's markup.
 const stack = [];
+// The page behind an open sheet is made inert, so touch and screen-reader
+// swiping stay inside the dialog. Each node remembers whether it was inert.
+const BACKGROUND = [".hud", "#main-content"];
+
+function setBackgroundInert(doc, on) {
+  for (const selector of BACKGROUND) {
+    const node = doc.querySelector(selector);
+    if (!node) continue;
+    if (on && !("inertWas" in node.dataset)) {
+      node.dataset.inertWas = String(node.hasAttribute("inert"));
+      node.toggleAttribute("inert", true);
+    } else if (!on && "inertWas" in node.dataset) {
+      node.toggleAttribute("inert", node.dataset.inertWas === "true");
+      delete node.dataset.inertWas;
+    }
+  }
+}
 
 function focusables(layer) {
   return [...layer.querySelectorAll(FOCUSABLE)]
@@ -24,6 +41,7 @@ export function openSheet(id, trigger = null, doc = document) {
   if (!layer.classList.contains("is-hidden")) return;
   layer.classList.remove("is-hidden");
   stack.push({ layer, trigger });
+  setBackgroundInert(doc, true);
   trigger?.setAttribute("aria-expanded", "true");
   focusables(layer)[0]?.focus();
 }
@@ -35,6 +53,9 @@ export function closeSheet(id, doc = document) {
   if (index < 0) return;
   const [{ trigger }] = stack.splice(index, 1);
   layer.classList.add("is-hidden");
+  if (!stack.some((entry) => entry.layer.ownerDocument === doc && entry.layer.isConnected)) {
+    setBackgroundInert(doc, false);
+  }
   if (trigger) {
     trigger.setAttribute("aria-expanded", "false");
     trigger.focus();

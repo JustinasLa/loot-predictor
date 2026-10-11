@@ -107,7 +107,7 @@ describe("save menu", () => {
     expect(stored().live.egg_Rare).toMatchObject({ seed: 42, opened: 0, history: [] });
     expect(stored().live.big).toMatchObject({ seed: 123, opened: 1 });
     expect($("#current-chest-name").textContent).toBe("Rare Egg");
-    expect($("#find-out .find-guidance")).not.toBeNull();
+    expect($("#find-out").textContent).toBe("");
   });
 
   it("asks before resetting, can cancel and confirms with a toast", async () => {

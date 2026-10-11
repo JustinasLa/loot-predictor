@@ -29,6 +29,8 @@ export function showTab(requested) {
     button.setAttribute("aria-selected", String(selected));
     button.tabIndex = selected ? 0 : -1;
   }
+  // Find and XP bring their own level fields, so the header slims down.
+  $("#box-header").classList.toggle("is-compact", tab !== "predict");
   syncChestHeading();
 }
 
@@ -57,12 +59,19 @@ export function renderRail() {
 export function setScreen(screen) {
   $("#workspace").dataset.screen = screen;
   document.body.dataset.screen = screen;
+  // On the phone Boxes screen the box name is hidden, so "Pick a box" is the page heading.
+  $(".rail-title").setAttribute("aria-level", screen === "boxes" ? "1" : "2");
 }
 
-/** After a load: Box screen, with a #boxes entry behind it for browser Back. */
+/**
+ * After a load: Box screen, with a #boxes entry behind it for browser Back.
+ * A reload that is already on #box keeps its history as it is.
+ */
 export function enterBoxScreen() {
-  history.replaceState(null, "", "#boxes");
-  history.pushState(null, "", "#box");
+  if (location.hash !== "#box") {
+    history.replaceState(null, "", "#boxes");
+    history.pushState(null, "", "#box");
+  }
   setScreen("box");
 }
 
@@ -126,5 +135,6 @@ function initTabs() {
 export function initNavigation() {
   initTabs();
   $("#back-to-boxes").addEventListener("click", goToBoxes);
+  $("#switch-box").addEventListener("click", goToBoxes);
   window.addEventListener("popstate", () => setScreen(location.hash === "#boxes" ? "boxes" : "box"));
 }

@@ -1,7 +1,7 @@
 /* area:phone-shell-polish — HUD and app frame (desktop and tablet). */
 :root {
   --frame-max: 1144px;            /* rail 300 + gap 24 + main 820 */
-  --awning-h: 6px;
+  --awning-h: 4px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
@@ -26,12 +26,12 @@ button, summary, label, a { touch-action: manipulation; }
   background: var(--hud);
   color: var(--hud-ink);
 }
-/* The awning: a thin shop-front stripe under the HUD (the only decoration). */
+/* A solid darker lip under the HUD, like the game's top bar. */
 .hud::after {
   content: "";
   position: absolute; left: 0; right: 0; top: 100%;
   height: var(--awning-h);
-  background: repeating-linear-gradient(90deg, #e6bd3c 0 16px, #fff 16px 32px);
+  background: #07090c;
   transition: box-shadow .15s ease-out;
 }
 body.is-scrolled .hud::after { box-shadow: 0 4px 0 rgb(0 0 0 / .18); }
@@ -43,6 +43,13 @@ body.is-scrolled .hud::after { box-shadow: 0 4px 0 rgb(0 0 0 / .18); }
 .hud .icon-btn svg { width: 26px; height: 26px; }
 /* On the dark HUD the dark half of --focus disappears: use a gold ring. */
 .hud .icon-btn:focus-visible { box-shadow: 0 var(--lip) 0 var(--lip-c), 0 0 0 3px var(--hud), 0 0 0 6px var(--gold); }
+
+/* The save button carries a word: a floppy alone is not obvious to everyone. */
+.hud .hud-save { width: auto; padding: 0 14px 0 10px; gap: 6px; font-size: 17px; }
+@media (max-width: 389px) {
+  .hud .hud-save { width: 48px; padding: 0; }
+  .hud-save-label { display: none; }
+}
 
 .hud-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .hud-brand img { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 3px 0 rgb(0 0 0 / .4)); }
@@ -83,6 +90,3 @@ body.is-scrolled .hud::after { box-shadow: 0 4px 0 rgb(0 0 0 / .18); }
 .box-main { display: grid; gap: 16px; min-width: 0; }
 .tab-panel { display: grid; gap: 16px; min-width: 0; }
 .workspace-status:empty { display: none; }
-
-/* Toasts float above the sticky action bar on phone (see mobile.css). */
-.toast-region { bottom: calc(24px + env(safe-area-inset-bottom)); }

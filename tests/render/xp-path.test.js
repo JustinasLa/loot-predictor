@@ -35,7 +35,10 @@ describe("xp-path renderer", () => {
     expect(delta.textContent).toBe("+10 XP");
     expect(delta.dataset.sign).toBe("up");
     expect(container.querySelector(".xp-summary").classList.contains("banner--go")).toBe(true);
-    expect(container.querySelector(".xp-versus").textContent).toBe("vs 1,220 XP in 2 openings at top level");
+    expect(container.querySelector(".xp-versus").textContent).toBe("More XP than always opening at your top level");
+    expect(container.querySelector(".xp-versus").title).toBe("1,220 XP in 2 openings");
+    // The chips live inside the banner, under the sub-line.
+    expect(container.querySelector(".xp-summary .xp-chips")).not.toBeNull();
     expect(container.querySelector(".xp-spend").textContent).toBe("3 opens");
     expect(container.querySelector(".xp-keys").textContent).toBe("1 bonus key");
     expect(container.querySelector(".xp-keys img").getAttribute("src")).toContain("ZeusKeyIcon");
@@ -46,11 +49,12 @@ describe("xp-path renderer", () => {
     expect(progress.querySelector("[aria-hidden]").textContent).toBe("1 of 3 done");
     expect(progress.querySelector(".sr-only").textContent).toBe(" 1 of 3 openings recorded.");
     const titles = [...container.querySelectorAll(".open-title")].map((title) => title.textContent);
-    expect(titles).toEqual(["Open at level 24", "Open at level 39"]);
+    expect(titles).toEqual(["Next box", "#3"]);
+    expect([...container.querySelectorAll(".open-level")].map((node) => node.textContent)).toEqual(["Lv 24", "Lv 39"]);
     expect([...container.querySelectorAll(".xp-pill")].map((pill) => pill.textContent)).toEqual(["+4 XP", "+1,200 XP"]);
     expect(container.querySelector(".open-subtitle")).toBeNull();
     const buttons = container.querySelectorAll("button");
-    expect([...buttons].map((button) => button.textContent)).toEqual(["I opened it!", "Opened up to here"]);
+    expect([...buttons].map((button) => button.textContent)).toEqual(["I opened it!", "I opened up to #3"]);
     expect(buttons[0].title).toBe("Marks this box opened");
     expect(buttons[1].title).toBe("Marks 2 boxes opened");
     buttons[0].click();
@@ -62,7 +66,8 @@ describe("xp-path renderer", () => {
     const solution = { xp: 4, path: [step()] };
     renderXpPath(container, solution, { xp: 4, opens: 1 }, 1);
     expect(container.querySelector(".xp-delta").dataset.sign).toBe("flat");
-    expect(container.querySelector(".xp-delta").textContent).toBe("Same as top level");
+    expect(container.querySelector(".xp-delta").textContent).toBe("Same XP");
+    expect(container.querySelector(".xp-versus").textContent).toBe("As always opening at your top level");
     expect(container.querySelector(".xp-summary").classList.contains("banner--go")).toBe(false);
     expect(container.querySelector(".xp-keys")).toBeNull();
     expect(container.textContent).not.toContain("No extra keys");
@@ -82,15 +87,19 @@ describe("xp-path renderer", () => {
       { xp: 25, path: [step()], truncated: true, maxOpens: 1 },
       { xp: 100, opens: 4 }, 4);
     expect(container.querySelector(".xp-delta").dataset.sign).toBe("down");
-    expect(container.querySelector(".xp-delta").textContent).toBe("75 XP less than top level");
-    expect(container.textContent).not.toContain("Same as");
+    expect(container.querySelector(".xp-delta").textContent).toBe("75 XP less");
+    expect(container.querySelector(".xp-versus").textContent).toBe("Than always opening at your top level");
+    expect(container.textContent).not.toContain("Same");
     expect(container.querySelector(".xp-warn").textContent).toBe("Best so far");
     expect(container.querySelector(".xp-keys")).toBeNull();
+    renderXpPath(container, { xp: 25, path: [step()] }, { xp: 100, opens: 4, level: 30 }, 4);
+    expect(container.querySelector(".xp-versus").textContent).toBe("Than always opening at Lv 30");
   });
 
-  it("titles a step without a level by its number and omits a missing XP pill", () => {
+  it("omits the level badge and XP pill when a step has neither", () => {
     renderXpPath(container, { xp: 4, path: [{ ...step(), level: undefined, xp: undefined }] }, { xp: 4, opens: 1 }, 1);
-    expect(container.querySelector(".open-title").textContent).toBe("Step 1");
+    expect(container.querySelector(".open-title").textContent).toBe("Next box");
+    expect(container.querySelector(".open-level")).toBeNull();
     expect(container.querySelector(".xp-pill")).toBeNull();
   });
 

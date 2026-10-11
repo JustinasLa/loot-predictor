@@ -20,9 +20,11 @@ describe("Next tab", () => {
     await init(restored());
     expect($("#out").children).toHaveLength(5);
     expect($("#out .open-box").classList.contains("is-next")).toBe(true);
+    // The ribbon says NEXT; the title is for screen readers only.
     expect($("#out .open-title").textContent).toBe("Next box");
+    expect($("#out .open-title").classList.contains("sr-only")).toBe(true);
     expect($("#out .open-card-btn").textContent).toBe("I opened it!");
-    expect($("#out").querySelectorAll(".open-card-btn")[1].textContent).toBe("Opened up to here");
+    expect($("#out").querySelectorAll(".open-card-btn")[1].textContent).toBe("I opened up to #2");
   });
 
   it("shows 5 more boxes up to the cap", async () => {
@@ -61,8 +63,8 @@ describe("Next tab", () => {
     expect($("#count").max).toBe("200");
     const more = $('[data-step-for="count"][data-step="1"]');
     const less = $('[data-step-for="count"][data-step="-1"]');
-    expect(more.getAttribute("aria-label")).toBe("More Boxes to show");
-    expect(less.getAttribute("aria-label")).toBe("Less Boxes to show");
+    expect(more.getAttribute("aria-label")).toBe("Increase Boxes to show");
+    expect(less.getAttribute("aria-label")).toBe("Decrease Boxes to show");
     more.click();
     expect($("#out").children).toHaveLength(6);
     less.click();
@@ -131,7 +133,7 @@ describe("Next tab", () => {
     await init(restored({ ui: { cardId: "adventure_Zeus" } }));
     $('[data-step-for="preview-level"][data-step="1"]').click();
     expect($("#preview-level").value).toBe("6");
-    expect($("#out .open-subtitle").textContent).toBe("Zeus' Feast · Level 6");
+    expect($("#out .open-level").textContent).toBe("Lv 6");
   });
 
   it("resets the preview level when another save replaces the same adventure box", async () => {

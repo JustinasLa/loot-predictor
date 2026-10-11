@@ -23,10 +23,13 @@ export function chainOpts(boxState) {
   return { level, vaultPercentage: vaultValue() };
 }
 
+// Where each tab shows its errors.
+const ERROR_OUT = { predict: "#out", find: "#find-out", xp: "#xp-out" };
+
 /** Runs a settings/marking action, showing any error in the visible panel. */
 export function predictAction(action) {
   try { action(); }
-  catch (err) { renderError($(state.activeTab === "find" ? "#find-out" : "#out"), err.message); }
+  catch (err) { renderError($(ERROR_OUT[state.activeTab]), err.message); }
 }
 
 // Shows the level field for adventure boxes and resets it to the box's real

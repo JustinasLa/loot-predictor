@@ -31,7 +31,9 @@ describe("item hunt UI", () => {
     chest("egg_Rare", "find");
     dispatch("#find-run");
     await vi.waitFor(() => expect($("#find-out button")).not.toBeNull());
-    expect($("#find-status").textContent).toContain("checked · ");
+    // The banner tells the story; the busy count is gone.
+    expect($("#find-status").textContent).toBe("");
+    expect($("#find-out .find-found")).not.toBeNull();
     $("#find-out button").click();
     expect(stored().live.egg_Rare.seed).toBe(302596119);
     expect($("#find-out").textContent).toContain("All found!");
@@ -64,7 +66,7 @@ describe("item hunt UI", () => {
       return { found: false, nodesVisited: 1, maxDepth: 10 };
     });
     dispatch("#find-run");
-    await vi.waitFor(() => expect($("#find-status").textContent).toContain("stopped early"));
+    await vi.waitFor(() => expect($("#find-out").textContent).toBe("Stopped."));
     dispatch("#find-run");
     await vi.waitFor(() => expect($("#find-out button")).not.toBeNull());
     $("#find-out button").click();
@@ -94,7 +96,7 @@ describe("item hunt UI", () => {
     input("#find-maxlevel", "");
     findModule.findAllPathsAsync.mockReturnValueOnce({ found: false, maxDepth: 10 });
     dispatch("#find-run");
-    await vi.waitFor(() => expect($("#find-status").textContent).toContain("0 checked"));
+    await vi.waitFor(() => expect($("#find-out").textContent).toBe("Not in the next 10 opens."));
     expect(findModule.findAllPathsAsync).toHaveBeenCalledWith(expect.objectContaining({ maxLevel: 1 }));
   });
 
@@ -242,7 +244,7 @@ describe("item hunt UI", () => {
     findModule.findItemLinearAsync.mockResolvedValueOnce({ found: false, opens: 3, missing: ["Pet_GoldenRetriever"], nodesVisited: 3, stopped: true, complete: false });
     dispatch("#find-run");
     await vi.waitFor(() => expect($("#find-out").textContent).toBe("Stopped."));
-    expect($("#find-status").textContent).toContain("Search stopped early");
+    expect($("#find-status").textContent).toBe("");
     expect($$("#find-actions button").map((button) => button.textContent)).toEqual(["Try again"]);
     $("#find-actions button").click();
     await vi.waitFor(() => expect($("#find-out button")).not.toBeNull());

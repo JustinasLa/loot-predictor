@@ -21,8 +21,8 @@ export function appendItemContent(node, item, { showQuantity = true } = {}) {
   const quantity = showQuantity ? itemQuantity(item) : null;
   if (quantity != null) {
     const badge = el("span", "item-quantity", `x${quantity}`);
-    badge.setAttribute("aria-label", `Quantity: ${quantity}`);
-    tile.append(badge);
+    badge.setAttribute("aria-hidden", "true");
+    tile.append(badge, el("span", "sr-only", `Quantity ${quantity}`));
   }
   if (typeof item.baseName === "string" && item.baseName.endsWith("KeyIcon")) {
     const key = el("span", "badge badge--gold item-key", "Key");
@@ -46,7 +46,7 @@ export function renderItems(items, hits = []) {
     const tile = appendItemContent(row, item);
     if (hits.includes(item.baseName)) {
       row.dataset.hit = "yes";
-      tile.append(el("span", "target-hit badge badge--gold", "Yours!"));
+      tile.append(el("span", "target-hit badge badge--gold badge--yours", "Yours!"));
     }
     list.append(row);
   }

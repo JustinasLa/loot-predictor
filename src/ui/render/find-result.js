@@ -17,22 +17,13 @@ function banner(className, text, role) {
   return node;
 }
 
-function stepCard(step, index, { adventure, onOpen, path, cardId, container }) {
+// Each step is a normal opening card: NEXT or #N, and "Lv N" on adventures.
+function stepCard(step, index, { onOpen, path, cardId, container }) {
   const count = index + 1;
-  const card = openingCard(step, {
-    cardId, number: count, count, route: true, container,
+  return openingCard(step, {
+    cardId, number: count, count, container,
     onOpen: onOpen ? () => onOpen(path.slice(0, count)) : null,
   });
-  const title = card.querySelector(".open-title");
-  if (adventure && step.level != null) {
-    title.textContent = `Open at level ${step.level}`;
-  } else if (count === 1) {
-    title.textContent = "Next box";
-  } else {
-    title.textContent = `#${count}`;
-    title.setAttribute("aria-label", `Opening ${count}`);
-  }
-  return card;
 }
 
 function routeBlock(route, options) {
@@ -45,7 +36,7 @@ function routeBlock(route, options) {
   const flush = () => {
     if (skipped.length > 1) {
       const fold = el("details", "find-skip");
-      fold.append(el("summary", "find-skip-summary", `+${countLabel(skipped.length, "open")}`), ...skipped);
+      fold.append(el("summary", "find-skip-summary", `Show ${countLabel(skipped.length, "more box", "more boxes")}`), ...skipped);
       block.append(fold);
     } else {
       block.append(...skipped);
@@ -113,7 +104,6 @@ export function renderFindResult(container, result, targets, onOpen, cardId) {
       limit ? "Hit the search limit. Best so far:" : "Stopped early. Best so far:", "status"));
   }
 
-  const adventure = !result.path;
   const routes = result.path
     ? [{ key: "route", title: "Route", path: result.path }]
     : [{ key: "fastest", title: "Fastest", path: result.shortest.path,
@@ -130,7 +120,7 @@ export function renderFindResult(container, result, targets, onOpen, cardId) {
   container.append(found);
 
   const blocks = routes.map((route, index) => {
-    const block = routeBlock(route, { adventure, onOpen, cardId, container });
+    const block = routeBlock(route, { onOpen, cardId, container });
     if (index > 0) block.classList.add("is-hidden");
     return block;
   });

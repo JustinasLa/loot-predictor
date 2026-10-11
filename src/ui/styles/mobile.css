@@ -3,6 +3,8 @@
    sticky action bar. Component colours stay in their own files. */
 @media (max-width: 767px) {
   :root { --bar-room: calc(104px + env(safe-area-inset-bottom)); }
+  /* Results scrolled into view land under the HUD and the sticky tabs. */
+  html { scroll-padding-top: calc(var(--frame-top) + 92px); }
 
   .hud {
     padding-inline: max(12px, var(--safe-left)) max(12px, var(--safe-right));
@@ -53,13 +55,12 @@
     box-shadow: inherit;
   }
 
-  /* Room for the fixed action bar, but only while one is on screen. */
-  body:has(#welcome-screen:not(.is-hidden) .action-bar:not(.is-hidden)),
+  /* Room for the fixed action bar, but only while one is on screen. The
+     welcome buttons sit in the page flow, so the Start screen needs none. */
   body:has(#workspace[data-screen="box"]:not(.is-hidden) .tab-panel:not(.is-hidden) .action-bar:not(.is-hidden)) {
     padding-bottom: var(--bar-room);
     scroll-padding-bottom: var(--bar-room);
   }
-  body:has(#welcome-screen:not(.is-hidden) .action-bar:not(.is-hidden)) .toast-region,
   body:has(#workspace[data-screen="box"]:not(.is-hidden) .tab-panel:not(.is-hidden) .action-bar:not(.is-hidden)) .toast-region {
     bottom: calc(var(--bar-room) + 12px);
   }
@@ -69,9 +70,12 @@
   }
 }
 
-/* Narrow phones: the demo banner already says which save is open. */
+/* Narrow phones: on the Boxes screen the demo banner already says which
+   save is open; on the Box screen the pill stays, so the demo is never
+   mistaken for real data. */
 @media (max-width: 420px) {
-  .hud-pill { display: none; }
+  body[data-screen="boxes"] .hud-pill { display: none; }
+  .hud-pill { height: 30px; padding: 0 10px; font-size: 14px; }
 }
 
 /* Very narrow phones (360px and below): keep the HUD on one line. */

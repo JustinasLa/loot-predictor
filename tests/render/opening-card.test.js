@@ -14,6 +14,12 @@ beforeEach(() => {
 const opening = (open = 1, extra = {}) => ({ open, seed: 42, nextSeed: 1, items: [item()], ...extra });
 
 describe("opening-card renderer", () => {
+  it("numbers the mark button by the card count when no number is given", async () => {
+    const { markButton } = await import("../../src/ui/render.js");
+    expect(markButton(3, vi.fn(), container).textContent).toBe("I opened up to #3");
+    expect(markButton(1, vi.fn(), container).textContent).toBe("I opened it!");
+  });
+
   it("keeps seeds in closed details and preserves zero-valued prediction data", () => {
     renderResults(container, "big", [opening(1, { seed: 0, nextSeed: 0, keyRoll: 0 })]);
     const details = container.querySelector("details");
@@ -31,15 +37,19 @@ describe("opening-card renderer", () => {
     renderResults(container, "adventure_Zeus", chain);
     expect([...container.querySelectorAll(".open-title")].map((node) => node.textContent))
       .toEqual(["Next box", "#2"]);
-    expect([...container.querySelectorAll(".open-subtitle")].map((node) => node.textContent))
-      .toEqual(["Zeus' Feast · Level 24", "Zeus' Feast · Level 4"]);
+    expect([...container.querySelectorAll(".open-level")].map((node) => node.textContent))
+      .toEqual(["Lv 24", "Lv 4"]);
+    // The box header names the box: cards never repeat it.
+    expect(container.textContent).not.toContain("Zeus' Feast");
+    expect(container.querySelector(".open-head").classList.contains("is-bare")).toBe(false);
     renderHistory(container, "adventure_Zeus", [...chain].reverse());
     expect([...container.querySelectorAll(".open-title")].map((node) => node.textContent))
       .toEqual(["Opened #2", "Opened #1"]);
-    expect([...container.querySelectorAll(".open-subtitle")].map((node) => node.textContent))
-      .toEqual(["Zeus' Feast · Level 4", "Zeus' Feast · Level 24"]);
+    expect([...container.querySelectorAll(".open-level")].map((node) => node.textContent))
+      .toEqual(["Lv 4", "Lv 24"]);
     renderHistory(container, "big", [opening()]);
-    expect(container.querySelector(".open-subtitle").textContent).toBe("Big Box");
+    expect(container.querySelector(".open-level")).toBeNull();
+    expect(container.textContent).not.toContain("Big Box");
   });
 
   it("ribbons the next box and names later cards by number", () => {
@@ -47,6 +57,8 @@ describe("opening-card renderer", () => {
     const [next, later] = container.querySelectorAll(".open-box");
     expect(next.classList.contains("is-next")).toBe(true);
     expect(next.querySelector(".open-ribbon").textContent).toBe("NEXT");
+    // Only the ribbon shows on a plain box's next card: the header takes no room.
+    expect(next.querySelector(".open-head").classList.contains("is-bare")).toBe(true);
     expect(later.querySelector(".open-ribbon")).toBeNull();
     expect(later.querySelector(".open-title").textContent).toBe("#14");
     expect(later.querySelector(".open-title").getAttribute("aria-label")).toBe("Opening 14");
@@ -71,7 +83,9 @@ describe("opening-card renderer", () => {
     expect(first.className).toContain("btn--go btn--lg btn--block");
     expect(first.textContent).toBe("I opened it!");
     expect(second.className).toContain("btn--ghost btn--sm");
-    expect(second.textContent).toBe("Opened up to here");
+    expect(second.textContent).toBe("I opened up to #2");
+    // Every card title is an h3, routes included.
+    expect([...container.querySelectorAll(".open-title")].every((title) => title.tagName === "H3")).toBe(true);
     expect(container.children[2].querySelector(".open-title").getAttribute("aria-label")).toBe("Opening 3");
   });
 });

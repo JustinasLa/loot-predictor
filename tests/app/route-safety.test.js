@@ -53,7 +53,7 @@ describe("search lifecycle and route safety", () => {
     if (action === "switch") chest("big", "find");
     if (action === "import") await upload();
     const before = stored().live;
-    expect($("#find-out .find-guidance")).not.toBeNull();
+    expect($("#find-out .find-found")).toBeNull();
     obsolete.click();
     expect(stored().live).toEqual(before);
   });
@@ -163,7 +163,7 @@ describe("search lifecycle and route safety", () => {
     chest("big", "find");
     pending.resolve({ found: false, opens: 0, missing: ["Pet_GoldenRetriever"] });
     await Promise.resolve();
-    expect($("#find-out .find-guidance")).not.toBeNull();
+    expect($("#find-out").textContent).toBe("");
   });
 
   it("reports a bounded Find search as incomplete and forwards current progress", async () => {
@@ -175,7 +175,8 @@ describe("search lifecycle and route safety", () => {
       return { found: false, maxDepth: 10, nodesVisited: 12, truncated: true };
     });
     dispatch("#find-run");
-    await vi.waitFor(() => expect($("#find-status").textContent).toContain("Search limit reached"));
+    await vi.waitFor(() => expect($("#find-out").textContent).toBe("Hit the search limit."));
+    expect($("#find-status").textContent).toBe("");
   });
 
   it("ignores late Stop actions when no run is active", async () => {
@@ -219,7 +220,8 @@ describe("search lifecycle and route safety", () => {
     expect($("#xp-search").disabled).toBe(true);
     expect($("#xp-stop").classList.contains("is-hidden")).toBe(false);
     second.resolve({ path: [], xp: 0, nodesVisited: 99 });
-    await vi.waitFor(() => expect($("#xp-status").textContent).toContain("99 routes checked"));
+    await vi.waitFor(() => expect($("#xp-out").textContent).toBe("No plan found. Try more keys or a higher level."));
+    expect($("#xp-status").textContent).toBe("");
     expect($("#xp-search").disabled).toBe(false);
   });
 
@@ -250,7 +252,7 @@ describe("search lifecycle and route safety", () => {
     dispatch("#find-stop");
     expect(newOptions.shouldStop()).toBe(true);
     second.resolve({ found: false, opens: 0, missing: ["Pet_HouseCat"], nodesVisited: 0, stopped: true });
-    await vi.waitFor(() => expect($("#find-status").textContent).toContain("stopped early"));
+    await vi.waitFor(() => expect($("#find-out").textContent).toBe("Stopped."));
     expect($("#find-run").disabled).toBe(false);
   });
 
@@ -280,7 +282,7 @@ describe("search lifecycle and route safety", () => {
     input("#xp-maxopens", 1);
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out button")).not.toBeNull());
-    expect($("#xp-out").textContent).toContain("in 1 opening");
+    expect($("#xp-out .xp-versus").title).toContain("in 1 opening");
   });
 
   it("bounds a stopped search's baseline by its partial path instead of the requested budget", async () => {
@@ -300,7 +302,8 @@ describe("search lifecycle and route safety", () => {
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out button")).not.toBeNull());
     expect(baselineCalls).toHaveBeenCalledTimes(1);
-    expect($("#xp-out").textContent).toContain("in 1 opening");
-    expect($("#xp-status").textContent).toContain("Stopped early");
+    expect($("#xp-out .xp-versus").title).toContain("in 1 opening");
+    expect($("#xp-out .xp-warn").textContent).toBe("Stopped early");
+    expect($("#xp-retry")).not.toBeNull();
   });
 });

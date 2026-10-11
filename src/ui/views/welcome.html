@@ -13,15 +13,30 @@
       <button id="load-demo" type="button" class="btn btn--primary btn--block">Try demo</button>
     </div>
     <div id="import-status" class="import-status" role="status" aria-live="polite"></div>
-    <button id="try-another-file" type="button" class="btn btn--primary btn--sm try-another is-hidden">Try another file</button>
     <p class="welcome-lock">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a5 5 0 0 1 5 5v3h.5A2.5 2.5 0 0 1 20 12.5v7a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 19.5v-7A2.5 2.5 0 0 1 6.5 10H7V7a5 5 0 0 1 5-5Zm0 3a2 2 0 0 0-2 2v3h4V7a2 2 0 0 0-2-2Z"/></svg>
       Your save stays on this device.
     </p>
     <details class="welcome-help">
       <summary>What's a save file?</summary>
-      <p>It's your Eatventure save (.json). It's read here, never uploaded.</p>
-      <p>No file? Tap Try demo.</p>
+      <ol class="save-steps">
+        <li class="save-step">
+          <span class="save-step-pic save-step-pic--file" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h8.2L20 7.8V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm7 1.8V9h5.2L13 3.8Z"/></svg></span>
+          <span>Copy your Eatventure save (.json) to this device.</span>
+        </li>
+        <li class="save-step">
+          <span class="save-step-pic" aria-hidden="true"><span class="btn btn--go btn--mini">Load my save</span></span>
+          <span>Tap it and pick the file.</span>
+        </li>
+        <li class="save-step">
+          <span class="save-step-pic save-step-pic--lock" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a5 5 0 0 1 5 5v3h.5A2.5 2.5 0 0 1 20 12.5v7a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 19.5v-7A2.5 2.5 0 0 1 6.5 10H7V7a5 5 0 0 1 5-5Zm0 3a2 2 0 0 0-2 2v3h4V7a2 2 0 0 0-2-2Z"/></svg></span>
+          <span>It's read here, never uploaded.</span>
+        </li>
+        <li class="save-step">
+          <span class="save-step-pic" aria-hidden="true"><span class="btn btn--primary btn--mini">Try demo</span></span>
+          <span>No file? Try the demo.</span>
+        </li>
+      </ol>
     </details>
   </div>
   <p class="app-footer">Fan-made. Not affiliated with Eatventure or Lessmore.</p>

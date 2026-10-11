@@ -17,6 +17,19 @@ export function itemSprites(items, className = "find-sprites") {
   return row;
 }
 
+// The game's own rarity order, so the colours step up grey, green, purple, gold, red.
+const RARITY_RANK = ["Common", "Rare", "Epic", "Legendary", "Ultimate", "Mythic"];
+const rank = (item) => {
+  const index = RARITY_RANK.indexOf(rarityTone(item.rarity));
+  return index < 0 ? RARITY_RANK.length : index;
+};
+
+/** Display order only: rarity rank, then name. Never changes which items are offered. */
+export function byRarity(items) {
+  return [...items].sort((a, b) =>
+    rank(a) - rank(b) || getItemPresentation(a).name.localeCompare(getItemPresentation(b).name));
+}
+
 function matches(item, query, rarity) {
   const name = getItemPresentation(item).name;
   const matchesQuery = `${name} ${item.baseName} ${item.rarity}`.toLowerCase().includes(query);
@@ -39,7 +52,7 @@ export function renderItemPicker(container, items, selected, onToggle, filters =
 
   const query = (filters.query || "").trim().toLowerCase();
   const rarity = (filters.rarity || "all").toLowerCase();
-  const visible = items.filter((item) => matches(item, query, rarity));
+  const visible = byRarity(items.filter((item) => matches(item, query, rarity)));
   if (visible.length === 0) {
     container.append(el("p", "empty", "No match."));
     return 0;

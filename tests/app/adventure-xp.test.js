@@ -20,12 +20,12 @@ import { step } from "../fixtures.js";
 setupApp();
 
 describe("adventure preview and XP UI", () => {
-  it.each([[1, 1, "Instant"], [10, 100, "seconds"], [12, 100, "minutes"], [14, 100, "hours"]])("estimates search cost for %i openings at max level %i", async (opens, level, unit) => {
+  it.each([[1, 1, ""], [10, 100, "Takes about 49 seconds"], [12, 100, "Takes about 20 minutes"], [14, 100, "Takes about 8.5 hours"]])("estimates search cost for %i openings at max level %i", async (opens, level, text) => {
     await init(restored({ ui: { cardId: "adventure_Zeus" } }));
     input("#xp-maxlevel", level, "input");
     input("#xp-openings", opens, "input");
-    expect($("#xp-estimate").textContent).toContain(unit);
-    if (opens >= 12) expect($("#xp-estimate").textContent).toContain("· may be slow");
+    // Quick plans say nothing at all.
+    expect($("#xp-estimate").textContent).toBe(text);
     if (opens === 1) expect($("#xp-estimate").dataset.heavy).toBe("no");
     if (opens >= 12) expect($("#xp-estimate").dataset.heavy).toBe("yes");
   });
@@ -37,10 +37,12 @@ describe("adventure preview and XP UI", () => {
     dispatch("#xp-search");
     await vi.waitFor(() => expect($("#xp-out button")).not.toBeNull());
     expect($("#xp-search").disabled).toBe(false);
-    expect($("#xp-status").textContent).toMatch(/^\d[\d,]* routes checked in \d+\.\ds$/);
+    // The plan replaces the big bar and the busy line.
+    expect($(".xp-action").classList.contains("is-hidden")).toBe(true);
+    expect($("#xp-status").textContent).toBe("");
     expect($("#xp-status").dataset.busy).toBe("no");
     expect($("#xp-out .xp-delta")).not.toBeNull();
-    expect($("#xp-out .open-title").textContent).toMatch(/^Open at level \d+$/);
+    expect($("#xp-out .open-level").textContent).toMatch(/^Lv \d+$/);
     $("#xp-out button").click();
     expect(stored().live.adventure_Zeus.opened).toBe(1);
     expect($("#xp-out").textContent).toContain("1 of 2 openings recorded");
@@ -51,6 +53,7 @@ describe("adventure preview and XP UI", () => {
     chest("big");
     expect($("#xp-out").textContent).toBe("");
     expect($("#xp-status").textContent).toBe("");
+    expect($(".xp-action").classList.contains("is-hidden")).toBe(false);
   });
 
   it("stops a running XP search and restores controls after a search error", async () => {
@@ -69,7 +72,7 @@ describe("adventure preview and XP UI", () => {
     await vi.waitFor(() => expect($("#xp-out").textContent).toBe("Stopped."));
     expect($("#xp-out button")).toBeNull();
     expect($("#xp-actions #xp-retry").textContent).toBe("Try again");
-    expect($("#xp-status").textContent).toMatch(/^Stopped early · 2 routes checked in /);
+    expect($("#xp-status").textContent).toBe("");
     xpModule.findOptimalXpPath.mockResolvedValueOnce({ path: [], xp: 0, nodesVisited: 1 });
     dispatch("#xp-retry");
     await vi.waitFor(() => expect($("#xp-out").textContent).toBe("No plan found. Try more keys or a higher level."));

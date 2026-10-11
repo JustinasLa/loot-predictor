@@ -1,9 +1,11 @@
 /* area:settings-help-errors — Settings sheet. */
 .settings-body { gap: 20px; }
 .settings-section { display: grid; gap: 10px; }
-/* Find / XP sections collapse when their rows are hidden (non-adventure boxes). */
+/* Sections collapse when all their rows are hidden (e.g. Find / XP / key drop on normal boxes). */
 .settings-section:not(:has(> :not(.is-hidden))) { display: none; }
 .settings-section + .settings-section { padding-top: 20px; border-top: 3px solid var(--divider); }
+
+.settings-error:empty { display: none; }
 
 .setting-row {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -11,21 +13,36 @@
 }
 .setting-row > label, label.setting-row { display: flex; align-items: center; gap: 10px; line-height: 1.15; }
 label.setting-row { justify-content: space-between; }
+.setting-row > label { flex: 1; min-width: 0; }
 .setting-row img { width: 32px; height: 32px; object-fit: contain; flex: none; filter: drop-shadow(0 2px 0 rgb(0 0 0 / .2)); }
-.setting-row .field { flex: none; }
+.setting-row .field { flex: none; width: 120px; }
 .setting-row .toggle { margin-right: 4px; }
 .setting-row--vault { padding-block: 8px; }
 .setting-row--vault .stepper { flex: none; }
 .setting-row--vault .stepper input { background: #fff; width: 76px; }
+.setting-row [aria-invalid="true"] { border-color: var(--danger); background: var(--r-ultimate-tint); }
 
-.tag {
-  font: 800 var(--t-small)/1 var(--font-ui);
-  background: var(--ink-muted); color: #fff;
-  padding: 4px 9px; border-radius: var(--radius-pill);
-}
 .setting-group { display: grid; gap: 10px; }
-.setting-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.setting-buttons .btn { margin-bottom: 4px; }
 .setting-row .btn { margin-bottom: 4px; }
 
-.settings-footer { font-size: 15px; font-weight: 600; margin: 0; padding-top: 4px; }
+/* Advanced: the raw seed and seed details, folded away at the bottom. */
+.settings-advanced-summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 48px; font: 800 var(--t-btn)/1 var(--font-ui); color: var(--ink-muted);
+  border-radius: 12px;
+}
+.settings-advanced-summary::-webkit-details-marker { display: none; }
+.settings-advanced-summary::after {
+  content: ""; width: 12px; height: 12px; margin-right: 8px;
+  border: solid var(--primary); border-width: 0 4px 4px 0;
+  transform: translateY(-3px) rotate(45deg); transition: transform .12s;
+}
+.settings-advanced[open] > .settings-advanced-summary::after { transform: translateY(3px) rotate(-135deg); }
+.settings-advanced-body { display: grid; gap: 10px; margin-top: 10px; }
+
+@media (max-width: 767px) {
+  /* The stepper needs the row's width: put the key-drop label above it. */
+  .setting-row--vault { flex-direction: column; align-items: stretch; gap: 8px; }
+  .setting-row--vault .stepper { align-self: center; }
+}

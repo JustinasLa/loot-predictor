@@ -54,7 +54,7 @@ describe("settings sheet", () => {
     expect($("#xp-vault").value).toBe("40");
   });
 
-  it("focuses the first control, traps Tab and returns focus to the gear on Escape", async () => {
+  it("focuses the close button (never a number field, which pops the phone keyboard) and returns focus on Escape", async () => {
     await init(restored());
     const trigger = $("#settings-trigger");
     trigger.focus();
@@ -62,31 +62,63 @@ describe("settings sheet", () => {
     const sheet = $("#settings-sheet");
     expect(sheet.querySelector('[role="dialog"]').getAttribute("aria-labelledby")).toBe("settings-title");
     expect($("#settings-title").textContent).toBe("Settings");
-    expect(document.activeElement).toBe($("#vault"));
-    expect(sheet.contains(document.activeElement)).toBe(true);
+    expect(document.activeElement).toBe(sheet.querySelector(".sheet-close"));
+    // The page behind is inert while the sheet is open.
+    expect($("#main-content").hasAttribute("inert")).toBe(true);
+    expect($(".hud").hasAttribute("inert")).toBe(true);
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     expect(sheet.classList.contains("is-hidden")).toBe(true);
     expect(trigger.getAttribute("aria-expanded")).toBe("false");
     expect(document.activeElement).toBe(trigger);
+    expect($("#main-content").hasAttribute("inert")).toBe(false);
+    expect($(".hud").hasAttribute("inert")).toBe(false);
     trigger.click();
     sheet.querySelector(".sheet-close").click();
     expect(sheet.classList.contains("is-hidden")).toBe(true);
     expect(document.activeElement).toBe(trigger);
   });
 
-  it("orders the rows core, next, marking, find, XP and keeps real labels", async () => {
+  it("puts everyday rows first and folds the seed under Advanced at the bottom", async () => {
     await init(restored());
     const sections = $$("#settings-sheet .settings-section");
     expect(sections.map((node) => node.classList[1])).toEqual([
-      "settings-core", "settings-next", "settings-marking", "settings-find", "settings-xp",
+      "settings-marking", "settings-next", "settings-core", "settings-find", "settings-xp", "settings-advanced",
     ]);
-    expect(sections[0].querySelector("#vault + *, #vault")).not.toBeNull();
-    expect($("#vault").labels[0].textContent.trim()).toBe("Vault key chance (%)");
-    expect($("#seed").labels[0].textContent.replace(/\s+/g, " ").trim()).toBe("Seed Advanced");
-    expect($('label[for="seed"] .tag').textContent).toBe("Advanced");
+    expect(sections[2].querySelector("#vault")).not.toBeNull();
+    expect($("#vault").labels[0].textContent.trim()).toBe("Key drop %");
+    const advanced = $(".settings-advanced");
+    expect(advanced.tagName).toBe("DETAILS");
+    expect(advanced.open).toBe(false);
+    expect(advanced.querySelector("summary").textContent).toBe("Advanced");
+    expect(advanced.querySelector("#seed")).not.toBeNull();
+    expect(advanced.querySelector("#show-details")).not.toBeNull();
+    expect($("#seed").labels[0].textContent.trim()).toBe("Seed");
     for (const field of $$("#settings-sheet input[type=number]")) expect(field.labels.length, field.id).toBeGreaterThan(0);
-    expect($(".settings-footer").textContent).toBe("Only change these if you know why.");
-    expect($("#settings-sheet .settings-footer").previousElementSibling.classList.contains("settings-xp")).toBe(true);
+    expect($(".settings-footer")).toBeNull();
+    expect($("#xp-maxopens").placeholder).toBe("None");
+  });
+
+  it("shows the key drop row only for adventures", async () => {
+    await init(restored());
+    $("#settings-trigger").click();
+    expect($(".setting-row--vault").classList.contains("is-hidden")).toBe(true);
+    $("#settings-trigger").click();
+    chest("adventure_Zeus");
+    $("#settings-trigger").click();
+    expect($(".setting-row--vault").classList.contains("is-hidden")).toBe(false);
+  });
+
+  it("shows a bad key drop chance inside the sheet, even on the XP tab", async () => {
+    await init(restored({ ui: { cardId: "adventure_Zeus", tab: "xp" } }));
+    $("#settings-trigger").click();
+    input("#vault", 150);
+    expect($("#settings-error .error-box").textContent).toContain("Oops! That didn't work.");
+    expect($("#settings-error .error-box").getAttribute("role")).toBe("alert");
+    expect($("#vault").getAttribute("aria-invalid")).toBe("true");
+    expect($("#settings-sheet").classList.contains("is-hidden")).toBe(false);
+    input("#vault", 50);
+    expect($("#settings-error").textContent).toBe("");
+    expect($("#vault").hasAttribute("aria-invalid")).toBe(false);
   });
 
   it("keeps the advanced inputs off the main screens", async () => {
@@ -100,7 +132,7 @@ describe("settings sheet", () => {
     await init(restored({ ui: { cardId: "adventure_Zeus" } }));
     const before = $("#out").textContent;
     const more = $('[data-step-for="vault"][data-step="1"]');
-    expect(more.getAttribute("aria-label")).toBe("More Vault key chance (%)");
+    expect(more.getAttribute("aria-label")).toBe("Increase Key drop %");
     input("#vault", 99);
     more.click();
     more.click();
@@ -128,7 +160,7 @@ describe("settings sheet", () => {
     expect($("#seed").disabled).toBe(false);
     input("#seed", "1.5");
     expect($("#seed").value).toBe(seed);
-    expect($("#out .error-box").textContent).toMatch(/^Oops! That didn't work\. /);
+    expect($("#settings-error .error-box").textContent).toMatch(/^Oops! That didn't work\. /);
     input("#seed", 12345);
     expect(stored().live.big.seed).toBe(12345);
   });

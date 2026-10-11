@@ -21,12 +21,12 @@ describe("save import", () => {
   it("reports parsing and file-reader errors", async () => {
     await init();
     await upload("{}");
-    expect($("#import-status .error-box").textContent).toBe("Oops! That didn't work. That's not an Eatventure save.");
+    expect($("#import-status .error-box").textContent).toBe("Oops! That didn't work. That's not an Eatventure save. How?");
     class UnreadableFile { readAsText() { this.onerror(); } }
     vi.stubGlobal("FileReader", UnreadableFile);
     await upload("{}", "unreadable.json");
     expect($("#import-status .error-box").textContent).toBe("Oops! That didn't work. Couldn't open that file.");
-    expect($("#try-another-file").classList.contains("is-hidden")).toBe(false);
+    expect($("#import-status .error-how")).toBeNull();
   });
 
   it("maps every reader and parser failure to short, exact copy", () => {
@@ -41,21 +41,20 @@ describe("save import", () => {
     expect(importErrorMessage(new Error("missing GameSavegame"))).toBe("That's not an Eatventure save.");
   });
 
-  it("offers Try another file only after an error, outside the live regions", async () => {
+  it("has one load button: a wrong file gets a How? link to the save steps instead", async () => {
     await init();
-    const retry = $("#try-another-file");
-    expect(retry.classList.contains("is-hidden")).toBe(true);
-    expect(retry.textContent).toBe("Try another file");
-    expect(retry.type).toBe("button");
-    expect(retry.closest('[role="status"], [role="alert"]')).toBeNull();
+    expect($("#try-another-file")).toBeNull();
     await upload("not json", "notes.txt");
-    expect($("#import-status .error-box").textContent).toBe("Oops! That didn't work. That's not an Eatventure save.");
-    expect(retry.classList.contains("is-hidden")).toBe(false);
-    const fileClick = vi.spyOn($("#save"), "click").mockImplementation(() => {});
-    retry.click();
-    expect(fileClick).toHaveBeenCalledTimes(1);
+    const how = $("#import-status .error-how");
+    expect(how.tagName).toBe("BUTTON");
+    expect(how.type).toBe("button");
+    expect($("#workspace-status .error-how")).toBeNull();
+    const help = $(".welcome-help");
+    expect(help.open).toBe(false);
+    how.click();
+    expect(help.open).toBe(true);
+    expect(document.activeElement).toBe(help.querySelector("summary"));
     await upload(JSON.stringify(savegame()), "good.json");
-    expect(retry.classList.contains("is-hidden")).toBe(true);
     expect($("#import-status").textContent).toBe("");
   });
 
@@ -69,7 +68,6 @@ describe("save import", () => {
       expect(line.classList.contains("is-busy")).toBe(true);
       expect(line.textContent).toBe("Reading savegame.json…");
     }
-    expect($("#try-another-file").classList.contains("is-hidden")).toBe(true);
   });
 
   it("rejects a save with no mapped boxes", async () => {
@@ -155,9 +153,10 @@ describe("save import", () => {
     dispatch("#load-demo");
     const banner = $("#demo-banner");
     expect(banner.classList.contains("is-hidden")).toBe(false);
-    expect(banner.textContent.replace(/\s+/g, " ").trim()).toBe("Demo save · Load my save");
+    expect(banner.textContent.replace(/\s+/g, " ").trim()).toBe("Demo save Load my save");
     const link = $("#demo-banner #load-save");
     expect(link.tagName).toBe("BUTTON");
+    expect(link.className).toContain("btn--go btn--sm");
     expect(link.textContent).toBe("Load my save");
     const fileClick = vi.spyOn($("#save"), "click").mockImplementation(() => {});
     link.click();

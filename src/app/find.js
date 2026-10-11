@@ -4,9 +4,10 @@ import { getAvailableItemsForChest } from "../loot/items.js";
 import { validateLevel } from "../validation.js";
 import { renderItemPicker, renderFindResult, renderError } from "../ui/render.js";
 import { itemSprites } from "../ui/render/item-picker.js";
+import { getItemPresentation } from "../ui/presentation.js";
 import { bindChipsToSelect } from "../ui/components/chips.js";
 import { state, currentId, isAdventure, targetsFor } from "./state.js";
-import { $, numberField, positiveInteger, vaultValue } from "./dom.js";
+import { $, $$, numberField, positiveInteger, vaultValue, reveal } from "./dom.js";
 import { contextMatches, invalidateChest, replayRoute, commitOpenings, syncSearchControls, SETTINGS_CHANGED } from "./routes.js";
 import { refresh } from "./predict.js";
 import { persist } from "./session.js";
@@ -41,14 +42,6 @@ export function syncFindControls() {
   const panel = $("#panel-find");
   panel.classList.toggle("is-collapsed", busy && !pickerOpen);
   panel.classList.toggle("has-result", !running && !!state.findView && !pickerOpen);
-}
-
-function showFindGuidance() {
-  const selected = targetsFor(currentId());
-  const note = document.createElement("p");
-  note.className = "empty find-guidance";
-  note.textContent = selected.size ? "Tap Find it!" : "Tap the items you want.";
-  $("#find-out").replaceChildren(note);
 }
 
 function openPicker() {
@@ -87,7 +80,7 @@ function showActions(kind, depth) {
 export function invalidateFind() {
   state.findRun = null;
   state.findView = null;
-  showFindGuidance();
+  $("#find-out").replaceChildren();
   $("#find-status").textContent = "";
   $("#find-actions").replaceChildren();
   syncSearchControls();
@@ -106,18 +99,35 @@ function pickedItems(items, selected) {
   return [...selected].map((name) => byName.get(name) ?? name);
 }
 
+/**
+ * Only offers rarity chips that this box can drop. A box with a single
+ * rarity (every egg) has nothing to filter, so the row goes away.
+ */
+function syncRarityChips(items) {
+  const present = new Set(items.flatMap((item) => item.rarities).map((rarity) => rarity.toLowerCase()));
+  let shown = 0;
+  for (const chip of $$("#rarity-chips .chip[data-rarity]")) {
+    const has = present.has(chip.dataset.value);
+    chip.classList.toggle("is-hidden", !has);
+    if (has) shown++;
+  }
+  $("#rarity-chips").classList.toggle("is-hidden", shown < 2);
+}
+
 export function syncFindPanel() {
   const cardId = currentId();
   if (!state.live[cardId]) return;
 
   const selected = targetsFor(cardId);
   const items = getAvailableItemsForChest(cardId);
+  syncRarityChips(items);
 
   const visible = renderItemPicker($("#find-items"), items, selected, (baseName) => {
     invalidateFind();
     if (selected.has(baseName)) selected.delete(baseName);
     else selected.add(baseName);
     syncFindPanel();
+    persist();
   }, { query: $("#item-search").value, rarity: $("#rarity-filter").value });
   $("#find-no-match").classList.toggle("is-hidden", items.length === 0 || visible > 0);
 
@@ -125,9 +135,11 @@ export function syncFindPanel() {
   $("#find-selected").textContent = selected.size ? `${selected.size} picked` : "";
   $("#find-stack").replaceChildren(itemSprites(picked.slice(0, MAX_STACK)));
   $("#find-picked-art").replaceChildren(itemSprites(picked));
-  if (!state.findRun && !state.findView) showFindGuidance();
+  // The sprites are silent; say what was picked in words.
+  $("#find-picked-names").textContent = picked.length
+    ? `Picked: ${picked.map((item) => getItemPresentation(item).name).join(", ")}`
+    : "";
   syncSearchControls();
-  persist();
 
   const adventure = isAdventure(cardId);
   $("#find-maxlevel").closest(".find-search-options").classList.toggle("is-hidden", !adventure);
@@ -185,27 +197,26 @@ export async function runFind() {
     syncSearchControls();
     out.textContent = "";
     $("#find-status").textContent = "Looking…";
-    const started = Date.now();
     const controls = {
       shouldStop: () => run.stopped || state.findRun !== run || !contextMatches(run, "find"),
       onProgress: (nodes) => {
         if (state.findRun === run && contextMatches(run, "find")) $("#find-status").textContent = `Looking… · ${nodes.toLocaleString()} checked`;
       }
     };
-    const result = isAdventure(cardId)
+    const solved = isAdventure(cardId)
       ? await findAllPathsAsync({ startSeed: run.seed, targets, cardId, ...options, ...controls })
       : await findItemLinearAsync(run.seed, cardId, targets, { level: boxState.level, ...options, ...controls });
     if (state.findRun !== run || !contextMatches(run, "find")) return;
+    // A Stop that lands after the last node still counts as stopped early.
+    const result = run.stopped && !solved.stopped ? { ...solved, stopped: true } : solved;
     const view = { ...run, result };
     state.findView = view;
     const kind = renderFindResult(out, result, pickedItems(getAvailableItemsForChest(cardId), new Set(targets)),
       (steps) => openRoute(view, steps), cardId);
     showActions(kind, options.maxDepth);
-    $("#find-status").textContent =
-      `${(result.nodesVisited ?? result.opens ?? 0).toLocaleString()} checked · ` +
-      `${((Date.now() - started) / 1000).toFixed(1)}s` +
-      (run.stopped || result.stopped ? " · Search stopped early" : "") +
-      (result.truncated ? " · Search limit reached" : "");
+    // The banner says what happened (found, stopped, limit); the count goes.
+    $("#find-status").textContent = "";
+    reveal(out);
   } catch (err) {
     if (run && (state.findRun !== run || !contextMatches(run, "find"))) return;
     renderError(out, err.message);

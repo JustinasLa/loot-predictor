@@ -52,7 +52,16 @@ describe("chest-list renderer", () => {
     expect(egg.querySelector(".box-check")).toBeNull();
     expect(egg.querySelector(".box-badges")).toBeNull();
     expect([big, egg, seaport, mystery].map((tile) => tile.querySelector(".box-art").dataset.box))
-      .toEqual(["big", "egg", "seaport", "unknown"]);
+      .toEqual(["big", "egg-rare", "seaport", "unknown"]);
+    // The Pets group shows what each egg hatches.
+    expect([...egg.querySelectorAll(".box-pets img")].map((img) => img.getAttribute("src").split("/").pop()))
+      .toEqual(["Pet_GoldenRetriever.webp", "Pet_HouseCat.webp"]);
+    expect(egg.querySelector(".box-pets").getAttribute("aria-hidden")).toBe("true");
+    expect(big.querySelector(".box-pets")).toBeNull();
+    // An egg with no known pets shows no strip.
+    renderChestList(container, { egg_Common: {} }, "big", vi.fn());
+    expect(container.querySelector(".box-pets")).toBeNull();
+    expect(boxTone("egg_Common")).toBe("egg-common");
     expect(["big", "adventure_Zeus", "event_Mine", "egg_Epic"].map(boxGroup))
       .toEqual(["boxes", "adventures", "events", "eggs"]);
     expect(boxTone("adventure_Pirate")).toBe("pirate");

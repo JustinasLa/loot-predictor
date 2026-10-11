@@ -59,8 +59,10 @@ describe("HUD and frame", () => {
       expect(button.classList.contains("btn--primary")).toBe(true);
       const glyph = button.querySelector("svg");
       expect(glyph.getAttribute("aria-hidden")).toBe("true");
-      expect(button.textContent.trim()).toBe("");
+      // Only the save button carries a (decorative, aria-hidden) word.
+      expect(button.textContent.trim()).toBe(button.id === "user-menu-trigger" ? "Save" : "");
     }
+    expect($("#user-menu-trigger .hud-save-label").getAttribute("aria-hidden")).toBe("true");
     // The frame: a rail and a main column inside one workspace.
     expect($("#workspace > #box-rail")).not.toBeNull();
     expect($("#workspace > .box-main")).not.toBeNull();

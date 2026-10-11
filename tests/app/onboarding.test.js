@@ -38,16 +38,20 @@ describe("Start screen", () => {
     expect($("#load-demo").className).toContain("btn--primary");
     expect(welcome.querySelectorAll("#welcome-load-save, #load-demo")).toHaveLength(2);
     expect(welcome.querySelector(".welcome-help summary").textContent).toBe("What's a save file?");
-    expect([...welcome.querySelectorAll(".welcome-help p")].map((p) => p.textContent)).toEqual([
-      "It's your Eatventure save (.json). It's read here, never uploaded.",
-      "No file? Tap Try demo.",
+    // Short picture steps: where the file comes from, then the demo fallback.
+    expect([...welcome.querySelectorAll(".welcome-help .save-step")].map((li) => li.textContent.trim().replace(/\s+/g, " "))).toEqual([
+      "Copy your Eatventure save (.json) to this device.",
+      "Load my save Tap it and pick the file.",
+      "It's read here, never uploaded.",
+      "Try demo No file? Try the demo.",
     ]);
+    for (const pic of welcome.querySelectorAll(".save-step-pic")) expect(pic.getAttribute("aria-hidden")).toBe("true");
     expect($(".app-footer").textContent).toBe("Fan-made. Not affiliated with Eatventure or Lessmore.");
     // Only the listed parts: no decorative extras.
     expect([...welcome.children].map((node) => node.className)).toEqual(["welcome-card panel", "app-footer"]);
     expect([...welcome.querySelector(".welcome-card").children].map((node) => node.className)).toEqual([
       "welcome-hero", "welcome-title", "welcome-actions action-bar", "import-status",
-      "btn btn--primary btn--sm try-another is-hidden", "welcome-lock", "welcome-help",
+      "welcome-lock", "welcome-help",
     ]);
   });
 });

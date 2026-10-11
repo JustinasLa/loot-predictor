@@ -61,6 +61,8 @@ describe("phone frame rules", () => {
   const shell = read("src/ui/styles/shell.css");
 
   it("reserves room for the sticky action bar only while one is on screen", () => {
+    // The Start screen buttons sit in the page flow: no bar room there.
+    expect(mobile).not.toContain("#welcome-screen");
     expect(mobile).toContain(".action-bar:not(.is-hidden)) {\n    padding-bottom: var(--bar-room);");
     expect(mobile).toContain("env(safe-area-inset-bottom)");
     expect(mobile).toMatch(/\.toast-region \{\s*bottom: calc\(var\(--bar-room\)/);
@@ -72,8 +74,9 @@ describe("phone frame rules", () => {
     expect(mobile).toMatch(/\.seg-tabs \{\s*position: sticky;/);
   });
 
-  it("keeps the awning as the only decoration, respects safe areas and reduced motion", () => {
-    expect(shell).toContain("repeating-linear-gradient(90deg, #e6bd3c 0 16px, #fff 16px 32px)");
+  it("uses a solid HUD lip instead of a striped awning, respects safe areas and reduced motion", () => {
+    expect(shell).not.toContain("repeating-linear-gradient");
+    expect(shell).toMatch(/\.hud::after \{[^}]*background: #07090c;/);
     expect(shell).toContain("env(safe-area-inset-top");
     expect(read("src/ui/styles/base.css")).toMatch(/prefers-reduced-motion: reduce[\s\S]*animation: none !important[\s\S]*transition: none !important/);
   });

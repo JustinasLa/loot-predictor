@@ -29,6 +29,26 @@ const key = (name, shiftKey = false) => {
 const $ = (selector) => document.querySelector(selector);
 
 describe("sheet component", () => {
+  it("makes the page behind inert while any sheet is open, keeping what was already inert", () => {
+    document.body.insertAdjacentHTML("afterbegin", '<header class="hud"></header><main id="main-content" inert></main>');
+    sheet.openSheet("demo-sheet");
+    expect($(".hud").hasAttribute("inert")).toBe(true);
+    sheet.openSheet("empty-sheet");
+    sheet.closeSheet("empty-sheet");
+    // Another sheet is still open: the background stays inert.
+    expect($(".hud").hasAttribute("inert")).toBe(true);
+    sheet.closeSheet("demo-sheet");
+    expect($(".hud").hasAttribute("inert")).toBe(false);
+    expect($("#main-content").hasAttribute("inert")).toBe(true);
+    expect("inertWas" in $(".hud").dataset).toBe(false);
+  });
+
+  it("works on pages without a HUD or main region", () => {
+    sheet.openSheet("demo-sheet");
+    sheet.closeSheet("demo-sheet");
+    expect($("#demo-sheet").classList.contains("is-hidden")).toBe(true);
+  });
+
   it("opens with focus on the first control and restores focus on close", () => {
     const opener = $("#opener");
     opener.focus();

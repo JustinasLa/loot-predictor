@@ -4,10 +4,12 @@ An Eatventure loot predictor: see what is coming in your next box, find an
 item you want, and plan adventure replays. Item pictures, readable names, and
 rarity labels make the drops easy to recognize.
 
-1. Select **Load save file** or **Try the demo** to explore with sample data.
-2. **Choose a box or egg** to see its next drops.
-3. Open it in Eatventure, then select **Mark 1 opened** here to keep your tracker
-   in step with the game.
+1. Tap **Load my save**, or **Try demo** to explore with sample data.
+2. **Pick a box** (or an egg under **Pets**) to see its next drops, in order.
+3. Open it in Eatventure, then tap **I opened it!** here to keep your tracker
+   in step with the game. Tapped by mistake? The toast has an **Undo**.
+
+![Next drops on desktop](docs/screenshots/next-desktop.png)
 
 Marking an opening only updates this browser's tracker. It does not open
 anything in Eatventure or change your save file. Savegames are parsed entirely
@@ -55,23 +57,28 @@ reports alongside it. CI runs the same coverage check before building.
 ### Next drops
 
 The demo uses a synthetic save, so you can explore without a real save file.
-Load your own save to see predictions for your boxes and eggs. Drop cards show
-item pictures, names, and rarities. The layout adapts to phones, and controls
-have keyboard focus states and text labels.
+Load your own save to see predictions for your boxes and eggs. Each card shows
+the real game art on rarity-coloured tiles; the next box wears a gold **NEXT**
+ribbon, later ones a number. Adventure cards show the level as **Lv 25**. The
+layout adapts to phones, and controls have keyboard focus states and labels.
 
-After opening a box in Eatventure, mark it as opened here. A batch action marks
-the first N openings in order. Your current position and the most recent 100
-openings survive a refresh. **Reset this box to your save** returns the selected
-box to its position in the loaded save and clears that box's tracked history.
+After opening a box in Eatventure, tap **I opened it!**, or **I opened up to #N**
+on a later card to mark several at once. Settings (the gear) can mark 5, 10 or
+any number. Your current position and the most recent 100 openings survive a
+refresh and show under **Opened**. The **Save** menu can **Reset this box**
+(back to its position in the loaded save, clearing its history) or **Remove
+from this device** (clears the saved tracker data).
 
 The browser stores extracted box data, tracked openings, selected items,
-preferences, and the file name. **Remove save from this device** clears the
-saved tracker data.
+preferences, and the file name.
 
-**Advanced settings** expose the prediction seed and vault key chance.
-Loading another save or changing a route's seed or options clears stale routes.
+Settings also hold the key drop chance (adventures only) and, under
+**Advanced**, the raw seed and seed details. Loading another save or changing a
+route's seed or options clears stale routes.
 
 ### Plan your best XP path
+
+![XP plan on a phone](docs/screenshots/xp-phone.png)
 
 Adventure chests let you choose a level per open, and the level you pick for
 open #1 changes every draw after it. So the best route is a search, not a
@@ -79,10 +86,17 @@ per-open choice: a weak first open at a low level can set up a much better
 second one. Vault keys refund an opening, so a path can run deeper than the
 free-openings budget suggests.
 
+On an adventure box, the **XP** tab takes the keys you have and your top level,
+then plans every opening: each step shows the level to pick (**Lv 24**) and
+the XP it earns, and the banner compares the plan with always opening at your
+top level.
+
 ### Find an item
 
-Search item names, filter by rarity, and select the items you want. Select
-**Find my items** to search for a route that collects **all selected items**,
+![Find result on a phone](docs/screenshots/find-phone.png)
+
+Tap the pictures of the items you want (search and rarity chips narrow the
+list), then tap **Find it!** to search for a route that collects **all selected items**,
 starting from your current tracked position. Adventure chests get a full search
 over levels; everything else has no level to choose, so it walks the chain
 until the items turn up.

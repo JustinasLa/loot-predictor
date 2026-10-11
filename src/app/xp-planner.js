@@ -7,7 +7,7 @@ import { validateLevel, validateVaultPercentage } from "../validation.js";
 import { renderXpPath, renderError, boxArt, el } from "../ui/render.js";
 import { getItemPresentation } from "../ui/presentation.js";
 import { state, currentId, currentState, isAdventure } from "./state.js";
-import { $, numberField, positiveInteger, vaultValue } from "./dom.js";
+import { $, numberField, positiveInteger, vaultValue, reveal } from "./dom.js";
 import { contextMatches, invalidateChest, replayRoute, commitOpenings, syncSearchControls, SETTINGS_CHANGED } from "./routes.js";
 import { predictAction, refresh } from "./predict.js";
 import { invalidateFind } from "./find.js";
@@ -25,6 +25,9 @@ export function xpOptions() {
 export function syncXpControls() {
   $("#xp-search").disabled = !!state.xpRun || !isAdventure(currentId());
   $("#xp-stop").classList.toggle("is-hidden", !state.xpRun);
+  // Once a plan is showing, the big bar would only cover it. Changing any
+  // input clears the plan and brings the bar back.
+  $(".xp-action").classList.toggle("is-hidden", !state.xpRun && !!state.xpView);
 }
 
 export function invalidateXp() {
@@ -42,13 +45,15 @@ function setStatus(text, busy = false) {
   status.dataset.busy = busy ? "yes" : "no";
 }
 
-// The heading shows the adventure's own icon and the stepper its vault key.
+// The heading and the level stepper show the adventure's own icon, the keys
+// stepper its key.
 function syncXpArt(cardId) {
   $("#xp-icon").replaceChildren(boxArt(cardId));
+  $("#xp-level-art").replaceChildren(boxArt(cardId));
   $("#xp-key-art").src = getItemPresentation(cardId === "adventure_Pirate" ? "PirateKeyIcon" : "ZeusKeyIcon").image;
 }
 
-// "Stopped." with no plan gets a Try again button outside #xp-out.
+// A stopped search gets a Try again button outside #xp-out.
 function syncRetry(show) {
   const actions = $("#xp-actions");
   actions.textContent = "";
@@ -100,15 +105,15 @@ function syncXpEstimate() {
   const paths = Math.pow(branchCount(options.maxLevel), options.openings);
   // ~200k paths/second measured in browser; rough, but the order of
   // magnitude is what matters when deciding whether to hit the button.
+  // Quick plans say nothing; only a wait worth knowing about is shown.
   const seconds = paths / 200000;
   const cost =
-    seconds < 1 ? "Instant"
-      : seconds < 60 ? `About ${Math.round(seconds)} seconds`
-      : seconds < 3600 ? `About ${Math.round(seconds / 60)} minutes`
-      : `About ${(seconds / 3600).toFixed(1)} hours`;
-  const heavy = seconds > 20;
-  label.textContent = heavy ? `${cost} · may be slow` : cost;
-  label.dataset.heavy = heavy ? "yes" : "no";
+    seconds < 3 ? ""
+      : seconds < 60 ? `Takes about ${Math.round(seconds)} seconds`
+      : seconds < 3600 ? `Takes about ${Math.round(seconds / 60)} minutes`
+      : `Takes about ${(seconds / 3600).toFixed(1)} hours`;
+  label.textContent = cost;
+  label.dataset.heavy = seconds > 20 ? "yes" : "no";
 }
 
 export function syncSmartXp() {
@@ -176,7 +181,6 @@ async function runXpSearch() {
     state.xpRun = run;
     syncSearchControls();
     setStatus("Planning…", true);
-    const started = Date.now();
     const eventType = cardId.slice("adventure_".length);
     const solution = await findOptimalXpPath({
       startSeed: run.seed,
@@ -195,17 +199,18 @@ async function runXpSearch() {
 
     // Bound the baseline by the path the solver actually found, so an
     // uncapped run cannot spin here forever on refunded keys.
-    const baseline = naiveXp(
-      run.seed, cardId, eventType, maxLevel, vaultPercentage, openings,
-      Math.min(maxOpens, solution.path.length)
-    );
+    const baseline = {
+      ...naiveXp(run.seed, cardId, eventType, maxLevel, vaultPercentage, openings, Math.min(maxOpens, solution.path.length)),
+      level: maxLevel,
+    };
     // A Stop that lands after the last node still counts as stopped early.
     const result = run.stopped && !solution.stopped ? { ...solution, stopped: true } : solution;
     state.xpView = { ...run, solution: result, baseline, openings, done: 0 };
     drawXpPath();
-    syncRetry(result.stopped && result.path.length === 0);
-    const checked = `${solution.nodesVisited.toLocaleString("en-US")} routes checked in ${((Date.now() - started) / 1000).toFixed(1)}s`;
-    setStatus(result.stopped ? `Stopped early · ${checked}` : checked);
+    syncRetry(!!result.stopped);
+    // The banner says it all; the busy count goes away.
+    setStatus("");
+    reveal($("#xp-out"));
   } catch (err) {
     if (run && (state.xpRun !== run || !contextMatches(run, "xp"))) return;
     state.xpView = null;

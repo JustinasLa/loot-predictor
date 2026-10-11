@@ -5,7 +5,8 @@ import * as storage from "../storage.js";
 import { renderHistory } from "../ui/render.js";
 import { showToast } from "../ui/components/toast.js";
 import { closeSheet } from "../ui/components/sheet.js";
-import { currentId, currentState } from "./state.js";
+import { getChestPresentation } from "../ui/presentation.js";
+import { state, currentId, currentState } from "./state.js";
 import { $, $$, numberField, positiveInteger } from "./dom.js";
 import { invalidateChest } from "./routes.js";
 import { chainOpts, predictAction, refresh } from "./predict.js";
@@ -17,6 +18,7 @@ export function openChest(times) {
   const cardId = currentId();
   const boxState = currentState();
   const opts = chainOpts(boxState);
+  const before = { seed: boxState.seed, opened: boxState.opened, history: boxState.history.slice() };
   invalidateChest(cardId);
 
   for (let i = 0; i < times; i++) {
@@ -27,7 +29,24 @@ export function openChest(times) {
   boxState.history.length = Math.min(boxState.history.length, storage.MAX_HISTORY);
 
   refresh();
-  showToast(`Got it! ${times} opened.`);
+  const after = boxState.seed;
+  showToast(`Marked ${times} opened`, document, {
+    art: getChestPresentation(cardId).image,
+    action: { label: "Undo", onClick: () => undoOpen(cardId, boxState, before, after) },
+  });
+}
+
+/**
+ * Puts a box back to how it was before the last mark, unless something else
+ * (another mark, a seed edit, a reset) has moved it on since.
+ */
+export function undoOpen(cardId, boxState, before, after) {
+  if (state.live[cardId] !== boxState || boxState.seed !== after) return false;
+  invalidateChest(cardId);
+  Object.assign(boxState, before);
+  refresh();
+  showToast("Undone.");
+  return true;
 }
 
 /** Redraws the opened count, the live status line and the history list. */

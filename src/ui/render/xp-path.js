@@ -1,5 +1,5 @@
-// XP planner results: a big +XP banner, a row of chips and one step card per
-// planned opening ("Open at level 12" with its XP pill).
+// XP planner results: a big +XP banner (with its chips inside) and one step
+// card per planned opening: NEXT or #N, a "Lv 12" badge and its XP pill.
 import { getItemPresentation } from "../presentation.js";
 import { el, countLabel, artwork } from "./dom.js";
 import { openingCard } from "./opening-card.js";
@@ -14,20 +14,23 @@ function emptyState(cardId, text) {
   return empty;
 }
 
-// The line under the banner keeps the opening count of the comparison, since
-// key refunds can make the top-level baseline shorter or longer than the plan.
+// The comparison is "always open at your top level", in plain words.
 function banner(xp, baseline) {
-  const baselineXp = baseline.xp;
-  const delta = xp - baselineXp;
+  const delta = xp - baseline.xp;
   const sign = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
+  const always = baseline.level != null ? `always opening at Lv ${baseline.level}` : "always opening at your top level";
   const box = el("div", `xp-summary banner ${sign === "up" ? "banner--go" : "xp-summary--flat"}`);
   const headline = el("p", sign === "up" ? "xp-delta display-text" : "xp-delta",
     sign === "up" ? `+${number(delta)} XP`
-      : sign === "down" ? `${number(-delta)} XP less than top level`
-        : "Same as top level");
+      : sign === "down" ? `${number(-delta)} XP less` : "Same XP");
   headline.dataset.sign = sign;
   box.append(headline);
-  box.append(el("p", "xp-versus", `vs ${number(baselineXp)} XP in ${countLabel(baseline.opens, "opening")} at top level`));
+  const versus = el("p", "xp-versus",
+    sign === "up" ? `More XP than ${always}` : sign === "down" ? `Than ${always}` : `As ${always}`);
+  // The exact comparison stays one hover away; key refunds can make it
+  // shorter or longer than the plan.
+  versus.title = `${number(baseline.xp)} XP in ${countLabel(baseline.opens, "opening")}`;
+  box.append(versus);
   return box;
 }
 
@@ -67,15 +70,11 @@ function chips(solution, doneCount) {
   return row;
 }
 
-// Re-title the shared opening card for a planned step: the level is what the
-// player has to pick, and the XP pill is what that opening earns.
-function stepCard(step, index, options) {
+// A planned step is the shared opening card: its "Lv N" badge is the level
+// to pick, and the XP pill is what that opening earns.
+function stepCard(step, options) {
   const card = openingCard(step, options);
   card.classList.add("xp-step");
-  const title = card.querySelector(".open-title");
-  title.textContent = step.level != null ? `Open at level ${step.level}` : `Step ${index + 1}`;
-  card.querySelector(".open-subtitle").remove();
-  if (step.xp != null) title.after(el("span", "xp-pill", `+${number(step.xp)} XP`));
   return card;
 }
 
@@ -88,14 +87,16 @@ export function renderXpPath(container, solution, baseline, freeOpenings, onOpen
     return;
   }
 
-  container.append(banner(solution.xp, baseline), chips(solution, doneCount));
+  const summary = banner(solution.xp, baseline);
+  summary.append(chips(solution, doneCount));
+  container.append(summary);
 
   // A button records every pending step up to it, at the levels in this plan.
   const steps = el("div", "xp-steps");
   for (const [index, step] of solution.path.entries()) {
     if (index < doneCount) continue;
-    steps.append(stepCard(step, index, {
-      cardId, number: index + 1, count: index + 1 - doneCount, route: true, container,
+    steps.append(stepCard(step, {
+      cardId, number: index + 1, count: index + 1 - doneCount, container,
       onOpen: onOpen ? () => onOpen(solution.path.slice(doneCount, index + 1)) : null,
     }));
   }
