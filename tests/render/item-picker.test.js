@@ -4,6 +4,7 @@ import {
   renderChestList, renderResults, renderHistory, renderXpPath,
   renderItemPicker, renderFindResult, renderError,
 } from "../../src/ui/render.js";
+import { itemSprites } from "../../src/ui/render/item-picker.js";
 import { item, step } from "../fixtures.js";
 
 let container;
@@ -77,5 +78,22 @@ describe("item-picker renderer", () => {
     expect(toggle).toHaveBeenCalledWith("B");
     renderItemPicker(container, [], new Set(), toggle);
     expect(container.textContent).toBe("Nothing to find in this box.");
+  });
+
+  it("returns how many items are visible so the app can offer Show all", () => {
+    const items = [item("Ring_Bronze"), item("Tool_LaserGun", "Ultimate")];
+    expect(renderItemPicker(container, items, new Set(), vi.fn())).toBe(2);
+    expect(renderItemPicker(container, items, new Set(), vi.fn(), { rarity: "ultimate" })).toBe(1);
+    expect(renderItemPicker(container, items, new Set(), vi.fn(), { query: "zzz" })).toBe(0);
+    expect(renderItemPicker(container, [], new Set(), vi.fn())).toBe(0);
+  });
+
+  it("draws silent mini sprites for items and bare base names", () => {
+    const row = itemSprites([item("Tool_LaserGun", "Legendary / Ultimate"), "Ring_Bronze"]);
+    expect(row.className).toBe("find-sprites");
+    expect(row.getAttribute("aria-hidden")).toBe("true");
+    expect([...row.children].map((tile) => tile.dataset.rarity)).toEqual(["Legendary", "None"]);
+    expect(row.querySelectorAll(".item-tile--mini img")).toHaveLength(2);
+    expect(itemSprites([], "find-stack-art").className).toBe("find-stack-art");
   });
 });

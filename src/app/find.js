@@ -1,8 +1,9 @@
-// Find tab: pick items, search a route, open along it.
+// Find tab: pick item pictures, search a route, open along it.
 import { findAllPathsAsync, findItemLinearAsync } from "../solver/find-items.js";
 import { getAvailableItemsForChest } from "../loot/items.js";
 import { validateLevel } from "../validation.js";
 import { renderItemPicker, renderFindResult, renderError } from "../ui/render.js";
+import { itemSprites } from "../ui/render/item-picker.js";
 import { bindChipsToSelect } from "../ui/components/chips.js";
 import { state, currentId, isAdventure, targetsFor } from "./state.js";
 import { $, numberField, positiveInteger, vaultValue } from "./dom.js";
@@ -12,6 +13,9 @@ import { persist } from "./session.js";
 
 // Set by initFind, which always runs before any filter reset.
 let syncChips;
+// "Change items" reopens the picker while a search or result is showing.
+let pickerOpen = false;
+const MAX_STACK = 4;
 
 export function findOptions(cardId) {
   return {
@@ -25,8 +29,18 @@ export function findOptions(cardId) {
 
 export function syncFindControls() {
   const cardId = currentId();
-  $("#find-run").disabled = !!state.findRun || !state.live[cardId] || targetsFor(cardId).size === 0;
-  $("#find-stop").classList.toggle("is-hidden", !state.findRun);
+  const running = !!state.findRun;
+  const picked = state.live[cardId] ? targetsFor(cardId).size : 0;
+  const run = $("#find-run");
+  run.disabled = running || picked === 0;
+  run.textContent = picked === 0 ? "Pick an item" : "Find it!";
+  run.classList.toggle("is-hidden", running);
+  $("#find-stop").classList.toggle("is-hidden", !running);
+  $("#find-status").classList.toggle("is-busy", running);
+  const busy = running || !!state.findView;
+  const panel = $("#panel-find");
+  panel.classList.toggle("is-collapsed", busy && !pickerOpen);
+  panel.classList.toggle("has-result", !running && !!state.findView && !pickerOpen);
 }
 
 function showFindGuidance() {
@@ -37,11 +51,45 @@ function showFindGuidance() {
   $("#find-out").replaceChildren(note);
 }
 
+function openPicker() {
+  pickerOpen = true;
+  syncFindControls();
+  $("#find-heading").focus();
+}
+
+function action(label, className, onClick) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = `btn ${className}`;
+  button.textContent = label;
+  button.addEventListener("click", onClick);
+  return button;
+}
+
+/** Follow-up buttons live outside #find-out, which holds one button per step. */
+function showActions(kind, depth) {
+  const field = $("#find-maxdepth");
+  const max = Number(field.max);
+  const buttons = [];
+  if (kind === "missing" && depth < max) {
+    buttons.push(action("Look further", "btn--primary", () => {
+      field.value = String(Math.min(max, depth * 2));
+      field.dispatchEvent(new Event("change", { bubbles: true }));
+      runFind();
+    }));
+  }
+  if (kind === "stopped") buttons.push(action("Try again", "btn--primary", runFind));
+  if (kind === "missing" || kind === "limit") buttons.push(action("Pick fewer items", "btn--ghost", openPicker));
+  if (kind === "done") buttons.push(action("Pick more", "btn--primary", openPicker));
+  $("#find-actions").replaceChildren(...buttons);
+}
+
 export function invalidateFind() {
   state.findRun = null;
   state.findView = null;
   showFindGuidance();
   $("#find-status").textContent = "";
+  $("#find-actions").replaceChildren();
   syncSearchControls();
 }
 
@@ -51,6 +99,13 @@ export function resetItemFilters() {
   syncChips();
 }
 
+/** One item per picked base name, with its rarity for the colour. */
+function pickedItems(items, selected) {
+  const byName = new Map();
+  for (const item of items) if (selected.has(item.baseName) && !byName.has(item.baseName)) byName.set(item.baseName, item);
+  return [...selected].map((name) => byName.get(name) ?? name);
+}
+
 export function syncFindPanel() {
   const cardId = currentId();
   if (!state.live[cardId]) return;
@@ -58,14 +113,18 @@ export function syncFindPanel() {
   const selected = targetsFor(cardId);
   const items = getAvailableItemsForChest(cardId);
 
-  renderItemPicker($("#find-items"), items, selected, (baseName) => {
+  const visible = renderItemPicker($("#find-items"), items, selected, (baseName) => {
     invalidateFind();
     if (selected.has(baseName)) selected.delete(baseName);
     else selected.add(baseName);
     syncFindPanel();
   }, { query: $("#item-search").value, rarity: $("#rarity-filter").value });
+  $("#find-no-match").classList.toggle("is-hidden", items.length === 0 || visible > 0);
 
+  const picked = pickedItems(items, selected);
   $("#find-selected").textContent = selected.size ? `${selected.size} picked` : "";
+  $("#find-stack").replaceChildren(itemSprites(picked.slice(0, MAX_STACK)));
+  $("#find-picked-art").replaceChildren(itemSprites(picked));
   if (!state.findRun && !state.findView) showFindGuidance();
   syncSearchControls();
   persist();
@@ -96,10 +155,11 @@ function openRoute(view, steps) {
     if (selected.size > 0) {
       runFind();
     } else {
-      $("#find-out").replaceChildren(Object.assign(document.createElement("p"), {
-        className: "banner banner--go find-done",
-        textContent: "All found!"
-      }));
+      const done = document.createElement("div");
+      done.className = "banner banner--go find-done";
+      done.append(Object.assign(document.createElement("p"), { className: "find-banner-text display-text", textContent: "All found!" }));
+      $("#find-out").replaceChildren(done);
+      showActions("done");
     }
   } catch (err) {
     invalidateFind();
@@ -120,6 +180,7 @@ export async function runFind() {
     const options = findOptions(cardId);
     run = { cardId, state: boxState, seed: boxState.seed, vaultPercentage: options.vaultPercentage, optionsKey: JSON.stringify(options), targetsKey: JSON.stringify(targets), stopped: false };
     invalidateFind();
+    pickerOpen = false;
     state.findRun = run;
     syncSearchControls();
     out.textContent = "";
@@ -128,7 +189,7 @@ export async function runFind() {
     const controls = {
       shouldStop: () => run.stopped || state.findRun !== run || !contextMatches(run, "find"),
       onProgress: (nodes) => {
-        if (state.findRun === run && contextMatches(run, "find")) $("#find-status").textContent = `Looking… · ${nodes.toLocaleString()} checked.`;
+        if (state.findRun === run && contextMatches(run, "find")) $("#find-status").textContent = `Looking… · ${nodes.toLocaleString()} checked`;
       }
     };
     const result = isAdventure(cardId)
@@ -137,12 +198,14 @@ export async function runFind() {
     if (state.findRun !== run || !contextMatches(run, "find")) return;
     const view = { ...run, result };
     state.findView = view;
-    renderFindResult(out, result, targets, (steps) => openRoute(view, steps), cardId);
+    const kind = renderFindResult(out, result, pickedItems(getAvailableItemsForChest(cardId), new Set(targets)),
+      (steps) => openRoute(view, steps), cardId);
+    showActions(kind, options.maxDepth);
     $("#find-status").textContent =
-      `${(result.nodesVisited ?? result.opens ?? 0).toLocaleString()} ` +
-      `possibilities checked in ${((Date.now() - started) / 1000).toFixed(1)} seconds.` +
-      (run.stopped || result.stopped ? " Search stopped early." : "") +
-      (result.truncated ? " Search limit reached." : "");
+      `${(result.nodesVisited ?? result.opens ?? 0).toLocaleString()} checked · ` +
+      `${((Date.now() - started) / 1000).toFixed(1)}s` +
+      (run.stopped || result.stopped ? " · Search stopped early" : "") +
+      (result.truncated ? " · Search limit reached" : "");
   } catch (err) {
     if (run && (state.findRun !== run || !contextMatches(run, "find"))) return;
     renderError(out, err.message);
@@ -157,6 +220,11 @@ export function initFind() {
   syncChips = bindChipsToSelect($("#rarity-chips"), $("#rarity-filter"));
   $("#item-search").addEventListener("input", syncFindPanel);
   $("#rarity-filter").addEventListener("change", syncFindPanel);
+  $("#find-show-all").addEventListener("click", () => {
+    resetItemFilters();
+    syncFindPanel();
+  });
+  $("#find-change").addEventListener("click", openPicker);
   for (const id of ["#find-maxlevel", "#find-maxdepth"]) {
     $(id).addEventListener("input", invalidateFind);
     $(id).addEventListener("change", invalidateFind);
