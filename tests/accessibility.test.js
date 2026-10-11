@@ -1,16 +1,18 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
-import html from "../index.html?raw";
+import { bodyHtml } from "./helpers/html.js";
+
+const html = bodyHtml();
 import { renderChestList, renderItemPicker, renderResults, renderError } from "../src/ui/render.js";
 import { item } from "./fixtures.js";
 
 beforeEach(() => { document.body.innerHTML = ""; });
 
 describe("keyboard-accessible controls", () => {
-  it("provides native, focusable save-loading and category buttons", () => {
+  it("provides native, focusable save-loading and HUD buttons", () => {
     document.body.innerHTML = html;
 
-    for (const id of ["load-save", "load-save-menu", "welcome-load-save", "load-demo"]) {
+    for (const id of ["load-save", "load-save-menu", "welcome-load-save", "load-demo", "help-trigger", "settings-trigger", "user-menu-trigger", "back-to-boxes"]) {
       const button = document.getElementById(id);
       expect(button.tagName).toBe("BUTTON");
       expect(button.type).toBe("button");
@@ -20,12 +22,13 @@ describe("keyboard-accessible controls", () => {
     loadButton.focus();
     expect(document.activeElement).toBe(loadButton);
 
-    for (const button of document.querySelectorAll(".channel-category-head")) {
-      expect(button.tagName).toBe("BUTTON");
-      button.focus();
-      expect(document.activeElement).toBe(button);
-      expect(document.getElementById(button.getAttribute("aria-controls"))).not.toBeNull();
-      expect(button.getAttribute("aria-expanded")).toBe("true");
+    for (const button of document.querySelectorAll(".hud button, .sheet-close, [data-step-for]")) {
+      expect(button.getAttribute("aria-label")?.trim(), button.outerHTML).toBeTruthy();
+    }
+    for (const sheet of document.querySelectorAll(".sheet")) {
+      expect(sheet.getAttribute("role")).toBe("dialog");
+      expect(sheet.getAttribute("aria-modal")).toBe("true");
+      expect(document.getElementById(sheet.getAttribute("aria-labelledby")).textContent.trim()).not.toBe("");
     }
     expect(document.getElementById("open-custom").labels[0].textContent.trim()).not.toBe("");
   });
@@ -98,14 +101,14 @@ describe("keyboard-accessible controls", () => {
     expect(selected.size).toBe(0);
   });
 
-  it("preserves sidebar focus while both chest lists redraw after selection", () => {
-    const predict = document.createElement("div");
+  it("preserves rail focus while box groups redraw after selection", () => {
+    const boxes = document.createElement("div");
     const find = document.createElement("div");
-    document.body.append(predict, find);
+    document.body.append(boxes, find);
     const states = { small: {}, big: {} };
     let active = "small";
     const draw = () => {
-      for (const container of [predict, find]) {
+      for (const container of [boxes, find]) {
         renderChestList(container, states, active, (id) => { active = id; draw(); });
       }
     };
@@ -169,7 +172,7 @@ describe("accessible game artwork", () => {
       expect(drop.querySelector(".item-name").textContent).toBe(name);
       expect(drop.querySelector(".item-rarity").textContent).toBe(rarity);
     }
-    expect(container.querySelector(".open-card-btn").textContent).toMatch(/mark/i);
+    expect(container.querySelector(".open-card-btn").textContent).toBe("I opened it!");
   });
 });
 
@@ -179,6 +182,7 @@ describe("accessible state feedback", () => {
     for (const id of ["open-status", "xp-status", "find-status", "import-status"]) {
       expect(document.getElementById(id).getAttribute("role")).toBe("status");
     }
+    expect(document.getElementById("toast-region").getAttribute("aria-live")).toBe("polite");
     const trigger = document.getElementById("user-menu-trigger");
     expect(trigger.getAttribute("aria-controls")).toBe("user-menu");
     expect(trigger.getAttribute("aria-expanded")).toBe("false");
@@ -229,7 +233,7 @@ describe("keyboard navigation through the workspace", () => {
 
     const trigger = document.getElementById("user-menu-trigger");
     trigger.click();
-    document.getElementById("load-save-menu").focus();
+    expect(document.activeElement.closest("#user-menu")).not.toBeNull();
     press(document.activeElement, "Escape");
     expect(document.activeElement).toBe(trigger);
     expect(trigger.getAttribute("aria-expanded")).toBe("false");

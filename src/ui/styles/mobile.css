@@ -1,0 +1,25 @@
+/* area:phone-shell-polish — phone layout (< 768px): Boxes / Box screens. */
+@media (max-width: 767px) {
+  body { padding-bottom: 120px; }
+  .hud { padding: 0 10px; }
+  .hud-title { font-size: 20px; white-space: nowrap; }
+  .hud-brand img { width: 30px; height: 30px; }
+  .app-main { padding: 12px; }
+
+  .workspace { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .box-rail { position: static; max-height: none; overflow: visible; }
+  .box-main { max-width: none; gap: 12px; }
+
+  .workspace[data-screen="boxes"] .box-main { display: none; }
+  .workspace[data-screen="box"] .box-rail { display: none; }
+
+  body[data-screen="box"] .hud-back { display: inline-flex; }
+  body[data-screen="box"] .hud-brand { display: none; }
+
+  .seg-tabs { position: sticky; top: calc(var(--hud-h) + 8px); z-index: 20; }
+}
+
+/* Narrow phones: the demo banner already says which save is open. */
+@media (max-width: 420px) {
+  .hud-pill { display: none; }
+}

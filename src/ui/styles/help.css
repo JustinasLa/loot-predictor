@@ -1,0 +1,6 @@
+/* area:settings-help-errors — Help sheet rows. */
+.help-row { display: flex; align-items: center; gap: 14px; min-height: 76px; font-weight: 700; }
+.help-pic { flex: none; width: 104px; display: flex; justify-content: center; align-items: center; gap: 6px; }
+.help-pic--box img { width: 56px; height: 56px; object-fit: contain; filter: drop-shadow(0 3px 0 rgb(0 0 0 / .2)); }
+.help-pic--lock svg { width: 36px; height: 36px; color: var(--go-lip); }
+.help-pic .item-tile--mini img { width: 84%; height: 84%; }

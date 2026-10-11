@@ -1,0 +1,107 @@
+// @vitest-environment jsdom
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("../../src/solver/xp-path.js", async (importOriginal) => {
+  const actual = await importOriginal();
+  return { ...actual, findOptimalXpPath: vi.fn(actual.findOptimalXpPath) };
+});
+vi.mock("../../src/solver/find-items.js", async (importOriginal) => {
+  const actual = await importOriginal();
+  return { ...actual, findAllPathsAsync: vi.fn(actual.findAllPathsAsync), findItemLinearAsync: vi.fn(actual.findItemLinearAsync) };
+});
+
+import { $, stored, dispatch, markOpened, init, upload, restored, setupApp } from "../helpers/app-harness.js";
+import { createDemoSave } from "../../src/ui/demo.js";
+import { savegame } from "../fixtures.js";
+
+setupApp();
+
+describe("save import", () => {
+  it("reports parsing and file-reader errors", async () => {
+    await init();
+    await upload("{}");
+    expect($("#import-status .error-box").textContent).toBe("Oops! That didn't work. That's not an Eatventure save.");
+    class UnreadableFile { readAsText() { this.onerror(); } }
+    vi.stubGlobal("FileReader", UnreadableFile);
+    await upload("{}", "unreadable.json");
+    expect($("#import-status").textContent).toContain("Couldn't open that file.");
+  });
+
+  it("rejects a save with no mapped boxes", async () => {
+    await init();
+    await upload('{"GameSavegame":{}}');
+    expect($("#import-status").textContent).toContain("No boxes found in this save.");
+    expect($("#box-rail-list").querySelectorAll("[data-card-id]")).toHaveLength(0);
+  });
+
+  it("keeps an existing preview and tracked progress when a replacement file is invalid", async () => {
+    await init(restored());
+    markOpened(1);
+    const session = stored();
+    const preview = $("#out").innerHTML;
+    await upload("{}", "invalid.json");
+    expect($("#workspace-status .error-box").textContent).toContain("That's not an Eatventure save.");
+    expect($("#out").innerHTML).toBe(preview);
+    expect(stored()).toEqual(session);
+    expect($("#save").value).toBe("");
+    await upload(JSON.stringify(savegame()), "fixed.json");
+    expect($("#workspace-status").textContent).toBe("");
+    expect($("#session-label").dataset.demo).toBe("false");
+    expect(stored().live.big.opened).toBe(0);
+  });
+
+  it.each(["success", "error"])("uses only the latest selected file when an older read finishes with %s", async (result) => {
+    const readers = [];
+    vi.stubGlobal("FileReader", class {
+      constructor() { readers.push(this); }
+      readAsText() {}
+    });
+    await init();
+    const selectFile = (name) => {
+      Object.defineProperty($("#save"), "files", { configurable: true, value: [new File([""], name)] });
+      dispatch("#save", "change");
+    };
+    selectFile("first.json");
+    selectFile("second.json");
+    const newer = savegame();
+    newer.Data.GameSavegame.CharacterSavegame.EquipmentChestSavegames[0].Seed = 99;
+    readers[1].onload({ target: { result: JSON.stringify(newer) } });
+    await vi.waitFor(() => expect($("#user-filename").textContent).toBe("second.json"));
+    if (result === "success") readers[0].onload({ target: { result: JSON.stringify(savegame()) } });
+    else readers[0].onerror();
+    await Promise.resolve();
+    expect(stored().saved.big.initialSeed).toBe(99);
+    expect($("#user-filename").textContent).toBe("second.json");
+  });
+
+  it.each(["success", "error"])("keeps a newly selected demo when an older file read ends with %s", async (result) => {
+    const readers = [];
+    vi.stubGlobal("FileReader", class {
+      constructor() { readers.push(this); }
+      readAsText() {}
+    });
+    await init();
+    Object.defineProperty($("#save"), "files", { configurable: true, value: [new File([""], "pending.json")] });
+    dispatch("#save", "change");
+    expect($("#import-status").textContent).toBe("Reading pending.json…");
+    dispatch("#load-demo");
+    if (result === "success") readers[0].onload({ target: { result: JSON.stringify(savegame()) } });
+    else readers[0].onerror();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(stored().saved).toEqual(createDemoSave());
+    expect($("#user-filename").textContent).toBe("Demo save");
+    expect($("#session-label").dataset.demo).toBe("true");
+    expect($("#import-status").textContent).toBe("");
+    expect($("#workspace-status").textContent).toBe("");
+  });
+
+  it("wires every load button to the native file picker", async () => {
+    await init(restored());
+    const fileClick = vi.spyOn($("#save"), "click").mockImplementation(() => {});
+    $("#welcome-load-save").click();
+    $("#load-save").click();
+    $("#load-save-menu").click();
+    expect(fileClick).toHaveBeenCalledTimes(3);
+  });
+});

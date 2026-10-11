@@ -1,0 +1,55 @@
+<!-- area:phone-shell-polish start (HUD + app frame) -->
+<header class="hud">
+  <div class="hud-left">
+    <button id="back-to-boxes" type="button" class="icon-btn btn btn--primary hud-back" aria-label="Back to boxes">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14.6 3.9a2 2 0 0 1 0 2.8L9.3 12l5.3 5.3a2 2 0 1 1-2.8 2.8l-6.7-6.7a2 2 0 0 1 0-2.8l6.7-6.7a2 2 0 0 1 2.8 0Z"/></svg>
+    </button>
+    <p class="hud-brand">
+      <img src="{{BASE}}assets/items/BigChestIcon.webp" width="36" height="36" alt="" />
+      <span class="display-text hud-title">Loot Lookout</span>
+    </p>
+  </div>
+  <div class="hud-right">
+    <span id="session-label" class="hud-pill is-hidden"></span>
+    <button id="help-trigger" type="button" class="icon-btn btn btn--primary" aria-label="Help" aria-controls="help-sheet" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.5c3.6 0 6.3 2.2 6.3 5.4 0 2.5-1.5 3.8-3 4.8-1.2.8-1.6 1.2-1.6 2.1v.4h-3.6v-.7c0-2 .9-3 2.4-4 1.2-.8 1.9-1.3 1.9-2.4 0-1.1-1-2-2.5-2-1.6 0-2.6.9-2.8 2.4L5.5 8.3C5.8 4.8 8.4 2.5 12 2.5Zm-2.1 15.7a2.2 2.2 0 1 1 4.4 0 2.2 2.2 0 0 1-4.4 0Z"/></svg>
+    </button>
+    <div id="user-panel-loggedin" class="hud-group is-hidden">
+      <button id="settings-trigger" type="button" class="icon-btn btn btn--primary" aria-label="Settings" aria-controls="settings-sheet" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M10.3 2h3.4l.6 2.7c.6.2 1.2.5 1.7.9l2.6-.9 1.7 3-2 1.8c.1.6.1 1.4 0 2l2 1.8-1.7 3-2.6-.9c-.5.4-1.1.7-1.7.9l-.6 2.7h-3.4l-.6-2.7c-.6-.2-1.2-.5-1.7-.9l-2.6.9-1.7-3 2-1.8a6 6 0 0 1 0-2l-2-1.8 1.7-3 2.6.9c.5-.4 1.1-.7 1.7-.9L10.3 2ZM12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8Z" transform="translate(0 1)"/></svg>
+      </button>
+      <button id="user-menu-trigger" type="button" class="icon-btn btn btn--primary" aria-label="Save options" aria-controls="user-menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h8.2L20 7.8V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm7 1.8V9h5.2L13 3.8ZM7.5 13v2.4h9V13h-9Zm0 4v2.2h6V17h-6Z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main-content" class="app-main" tabindex="-1">
+  {{slot:welcome}}
+
+  <div id="workspace" class="workspace is-hidden" data-screen="box">
+    <aside id="box-rail" class="box-rail panel" aria-label="Boxes">
+      {{slot:demo-banner}}
+      {{slot:box-rail}}
+    </aside>
+
+    <div class="box-main">
+      {{slot:box-header}}
+      {{slot:tabs}}
+      <div id="workspace-status" class="workspace-status" role="status" aria-live="polite"></div>
+      {{slot:next-panel}}
+      {{slot:find-panel}}
+      {{slot:xp-panel}}
+    </div>
+  </div>
+</main>
+
+<input id="save" type="file" accept=".json,application/json" class="is-hidden" aria-label="Choose an Eatventure save file" />
+
+{{slot:settings-sheet}}
+{{slot:save-menu}}
+{{slot:help-sheet}}
+
+<div id="toast-region" class="toast-region" role="status" aria-live="polite"></div>
+<!-- area:phone-shell-polish end -->

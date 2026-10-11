@@ -1,0 +1,121 @@
+/* Design tokens (docs/DESIGN.md §2). Frozen after the foundation. */
+@theme {
+  --font-ui: "Baloo 2 Variable", "Baloo 2", ui-rounded, system-ui, sans-serif;
+  --color-sky-top: #5cc0ff;
+  --color-sky-bottom: #2a8cff;
+  --color-hud: #14181f;
+  --color-ink: #1a1f26;
+  --color-ink-muted: #5f6b78;
+  --color-go: #4bc25d;
+  --color-primary: #4bbeff;
+  --color-gold: #ffd746;
+  --color-danger: #ff554b;
+}
+
+:root {
+  /* page */
+  --bg-top: #5cc0ff;
+  --bg-bottom: #2a8cff;
+  --page-bg: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%) fixed;
+
+  /* HUD */
+  --hud: #14181f;
+  --hud-ink: #ffffff;
+  --hud-pill: #fefff0;
+  --hud-pill-ink: #1a252c;
+
+  /* surfaces */
+  --panel: #ffffff;
+  --panel-row: #eceff3;
+  --panel-sunk: #f3f5f8;
+  --divider: #e3e7ec;
+
+  /* text */
+  --ink: #1a1f26;
+  --ink-muted: #5f6b78;
+  --ink-on-color: #ffffff;
+  --display-stroke: #003c97;
+
+  /* buttons: face / lip */
+  --primary: #4bbeff;  --primary-lip: #2c9cdd;
+  --go: #4bc25d;       --go-lip: #2f9a40;
+  --gold: #ffd746;     --gold-lip: #e0a21c;  --gold-ink: #5a3a00;
+  --danger: #ff554b;   --danger-lip: #dd362c;
+  --ghost: #ffffff;    --ghost-lip: #b9bfc6;  --ghost-border: #d5d9de;
+
+  /* rarity: face / dark lip / light tint */
+  --r-common: #a7b0bd;    --r-common-dk: #6b7686;    --r-common-tint: #eef1f5;
+  --r-rare: #3fcf6a;      --r-rare-dk: #1f9a45;      --r-rare-tint: #dcf8e4;
+  --r-epic: #a64dff;      --r-epic-dk: #7426c9;      --r-epic-tint: #f0e2ff;
+  --r-legendary: #ffc21a; --r-legendary-dk: #d98a00; --r-legendary-tint: #fff3c9;
+  --r-ultimate: #ff4d5e;  --r-ultimate-dk: #c8243a;  --r-ultimate-tint: #ffe0e4;
+  --r-mythic: #29bffa;    --r-mythic-dk: #0b86c4;    --r-mythic-tint: #d8f3ff;
+
+  /* box backings */
+  --box-small: #7cc8f0;  --box-big: #ffd76a;     --box-clan: #c9d2e3;  --box-pet: #e9c58f;
+  --box-mine: #ff9d6c;   --box-seaport: #5fd6d6; --box-space: #2f4f9e; --box-middleages: #b07a4a;
+  --box-alchemist: #5fd39b; --box-zeus: #2f7fe0; --box-pirate: #f2c45a;
+  --box-egg: #ffffff;
+  --box-unknown: #a7b0bd;
+
+  /* type */
+  --font-ui: "Baloo 2 Variable", "Baloo 2", ui-rounded, system-ui, sans-serif;
+  --t-display: 44px;
+  --t-title: 30px;
+  --t-h2: 24px;
+  --t-btn-lg: 22px;
+  --t-btn: 18px;
+  --t-body: 17px;
+  --t-label: 15px;
+  --t-small: 13px;
+
+  /* spacing, radii, depth */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+  --radius-btn: 14px; --radius-tile: 16px; --radius-card: 22px; --radius-sheet: 28px; --radius-pill: 999px;
+  --lip: 6px;
+  --lip-tile: 5px;
+  --shadow-ambient: 0 10px 20px rgb(0 0 0 / .16);
+  --shadow-panel: 0 8px 0 rgb(0 0 0 / .10), 0 16px 30px rgb(0 0 0 / .16);
+  --focus: 0 0 0 4px #fff, 0 0 0 7px #1a1f26;
+  --tap-min: 48px;
+  --ease-press: transform .06s ease-out, box-shadow .06s ease-out;
+
+  /* layout */
+  --hud-h: 64px;
+  --rail-w: 300px;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --t-display: 36px;
+    --t-title: 26px;
+    --hud-h: 56px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  :root { --rail-w: 240px; }
+}
+
+/* Rarity colour lookup: any element with data-rarity gets --c / --dk / --tint. */
+[data-rarity] { --c: var(--r-common); --dk: var(--r-common-dk); --tint: var(--r-common-tint); }
+[data-rarity="Rare"] { --c: var(--r-rare); --dk: var(--r-rare-dk); --tint: var(--r-rare-tint); }
+[data-rarity="Epic"] { --c: var(--r-epic); --dk: var(--r-epic-dk); --tint: var(--r-epic-tint); }
+[data-rarity="Legendary"] { --c: var(--r-legendary); --dk: var(--r-legendary-dk); --tint: var(--r-legendary-tint); }
+[data-rarity="Ultimate"] { --c: var(--r-ultimate); --dk: var(--r-ultimate-dk); --tint: var(--r-ultimate-tint); }
+[data-rarity="Mythic"] { --c: var(--r-mythic); --dk: var(--r-mythic-dk); --tint: var(--r-mythic-tint); }
+
+/* Box backing lookup: data-box="<tone>" sets --box. */
+[data-box] { --box: var(--box-unknown); }
+[data-box="small"] { --box: var(--box-small); }
+[data-box="big"] { --box: var(--box-big); }
+[data-box="clan"] { --box: var(--box-clan); }
+[data-box="pet"] { --box: var(--box-pet); }
+[data-box="mine"] { --box: var(--box-mine); }
+[data-box="seaport"] { --box: var(--box-seaport); }
+[data-box="space"] { --box: var(--box-space); }
+[data-box="middleages"] { --box: var(--box-middleages); }
+[data-box="alchemist"] { --box: var(--box-alchemist); }
+[data-box="zeus"] { --box: var(--box-zeus); }
+[data-box="pirate"] { --box: var(--box-pirate); }
+[data-box="egg"] { --box: var(--box-egg); }

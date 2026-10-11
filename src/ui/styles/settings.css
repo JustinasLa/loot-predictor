@@ -1,0 +1,17 @@
+/* area:settings-help-errors — Settings sheet rows. */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 60px; font-weight: 700;
+}
+.setting-row > label, label.setting-row { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+label.setting-row { justify-content: space-between; }
+.setting-row img { width: 32px; height: 32px; object-fit: contain; }
+.tag {
+  font: 800 var(--t-small)/1 var(--font-ui);
+  background: var(--ink-muted); color: #fff;
+  padding: 3px 8px; border-radius: var(--radius-pill);
+}
+.setting-group { display: grid; gap: 12px; }
+.setting-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.setting-buttons .btn { margin-bottom: 4px; }
+.setting-row .btn { margin-bottom: 4px; }

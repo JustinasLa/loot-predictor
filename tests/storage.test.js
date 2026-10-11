@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import html from "../index.html?raw";
+import { mountDocument } from "./helpers/html.js";
 import { clear, load, save } from "../src/storage.js";
 import { predictChain } from "../src/loot/simulate.js";
 import { CHEST_ID_MAP, EGG_RARITY_MAP } from "../src/loot/tables.js";
@@ -187,19 +187,19 @@ describe("session persistence", () => {
     state.live.big.history = [null];
     state.targets = { big: 7 };
     cache(state);
-    document.documentElement.innerHTML = html.replace(/<!doctype html>/i, "");
+    mountDocument();
     await expect(import("../src/app.js")).resolves.toBeDefined();
     expect(document.querySelector("#seed").value).toBe(String(state.live.big.seed));
     expect(document.querySelector("#find-selected").textContent).toBe("");
-    expect(document.querySelector("#history").textContent).toContain("No openings recorded yet");
+    expect(document.querySelector("#history").textContent).toBe("Nothing opened yet.");
   });
 
   it("leaves the real app in the guest view when the cached core is invalid", async () => {
     cache({ saved: { big: null }, live: { big: {} } });
-    document.documentElement.innerHTML = html.replace(/<!doctype html>/i, "");
+    mountDocument();
     await expect(import("../src/app.js")).resolves.toBeDefined();
     expect(document.querySelector("#seed").disabled).toBe(true);
-    expect(document.querySelector("#user-panel-guest").classList.contains("is-hidden")).toBe(false);
+    expect(document.querySelector("#welcome-screen").classList.contains("is-hidden")).toBe(false);
   });
 
   it("tolerates disabled storage on read, write and clear", () => {

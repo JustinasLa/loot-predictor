@@ -1,0 +1,21 @@
+<!-- area:marking-history-savemenu start (Save menu sheet) -->
+<div id="user-menu" class="sheet-layer is-hidden">
+  <div class="sheet-backdrop" data-sheet-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="save-menu-title">
+    <div class="sheet-handle" aria-hidden="true"></div>
+    <div class="sheet-head">
+      <h2 id="save-menu-title" class="sheet-title">My save</h2>
+      <button type="button" class="icon-btn btn btn--danger sheet-close" data-sheet-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5.6 5.6a2 2 0 0 1 2.8 0L12 9.2l3.6-3.6a2 2 0 1 1 2.8 2.8L14.8 12l3.6 3.6a2 2 0 1 1-2.8 2.8L12 14.8l-3.6 3.6a2 2 0 1 1-2.8-2.8L9.2 12 5.6 8.4a2 2 0 0 1 0-2.8Z"/></svg></button>
+    </div>
+    <div class="sheet-body save-menu-body">
+      <p class="save-file panel-row">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 2h8.2L20 7.8V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm7 1.8V9h5.2L13 3.8Z"/></svg>
+        <span id="user-filename" class="save-filename" title=""></span>
+      </p>
+      <button id="load-save-menu" type="button" class="btn btn--go btn--block" data-sheet-action>Load another save</button>
+      <button id="reset" type="button" class="btn btn--primary btn--block" data-sheet-action disabled>Reset this box</button>
+      <button id="unload" type="button" class="btn btn--danger btn--block" data-sheet-action>Remove from this device</button>
+    </div>
+  </div>
+</div>
+<!-- area:marking-history-savemenu end -->
