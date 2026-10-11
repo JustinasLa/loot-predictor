@@ -1,21 +1,24 @@
 /* area:next-drops — item tile grid and names (the tile itself is in components.css). */
 .item-grid {
+  --gap-x: 12px;
   list-style: none; margin: 0; padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
-  gap: 16px 12px;
-}
-@media (min-width: 768px) {
-  .item-grid { grid-template-columns: repeat(auto-fit, minmax(96px, 112px)); justify-content: center; }
+  /* Desktop: tiles of 104px or more, never more than 6 per row, packed left. */
+  grid-template-columns: repeat(auto-fill, minmax(max(104px, calc((100% - 5 * var(--gap-x)) / 6)), 1fr));
+  gap: 16px var(--gap-x);
+  padding-bottom: 2px;
 }
 .item-row { display: grid; gap: 8px; align-content: start; text-align: center; min-width: 0; }
+.item-row .item-tile { width: 100%; }
 .item-copy { display: block; min-width: 0; }
 .item-name {
   font: 700 var(--t-label)/1.15 var(--font-ui); color: var(--ink);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  overflow-wrap: anywhere;
 }
 .item-row[data-hit="yes"] .item-tile { outline: 4px solid var(--gold); outline-offset: 2px; }
 
+/* Phone: always 3 per row, so a Small Box's 2 items sit side by side at the left. */
 @media (max-width: 767px) {
-  .item-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 10px; }
+  .item-grid { --gap-x: 10px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px var(--gap-x); }
 }

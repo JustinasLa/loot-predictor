@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { getChestPresentation, getItemPresentation } from "../src/ui/presentation.js";
+import { CHEST_ID_MAP, EGG_RARITY_MAP, ITEM_POOLS } from "../src/loot/tables.js";
+
+const publicFile = (url) => fileURLToPath(new URL(`../public${url}`, import.meta.url));
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -88,5 +93,22 @@ describe("friendly box presentation", () => {
     const presentation = await import("../src/ui/presentation.js");
     expect(presentation.getItemPresentation("PetFood").image).toBe("/assets/items/PetFood.webp");
     expect(presentation.getChestPresentation("small").image).toBe("/assets/items/SmallChestIcon.webp");
+  });
+
+  it.each([...Object.values(CHEST_ID_MAP), ...Object.values(EGG_RARITY_MAP), "egg_Common"])(
+    "shows real local box art for %s", (cardId) => {
+      const { image, name } = getChestPresentation(cardId);
+      expect(name).not.toBe("Unknown box");
+      expect(existsSync(publicFile(image)), image).toBe(true);
+    },
+  );
+
+  it("names every item the predictor can drop and shows its real sprite", () => {
+    const ids = [...new Set([...Object.values(ITEM_POOLS).flat(), "PetFood", "ZeusKeyIcon", "PirateKeyIcon"])];
+    for (const id of ids) {
+      const { image, category } = getItemPresentation(id);
+      expect(category, id).not.toBe("Item");
+      expect(existsSync(publicFile(image)), id).toBe(true);
+    }
   });
 });

@@ -40,6 +40,70 @@ describe("Next tab", () => {
     dispatch("#show-more");
     expect($("#count").value).toBe("5");
     expect($("#show-more").textContent).toBe("Show 5 more");
+  }, 30000);
+
+  it("keeps Show 5 more below the cards, outside #out, as a full-width button", async () => {
+    await init(restored());
+    const more = $("#show-more");
+    expect($("#out").contains(more)).toBe(false);
+    expect(more.classList.contains("btn--primary")).toBe(true);
+    expect(more.classList.contains("btn--block")).toBe(true);
+    expect($("#out").compareDocumentPosition(more) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect($("#open-status").getAttribute("role")).toBe("status");
+    expect($("#open-status").classList.contains("sr-only")).toBe(true);
+  });
+
+  it("sets how many boxes to show with the Boxes to show stepper", async () => {
+    await init(restored());
+    expect($("#count").labels[0].textContent).toBe("Boxes to show");
+    expect($("#count").closest(".stepper")).not.toBeNull();
+    expect($("#count").min).toBe("1");
+    expect($("#count").max).toBe("200");
+    const more = $('[data-step-for="count"][data-step="1"]');
+    const less = $('[data-step-for="count"][data-step="-1"]');
+    expect(more.getAttribute("aria-label")).toBe("More Boxes to show");
+    expect(less.getAttribute("aria-label")).toBe("Less Boxes to show");
+    more.click();
+    expect($("#out").children).toHaveLength(6);
+    less.click();
+    less.click();
+    expect($("#out").children).toHaveLength(4);
+    expect($("#out").querySelectorAll(".open-card-btn")).toHaveLength(4);
+  });
+
+  it("hides seed details until Show seed details is switched on", async () => {
+    await init(restored());
+    const toggle = $("#show-details");
+    expect(toggle.type).toBe("checkbox");
+    expect(toggle.classList.contains("toggle")).toBe(true);
+    expect(toggle.labels[0].textContent.trim()).toBe("Show seed details");
+    expect(document.body.dataset.details).toBe("off");
+    expect($("#out .prediction-details")).not.toBeNull();
+    toggle.click();
+    expect(document.body.dataset.details).toBe("on");
+    toggle.click();
+    expect(document.body.dataset.details).toBe("off");
+  });
+
+  it("folds the opened cards away and drops the ribbon on the new next box", async () => {
+    vi.useFakeTimers();
+    window.matchMedia = vi.fn(() => ({ matches: false }));
+    try {
+      await init(restored());
+      const leaving = $(".out-leaving");
+      expect(leaving.getAttribute("aria-hidden")).toBe("true");
+      expect(leaving.hasAttribute("inert")).toBe(true);
+      markOpened(3);
+      expect($("#out").children).toHaveLength(5);
+      expect($("#out .open-box").classList.contains("is-arriving")).toBe(true);
+      expect(leaving.querySelectorAll(".open-box.is-collapsing")).toHaveLength(3);
+      expect(leaving.querySelector("button")).toBeNull();
+      vi.advanceTimersByTime(250);
+      expect(leaving.children).toHaveLength(0);
+    } finally {
+      delete window.matchMedia;
+      vi.useRealTimers();
+    }
   });
 
   it("previews the selected box's level immediately and preserves edits while opening", async () => {

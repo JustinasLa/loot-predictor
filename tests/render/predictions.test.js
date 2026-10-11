@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   renderChestList, renderResults, renderHistory, renderXpPath,
   renderItemPicker, renderFindResult, renderError,
@@ -80,5 +80,70 @@ describe("predictions renderer", () => {
     expect(open.mock.calls).toEqual([[1], [2]]);
     expect(container.textContent).toContain("Key roll 12");
     expect(container.querySelector("li").dataset.rarity).toBe("Common");
+  });
+
+  describe("collapse after marking", () => {
+    const setup = () => {
+      const panel = document.createElement("section");
+      const leaving = document.createElement("div");
+      leaving.className = "out-leaving";
+      panel.append(leaving, container);
+      document.body.append(panel);
+      return leaving;
+    };
+    afterEach(() => {
+      delete window.matchMedia;
+      vi.useRealTimers();
+    });
+
+    it("folds up to five opened cards into the silent sibling, then clears it", () => {
+      vi.useFakeTimers();
+      window.matchMedia = vi.fn(() => ({ matches: false }));
+      const leaving = setup();
+      const chain = Array.from({ length: 8 }, (_, index) => opening(index + 1));
+      const draw = (from) => renderResults(container, "big", chain.slice(from), (count) => draw(from + count));
+      draw(0);
+      container.querySelectorAll(".open-card-btn")[6].click();
+      expect(window.matchMedia).toHaveBeenCalledWith("(prefers-reduced-motion: reduce)");
+      expect(leaving.children).toHaveLength(5);
+      expect([...leaving.children].every((card) => card.classList.contains("is-collapsing"))).toBe(true);
+      expect(leaving.querySelector("button")).toBeNull();
+      expect(container.children).toHaveLength(1);
+      expect(container.firstElementChild.classList.contains("is-arriving")).toBe(true);
+      vi.advanceTimersByTime(250);
+      expect(leaving.children).toHaveLength(0);
+    });
+
+    it("stays instant under reduced motion or without matchMedia", () => {
+      const leaving = setup();
+      const draw = () => renderResults(container, "big", [opening(), opening(2)], draw);
+      draw();
+      container.querySelector(".open-card-btn").click();
+      expect(leaving.children).toHaveLength(0);
+      window.matchMedia = vi.fn(() => ({ matches: true }));
+      container.querySelector(".open-card-btn").click();
+      expect(leaving.children).toHaveLength(0);
+      expect(container.querySelector(".is-arriving")).toBeNull();
+    });
+
+    it("skips the animation without a leaving sibling or when the redraw shows no cards", () => {
+      window.matchMedia = vi.fn(() => ({ matches: false }));
+      const draw = () => renderResults(container, "big", [opening()], draw);
+      document.body.append(container);
+      draw();
+      container.querySelector(".open-card-btn").click();
+      expect(container.querySelector(".is-arriving")).toBeNull();
+      const other = document.createElement("div");
+      container.before(other);
+      container.querySelector(".open-card-btn").click();
+      expect(other.children).toHaveLength(0);
+      const leaving = setup();
+      renderResults(container, "big", [opening()], () => { container.textContent = ""; });
+      container.querySelector(".open-card-btn").click();
+      renderResults(container, "big", [opening()], () => { container.innerHTML = "<p class='error-box'>Oops</p>"; });
+      container.querySelector(".open-card-btn").click();
+      expect(leaving.children).toHaveLength(0);
+      expect(window.matchMedia).not.toHaveBeenCalled();
+    });
   });
 });

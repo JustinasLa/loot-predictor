@@ -51,7 +51,7 @@ function cardTitle({ number, count, past, route }) {
 }
 
 export function openingCard(open, { cardId, number, count, onOpen, container, past = false, route = false }) {
-  const box = el("article", "open-box panel");
+  const box = el("article", past ? "open-box panel is-past" : "open-box panel");
   const head = el("div", "open-head");
   if (!past && count === 1) {
     box.classList.add("is-next");
