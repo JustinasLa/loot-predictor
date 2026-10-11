@@ -1,17 +1,31 @@
-/* area:settings-help-errors — Settings sheet rows. */
+/* area:settings-help-errors — Settings sheet. */
+.settings-body { gap: 20px; }
+.settings-section { display: grid; gap: 10px; }
+/* Find / XP sections collapse when their rows are hidden (non-adventure boxes). */
+.settings-section:not(:has(> :not(.is-hidden))) { display: none; }
+.settings-section + .settings-section { padding-top: 20px; border-top: 3px solid var(--divider); }
+
 .setting-row {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  min-height: 60px; font-weight: 700;
+  min-height: 64px; font-weight: 700; color: var(--ink);
 }
-.setting-row > label, label.setting-row { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.setting-row > label, label.setting-row { display: flex; align-items: center; gap: 10px; line-height: 1.15; }
 label.setting-row { justify-content: space-between; }
-.setting-row img { width: 32px; height: 32px; object-fit: contain; }
+.setting-row img { width: 32px; height: 32px; object-fit: contain; flex: none; filter: drop-shadow(0 2px 0 rgb(0 0 0 / .2)); }
+.setting-row .field { flex: none; }
+.setting-row .toggle { margin-right: 4px; }
+.setting-row--vault { padding-block: 8px; }
+.setting-row--vault .stepper { flex: none; }
+.setting-row--vault .stepper input { background: #fff; width: 76px; }
+
 .tag {
   font: 800 var(--t-small)/1 var(--font-ui);
   background: var(--ink-muted); color: #fff;
-  padding: 3px 8px; border-radius: var(--radius-pill);
+  padding: 4px 9px; border-radius: var(--radius-pill);
 }
-.setting-group { display: grid; gap: 12px; }
+.setting-group { display: grid; gap: 10px; }
 .setting-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .setting-buttons .btn { margin-bottom: 4px; }
 .setting-row .btn { margin-bottom: 4px; }
+
+.settings-footer { font-size: 15px; font-weight: 600; margin: 0; padding-top: 4px; }

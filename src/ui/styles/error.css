@@ -1,2 +1,20 @@
-/* area:settings-help-errors — error placement (the .error-box component is in components.css). */
-.workspace-status .error-box, .import-status .error-box { text-align: left; }
+/* area:settings-help-errors — error placement and the two-tone line
+   (the base .error-box component is in components.css). */
+.error-box {
+  position: relative;
+  margin: 0;
+  padding-left: 48px;
+  font: 600 var(--t-body)/1.35 var(--font-ui);
+  text-align: left;
+}
+.error-box::before {
+  content: "!";
+  position: absolute; left: 12px; top: 50%; translate: 0 -50%;
+  width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--danger); box-shadow: 0 2px 0 var(--danger-lip);
+  color: #fff; font: 800 18px/1 var(--font-ui);
+}
+.error-lead { color: var(--ink); font-weight: 800; }
+.error-reason { color: var(--ink-muted); font-weight: 600; }
+#out > .error-box, #find-out > .error-box, #xp-out > .error-box { grid-column: 1 / -1; }

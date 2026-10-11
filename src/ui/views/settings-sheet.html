@@ -1,26 +1,44 @@
 <!-- area:settings-help-errors start (Settings sheet) -->
 <div id="settings-sheet" class="sheet-layer is-hidden">
   <div class="sheet-backdrop" data-sheet-close></div>
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+  <div class="sheet settings-sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
     <div class="sheet-handle" aria-hidden="true"></div>
     <div class="sheet-head">
       <h2 id="settings-title" class="sheet-title">Settings</h2>
       <button type="button" class="icon-btn btn btn--danger sheet-close" data-sheet-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5.6 5.6a2 2 0 0 1 2.8 0L12 9.2l3.6-3.6a2 2 0 1 1 2.8 2.8L14.8 12l3.6 3.6a2 2 0 1 1-2.8 2.8L12 14.8l-3.6 3.6a2 2 0 1 1-2.8-2.8L9.2 12 5.6 8.4a2 2 0 0 1 0-2.8Z"/></svg></button>
     </div>
     <div class="sheet-body settings-body">
-      <div class="setting-row panel-row">
-        <label for="vault"><img src="{{BASE}}assets/items/ZeusKeyIcon.webp" width="32" height="32" alt="" />Vault key chance (%)</label>
-        <input id="vault" type="number" value="0" min="0" max="100" step="any" class="field" />
+      <div class="settings-section settings-core">
+        <div class="setting-row panel-row setting-row--vault">
+          <label for="vault"><img id="vault-key-art" class="vault-key" src="{{BASE}}assets/items/PirateKeyIcon.webp" width="32" height="32" alt="" />Vault key chance (%)</label>
+          <div class="stepper">
+            <button type="button" class="icon-btn btn btn--primary" data-step-for="vault" data-step="-1" aria-label="Less Vault key chance (%)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect fill="currentColor" x="4" y="9.5" width="16" height="5" rx="2.5"/></svg>
+            </button>
+            <input id="vault" type="number" value="0" min="0" max="100" step="any" inputmode="decimal" />
+            <button type="button" class="icon-btn btn btn--primary" data-step-for="vault" data-step="1" aria-label="More Vault key chance (%)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3.5a2.5 2.5 0 0 1 2.5 2.5v3.5H18a2.5 2.5 0 0 1 0 5h-3.5V18a2.5 2.5 0 0 1-5 0v-3.5H6a2.5 2.5 0 0 1 0-5h3.5V6A2.5 2.5 0 0 1 12 3.5Z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="setting-row panel-row setting-row--seed">
+          <label for="seed">Seed <span class="tag">Advanced</span></label>
+          <input id="seed" type="number" step="1" inputmode="numeric" class="field field--wide" disabled />
+        </div>
       </div>
-      <div class="setting-row panel-row">
-        <label for="seed">Seed <span class="tag">Advanced</span></label>
-        <input id="seed" type="number" step="1" class="field field--wide" disabled />
+      <div class="settings-section settings-next">
+        {{slot:settings-next}}
       </div>
-      {{slot:settings-next}}
-      {{slot:settings-marking}}
-      {{slot:settings-find}}
-      {{slot:settings-xp}}
-      <p class="sheet-footer">Only change these if you know why.</p>
+      <div class="settings-section settings-marking">
+        {{slot:settings-marking}}
+      </div>
+      <div class="settings-section settings-find">
+        {{slot:settings-find}}
+      </div>
+      <div class="settings-section settings-xp">
+        {{slot:settings-xp}}
+      </div>
+      <p class="sheet-footer settings-footer">Only change these if you know why.</p>
     </div>
   </div>
 </div>

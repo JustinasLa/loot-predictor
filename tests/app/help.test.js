@@ -32,4 +32,24 @@ describe("help sheet", () => {
     expect($("#help-sheet").classList.contains("is-hidden")).toBe(true);
     expect(document.activeElement).toBe(trigger);
   });
+
+  it("uses real sprites with no step numbers and closes on Escape", async () => {
+    await init();
+    const trigger = $("#help-trigger");
+    trigger.focus();
+    trigger.click();
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    expect($("#help-sheet").contains(document.activeElement)).toBe(true);
+    const sprites = $$("#help-sheet img").map((img) => img.getAttribute("src").split("/").pop());
+    expect(sprites).toEqual(["BigChestIcon.webp", "Ring_Silver.webp", "Ring_Snake.webp"]);
+    expect($$("#help-sheet .item-tile").map((tile) => tile.dataset.rarity)).toEqual(["Rare", "Legendary"]);
+    expect($("#help-sheet ol")).toBeNull();
+    expect($("#help-sheet .help-rows").textContent).not.toMatch(/\d/);
+    expect($("#help-sheet .btn--mini").getAttribute("aria-hidden")).toBe("true");
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    expect($("#help-sheet").classList.contains("is-hidden")).toBe(true);
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(trigger);
+  });
 });
+
