@@ -1,0 +1,1384 @@
+{
+  "sourceCommit": "f427d12473f3d78f10be7450cfc95ab35703fd44",
+  "retrieved": "2026-10-11",
+  "format": "Lossless WebP; original dimensions and visible RGBA pixels preserved. Fully transparent RGB values may differ.",
+  "assets": [
+    {
+      "file": "BigChestIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/BigChestIcon.png",
+      "sourceSha256": "6369e020d30a82c46d7486c62abec2045e3f7e3be55e241ae1e7e83ff7a4bc7a",
+      "sha256": "38bbfe9f941f46c0190709d557e381b746b0758890e90aee187371153b7f8213",
+      "width": 257,
+      "height": 256,
+      "bytes": 1870
+    },
+    {
+      "file": "Body_Apron_Purple.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Apron_Purple.png",
+      "sourceSha256": "ad953a00a67547f5a26d1429081fbe47fbf395bad6eb1e027fa3e55f4cc2e69d",
+      "sha256": "7402d126790d91ff457ee1fb35680ff9162da23c1f5078fc4634772ed7c65e2a",
+      "width": 512,
+      "height": 512,
+      "bytes": 23492
+    },
+    {
+      "file": "Body_Apron_White.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Apron_White.png",
+      "sourceSha256": "492ce1f38029e2b471a537dbe335478d8f5bfd230dc5bbdb4c41f2e1116b6d0a",
+      "sha256": "3290c17aae43592e63cb87d7d22b7ee654b825b9da9b46fd3bb38d30b5546cb9",
+      "width": 512,
+      "height": 512,
+      "bytes": 15162
+    },
+    {
+      "file": "Body_Bandolier.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Bandolier.png",
+      "sourceSha256": "4019c5c1a4d9104efaf09ce22029399320b871202cd80ab971a647f25740935e",
+      "sha256": "62e6ba77e3287f04e15b90c355bb7558a9d27329974d9f65e55fc1de1d122227",
+      "width": 512,
+      "height": 512,
+      "bytes": 42880
+    },
+    {
+      "file": "Body_Barista.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Barista.png",
+      "sourceSha256": "86234966862a511c3936161cb18285492df5f317e3727c88ac05d0733045c401",
+      "sha256": "292902591f7a6e5188a9bbe7af0feb15d6be98deccef699db18c90edea262e7e",
+      "width": 512,
+      "height": 512,
+      "bytes": 14340
+    },
+    {
+      "file": "Body_Barrel.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Barrel.png",
+      "sourceSha256": "5f89905164d64395e3a27ec83bf7685ee2acaabb858b24b5eac63e80e2ce5f18",
+      "sha256": "8408ecdd23ce0ea51dc112454da34f542c4432fa5c856ab57bfe57921a96151d",
+      "width": 512,
+      "height": 512,
+      "bytes": 17092
+    },
+    {
+      "file": "Body_BlueWhite.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_BlueWhite.png",
+      "sourceSha256": "c1ea9c99d6d165e34fce3d1035284b643517e8a6693af08d67858a57aaebecf8",
+      "sha256": "dfc97dba3c0634760d4c1ec4ba84c46e712fd2036ed761b874fcb33fb161d5ad",
+      "width": 512,
+      "height": 512,
+      "bytes": 16322
+    },
+    {
+      "file": "Body_BowTieRed.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_BowTieRed.png",
+      "sourceSha256": "8f5fbe526dd6248f078a0c4c99494914076fb36afc461b908107a0ac2e9cf460",
+      "sha256": "9eafecdb9773bb454929b668690a05b7b74efd9773560db17feb7ac436cf525e",
+      "width": 512,
+      "height": 512,
+      "bytes": 16342
+    },
+    {
+      "file": "Body_Box.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Box.png",
+      "sourceSha256": "402a4c0874cfbbaa02b3b27e508e652c8cfd02e3adaac6409ee76c537b0a24cf",
+      "sha256": "59442b0021ebd81ff8ec32c99603ff721b17df0f5cfc4383b5037a88f75effda",
+      "width": 512,
+      "height": 512,
+      "bytes": 15266
+    },
+    {
+      "file": "Body_Coat.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Coat.png",
+      "sourceSha256": "d5ad71744e8129f6a1f2fd97660712e9131462e266317187108ea21df5a25449",
+      "sha256": "5e9e48d170b516859d2998f56aa9e08ec107289688bf232a9000087cb86bb2b7",
+      "width": 512,
+      "height": 512,
+      "bytes": 24828
+    },
+    {
+      "file": "Body_ItalianChef.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_ItalianChef.png",
+      "sourceSha256": "8c390272db10a99bb3ec83695901a818ecd21e182bfdd17e524bdc59ed5b4d09",
+      "sha256": "ea8b453955abb8946bc888d7c1ed41f262e993bbe98e4acb092732717d6120d7",
+      "width": 512,
+      "height": 512,
+      "bytes": 17310
+    },
+    {
+      "file": "Body_JumperBlackWhite.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_JumperBlackWhite.png",
+      "sourceSha256": "ef040251af7a3c9cfcb866d0fe49e4b83987fe4815f791fec839f28043fc0fbd",
+      "sha256": "c312077e89eca0888b824614d90723d5b6fb0df74e37afaf9f2ced5477b46c4f",
+      "width": 512,
+      "height": 512,
+      "bytes": 31478
+    },
+    {
+      "file": "Body_JumperRedBlue.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_JumperRedBlue.png",
+      "sourceSha256": "89e5c01c2ebb1fe169abfbeb49d262fc6dc6513a24e80ebe145c64ce7200a793",
+      "sha256": "e661102e1a2b1357ad36796b14892773e0479c5b19ab8588a8e397029d252c1f",
+      "width": 512,
+      "height": 512,
+      "bytes": 35280
+    },
+    {
+      "file": "Body_JumperYellow.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_JumperYellow.png",
+      "sourceSha256": "1cebaaa0702e8095491646a62b62f1e3f4fc9b9742418d9b9023db6ceca3fe9a",
+      "sha256": "f15f0712d00c8699fb2687aff2f70079bed55b0449492d9de6950ccb813e1d36",
+      "width": 512,
+      "height": 512,
+      "bytes": 35614
+    },
+    {
+      "file": "Body_Kimono_Black.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Kimono_Black.png",
+      "sourceSha256": "8bd78730d270c452d28ce3745d5c0c7176913b8a82865dc789f7b71f2a561206",
+      "sha256": "ec411f0245d7293ba4d88cf24e61b68df76558f5e94f11f40ab783463000a757",
+      "width": 512,
+      "height": 512,
+      "bytes": 20302
+    },
+    {
+      "file": "Body_Kimono_Blue.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Kimono_Blue.png",
+      "sourceSha256": "b5f25ec527cbf497a24b9c4488bbf4d4e116e2c854aeab25f0ede6899a51d76f",
+      "sha256": "9aa8006c7f2a84abd90cc30cd17bbd0040aa91129d57081e1a37a34ff7229831",
+      "width": 512,
+      "height": 512,
+      "bytes": 21076
+    },
+    {
+      "file": "Body_RedGray.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_RedGray.png",
+      "sourceSha256": "fc0895635d207020d76ffccb68b64817972a307862ac462b15f17260b52c9168",
+      "sha256": "4bea77a8aa8893b05c75eb8724ab6a75192d46543b81e182c6fb2d22f57f28d8",
+      "width": 512,
+      "height": 512,
+      "bytes": 17632
+    },
+    {
+      "file": "Body_RedShirt_Belt.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_RedShirt_Belt.png",
+      "sourceSha256": "466b65c5b763654436459a9d935a5dec567a6fc261bedc00bc48a47136715833",
+      "sha256": "dc99b7e11251620591225ac025fa0f5e0336b9c0721ea349e835ffd2619e0dfd",
+      "width": 512,
+      "height": 512,
+      "bytes": 16036
+    },
+    {
+      "file": "Body_Robot.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Robot.png",
+      "sourceSha256": "717205e0192589899e94bef785859d2e9f5bccd50542a9b3b57c678e41df2832",
+      "sha256": "34f58967d26597ff0b9510cbed126fc9d4eacc4219601414c42f87c2a680054b",
+      "width": 512,
+      "height": 512,
+      "bytes": 15218
+    },
+    {
+      "file": "Body_RoyalRobe.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_RoyalRobe.png",
+      "sourceSha256": "5028584b680dc2da0fc2cf488c62b855ed2932f9bb22cf30b1af62a9c902205e",
+      "sha256": "031706b9ffdf92550989da2cea7d21131ba1dcc8887379d6ff2cb19918077d85",
+      "width": 512,
+      "height": 512,
+      "bytes": 34802
+    },
+    {
+      "file": "Body_Shark.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Shark.png",
+      "sourceSha256": "56c702aad1ed169e77c7d0910f7632d7895b7edd737e06f14b3610ce47052567",
+      "sha256": "077c99970146615c4196b0971edaabf4f71ff134938783a8d3ba231488cfc70a",
+      "width": 512,
+      "height": 512,
+      "bytes": 22286
+    },
+    {
+      "file": "Body_TankTop_White.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_TankTop_White.png",
+      "sourceSha256": "7fcdab96ebb097366ba3f9dc1410af5659f1a9248760c3f19a43491781f74c34",
+      "sha256": "441646be6994f0414e051cf0c85d133620e07ed1c53e3ba5b2088d592b3a3e14",
+      "width": 512,
+      "height": 512,
+      "bytes": 19744
+    },
+    {
+      "file": "Body_ToolBelt.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_ToolBelt.png",
+      "sourceSha256": "b26a155327496dec2a61585b4564485741a0e1f3bfe0fbfdfc655a2d7bb05822",
+      "sha256": "383d4e13d9ad471ac15162142a2d9d82bb4fab88163fae27440d1eb60102459d",
+      "width": 512,
+      "height": 512,
+      "bytes": 20816
+    },
+    {
+      "file": "Body_Waiter.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_Waiter.png",
+      "sourceSha256": "df4e4c1f1adae5f86b5366701325d172858779083aed45753b06d38c4eed5e6e",
+      "sha256": "13e3580761621b5aec81cd43c165f5fc0c73894d66af4c37ac3248f136771ed1",
+      "width": 512,
+      "height": 512,
+      "bytes": 13418
+    },
+    {
+      "file": "Body_WarriorApron.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_WarriorApron.png",
+      "sourceSha256": "864d08b6440d638b399349c98abc9df37bb8451c4ecd90add11b62ad366172bd",
+      "sha256": "404ed92f6d87a85a4983c7d63faee97d9e0487efde83b1233a2d69287fb76fc8",
+      "width": 512,
+      "height": 512,
+      "bytes": 45978
+    },
+    {
+      "file": "Body_WhiteShirt_Belt.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Body_WhiteShirt_Belt.png",
+      "sourceSha256": "182e2eb12b663eb499b696d9c29443b698cc107d1a2fa6e9587b82e1647f70b2",
+      "sha256": "a14503019b9325aba0f6969fb27856aa4669fb9cfd2225d458044722516503f8",
+      "width": 512,
+      "height": 512,
+      "bytes": 15530
+    },
+    {
+      "file": "ClubChestIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/ClubChestIcon.png",
+      "sourceSha256": "02d210fb2f3dd64651bf4a4135d5adfd7f7fed32b3f2d56fa2d46534f6e33444",
+      "sha256": "f6938f9e4bde83c53ccb73b3097e1bc522792cb327600e30188f3140a0ef3be0",
+      "width": 256,
+      "height": 256,
+      "bytes": 5708
+    },
+    {
+      "file": "GreekAdventureIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/GreekAdventureIcon.png",
+      "sourceSha256": "47169fecb7df9ae6295bf3b26c361f924dc732f8a159a5f84d21d9cc98a094ce",
+      "sha256": "18652b2ba95c1a13681fc2816909681078194ff3d36b67981d87a1907f5a936c",
+      "width": 256,
+      "height": 256,
+      "bytes": 4558
+    },
+    {
+      "file": "Hat_Barista.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Barista.png",
+      "sourceSha256": "259622adf133dbf5f1f721adab197dc74ec815be6f19ca9507f0ed619934683d",
+      "sha256": "913760a77b93168adb86d89e83e81de85d01bdff4b2cd56ef8272cba4afa06e8",
+      "width": 512,
+      "height": 512,
+      "bytes": 11566
+    },
+    {
+      "file": "Hat_Beanie.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Beanie.png",
+      "sourceSha256": "6689f1b183243e404ba40b0af6695e46f6c8cf7ee69f4e865d53b30979326b22",
+      "sha256": "e7eac689c1f4721ec78441dc230c768132012bdef5d4be084e7709578b525d10",
+      "width": 512,
+      "height": 512,
+      "bytes": 19748
+    },
+    {
+      "file": "Hat_CapPurple.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_CapPurple.png",
+      "sourceSha256": "7117b7595e1613f7b3d84f76c7697815449be2707d0c4b0a13494a39eba908ba",
+      "sha256": "f59ef907150c7de5a455d0f5a4ac1476162904511623a8c5713d35b3eb1dfa96",
+      "width": 512,
+      "height": 512,
+      "bytes": 16788
+    },
+    {
+      "file": "Hat_Cashier.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Cashier.png",
+      "sourceSha256": "20a6d1497378d41a740bd425caa66bf85d6571fe7795b5491dfe58de93e87422",
+      "sha256": "5ec767836ceaf1f22e62e260aa2bf8442814e75ab1e127af99eb1a9ba8e0a767",
+      "width": 512,
+      "height": 512,
+      "bytes": 10652
+    },
+    {
+      "file": "Hat_Cashier_Blue.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Cashier_Blue.png",
+      "sourceSha256": "0d28aedd39c00e9a1380d2abbd1f4a1870da1063e0ebe2d4cfdba9dbb4be3a43",
+      "sha256": "0c498ba9739fd1f954995ab61bd4fa004024498eb14bdbe6e13854e09af7a321",
+      "width": 512,
+      "height": 512,
+      "bytes": 11092
+    },
+    {
+      "file": "Hat_Chef.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Chef.png",
+      "sourceSha256": "674ab60e7b614c3e8db66e120becb8f58ae9ca123c8c31ddca3c36a0a210e6de",
+      "sha256": "32758383d7d306315ade935032e2f2dedc70ffee327fd6765eceac064736c81a",
+      "width": 512,
+      "height": 512,
+      "bytes": 26704
+    },
+    {
+      "file": "Hat_Chef_Black.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Chef_Black.png",
+      "sourceSha256": "baa969d9cb202ca3ecdaba35bd12c432d42e806e4afb4df8b24b09280f2091de",
+      "sha256": "11ab10ea5c41d3cc8b8290e8425c0c249e6cfbe5e8870d63a4faee4d68474f25",
+      "width": 512,
+      "height": 512,
+      "bytes": 20248
+    },
+    {
+      "file": "Hat_ChefTall.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_ChefTall.png",
+      "sourceSha256": "02dff51b0519f7835ce777829b8d97c999396af515221070ab14a9f3d13ffa2a",
+      "sha256": "65150e86ec804fbcb79192b6174e2b0d0a1ae7e5a6ec8227cb2eff4fe05e3905",
+      "width": 512,
+      "height": 512,
+      "bytes": 4770
+    },
+    {
+      "file": "Hat_ChefTall_Dark.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_ChefTall_Dark.png",
+      "sourceSha256": "29522f542f2d432229797a7d49ea585232e4c3ee7e8c2a509fbbe5850283b8a6",
+      "sha256": "9e3641d1d68a635614456a3926ba57124846d195818474bb10f2e1a3a3cb1e91",
+      "width": 512,
+      "height": 512,
+      "bytes": 2624
+    },
+    {
+      "file": "Hat_CoolCap.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_CoolCap.png",
+      "sourceSha256": "01e2d81bace8d22ce5a050315a3ee9c38ac4b0aa1768e8b814bab7085ce74ce3",
+      "sha256": "8f8d419fb7a2754264d854ef8a35961f7517e36fe210225a0c651edc5c04c33f",
+      "width": 512,
+      "height": 512,
+      "bytes": 16340
+    },
+    {
+      "file": "Hat_ElderBeard.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_ElderBeard.png",
+      "sourceSha256": "ba402dbf4392c4454926c0c0a8c1c0a3e0bba22cdede12c762ac233d8806a51b",
+      "sha256": "f121ac65e9dc3557ee5fb27905b2b1946ff3b83ee67ab79daec5078f19570922",
+      "width": 512,
+      "height": 512,
+      "bytes": 24280
+    },
+    {
+      "file": "Hat_Fireman.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Fireman.png",
+      "sourceSha256": "0f7486f950a2314e1d72c4ed506ebe294fd9b80c0902b4f8ea30b7a830657c72",
+      "sha256": "014053b15fe5717742ee8be9d1e5978122bc94af52def13b8732c1b6370bedfd",
+      "width": 512,
+      "height": 512,
+      "bytes": 17142
+    },
+    {
+      "file": "Hat_Glasses.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Glasses.png",
+      "sourceSha256": "f5b720db493983ec2772f3dcc00a35451b3cc7d45dbfc8aae1d91e9d6e343fc9",
+      "sha256": "e11a51860a016b11484c80890a8e348a2e4ce65f94e2b3252ab4b82760fb50ac",
+      "width": 512,
+      "height": 512,
+      "bytes": 20886
+    },
+    {
+      "file": "Hat_Goggles.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Goggles.png",
+      "sourceSha256": "7d6b4cfcc61ebb3473c8fef5a20b85f327ace9030e575a2a644910e308983286",
+      "sha256": "0e817a5c92ef70cb3dcb0eccc56d47b0bf6d0f2a9d14ea6e11e4450e60fa9efd",
+      "width": 512,
+      "height": 512,
+      "bytes": 14566
+    },
+    {
+      "file": "Hat_Hoodie.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Hoodie.png",
+      "sourceSha256": "b702b80a7b0a5910b115972fefec165c87ca2212ceb73179d9328be919e81f78",
+      "sha256": "cfe134f53fe6aaa8cc8159f7725993eb328bd09323c53980f777e025acb4a066",
+      "width": 512,
+      "height": 512,
+      "bytes": 20382
+    },
+    {
+      "file": "Hat_Leperchaun.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Leperchaun.png",
+      "sourceSha256": "0d6afe18f8d0a96f039a11e509a8ad1be2215edc8b9a67004ec598a21e197b40",
+      "sha256": "4c08ee6a37611e21db8814bb6bfac0fcdf7ce3ab5d23651ed34d5ab72ed6e891",
+      "width": 512,
+      "height": 512,
+      "bytes": 14730
+    },
+    {
+      "file": "Hat_Mafia.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Mafia.png",
+      "sourceSha256": "1d24c76248e1fd7f474c0c052486d316031cc34d9d193463b6ab0079e678fb38",
+      "sha256": "3d17a2d81b8ad7ea07e54b98afeac5b983fc82f43579d53a19e698b138ad5828",
+      "width": 512,
+      "height": 512,
+      "bytes": 11028
+    },
+    {
+      "file": "Hat_MineLamp.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_MineLamp.png",
+      "sourceSha256": "227799e78a614f37dc37fe4a85fcecc55fd3e91ee09d96655fa99db3b2f9ff74",
+      "sha256": "e261467462e24b36f2c14fdf6e0efc3fe77bb2186e4e3ff616f9ad9963563ab9",
+      "width": 512,
+      "height": 512,
+      "bytes": 24378
+    },
+    {
+      "file": "Hat_Round.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_Round.png",
+      "sourceSha256": "f66108095697940e525a7ef5fcc90b5c07f4b9f4aaa715f4b6754000aeaf59d3",
+      "sha256": "7ac7cf99f5b2de6b1e1773e0fd77c85751b99112f7255afe8ca063cbba712e16",
+      "width": 512,
+      "height": 512,
+      "bytes": 17632
+    },
+    {
+      "file": "Hat_RoyalCrown.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_RoyalCrown.png",
+      "sourceSha256": "dbb4a6bcf3bed04747ea3721b47fc7157a83aa96edfe503329a8836eb6f92eac",
+      "sha256": "9c54fbd71ccc227a80dd0be8f76b986c0edbb5e275e4944bb6f3659deca25b44",
+      "width": 512,
+      "height": 512,
+      "bytes": 25318
+    },
+    {
+      "file": "Hat_SushiChef.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_SushiChef.png",
+      "sourceSha256": "28892293e9e30aa0aea76c8995b059863cc24d77e400ed9c45a7b6374017fff3",
+      "sha256": "91862b2db81859dd09a40f956d22e89e89382360b03fa91eef0fc7683ce65b5f",
+      "width": 512,
+      "height": 512,
+      "bytes": 7610
+    },
+    {
+      "file": "Hat_SushiMaster.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_SushiMaster.png",
+      "sourceSha256": "58f4b32f01a0fdcce9b2f69f8b418a1816c94bd95f714c88ed0d973a20a39d7e",
+      "sha256": "991398d7a80b89873112a15e0d999850e23317154eb1ae4623b3c27645835b30",
+      "width": 512,
+      "height": 512,
+      "bytes": 16304
+    },
+    {
+      "file": "Hat_TrafficCone.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_TrafficCone.png",
+      "sourceSha256": "a03119106b5ab8518bd6d80e0bcfe8559c37cb49aa4785d5e9509073162379b6",
+      "sha256": "d7bbe009c4e2cb4cbdccfd8a2f2bb3fd703a638419261615251e7abbbdad8bdd",
+      "width": 512,
+      "height": 512,
+      "bytes": 15718
+    },
+    {
+      "file": "Hat_WarriorHelmet.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Hat_WarriorHelmet.png",
+      "sourceSha256": "ad7892b70204dd6586a79223b766adeaf7fba2ff9a4954009359e2c0a8ddde5a",
+      "sha256": "a43ad90c841366e6b210f2dabc87fbe5bfba8ba63bd690e93db477ed5286c384",
+      "width": 512,
+      "height": 512,
+      "bytes": 27724
+    },
+    {
+      "file": "Head_Robot.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Head_Robot.png",
+      "sourceSha256": "c7db9d3a616bf637c4b17676b81a152416e93dc27329752c64a1c5c64f3c4431",
+      "sha256": "8c19324ba677f76810c1475d58ab9a3e23b64b52565379078ddc6e2ea524b864",
+      "width": 512,
+      "height": 512,
+      "bytes": 20064
+    },
+    {
+      "file": "Head_Shark.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Head_Shark.png",
+      "sourceSha256": "2f21b7882d92df8c8d3bb05b9abcde90941cafa5a5d2ede86502ae72e8c29022",
+      "sha256": "5b7f4fdab962d641f5851f66d8719e81da07b79ba3b838c1bb511f897277b4a5",
+      "width": 512,
+      "height": 512,
+      "bytes": 28000
+    },
+    {
+      "file": "MiddleAgesChestIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/MiddleAgesChestIcon.png",
+      "sourceSha256": "b423e9a2e99beb924de9dbc31964815da58b5aaaca7d31d15b7af40aee3de5d8",
+      "sha256": "70802b8cd77d71685dbf0ce098dc97509b13ce8fb409173da62c9e1ae6cc3c0c",
+      "width": 256,
+      "height": 255,
+      "bytes": 7082
+    },
+    {
+      "file": "MineChestIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/MineChestIcon.png",
+      "sourceSha256": "0cfb9e21c0ae9facc27836a329f5f9ca0d841339f92aa3be80eb81d6cd719fb7",
+      "sha256": "e973a8a4fe4a093657c6eb1b7f8746e756180679c326aa69b3ef3fd63c6393aa",
+      "width": 256,
+      "height": 256,
+      "bytes": 6738
+    },
+    {
+      "file": "Necklace_Anchor.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Anchor.png",
+      "sourceSha256": "308c82ccabcd891c37b3f01cbf38ae3ed67902a2110e17f22c96d5ba8aed8d1e",
+      "sha256": "06df0a6a8047e6cb361aa7d5b252554b70dd6e5ce8797c8f00ba7635001a59cd",
+      "width": 512,
+      "height": 512,
+      "bytes": 25218
+    },
+    {
+      "file": "Necklace_Bandana.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Bandana.png",
+      "sourceSha256": "49f8de2a1a334abc33ffb64d51458e7c878ee373e7731797ed69770fbfb57bec",
+      "sha256": "f6082d7c059e9f802e65ead5ee4f45a13bd3a47a141bacf07802a3c16beef483",
+      "width": 512,
+      "height": 512,
+      "bytes": 28024
+    },
+    {
+      "file": "Necklace_Bands.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Bands.png",
+      "sourceSha256": "917f08a52203289b6cd4600c7ad5bff7f1e911b23126ac853d02cfa1d2c81306",
+      "sha256": "edf31d741b081d0ff18724bd46812cf1f50e52feef5ba9abcaf9c7101d376ac3",
+      "width": 512,
+      "height": 512,
+      "bytes": 31800
+    },
+    {
+      "file": "Necklace_Beads.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Beads.png",
+      "sourceSha256": "8ecba35adc355c1826a3de1906b875b339156749983ef163ac0f9453483003aa",
+      "sha256": "0b95ca326716a60d51c91d5f4f42e92abc8611d73630138b9dc1788fa07e0ee2",
+      "width": 512,
+      "height": 512,
+      "bytes": 28796
+    },
+    {
+      "file": "Necklace_Bow.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Bow.png",
+      "sourceSha256": "d4e34d056b51991d6ae85f2ab5b410d8233e748599e85626568d3f5721f1945c",
+      "sha256": "3d2291813912597650814af994d3865be4ff92af8b2c7271451388ba0eaa42a0",
+      "width": 512,
+      "height": 512,
+      "bytes": 17136
+    },
+    {
+      "file": "Necklace_Compass.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Compass.png",
+      "sourceSha256": "9ecf54c843100051903ac651107ba83210cc73b4caed20636ee8f2562f5d7db3",
+      "sha256": "e1fb7420bf877baaacd7f4ace2d5390dda4b73239a33c7182798ff38564ebb2a",
+      "width": 512,
+      "height": 512,
+      "bytes": 25136
+    },
+    {
+      "file": "Necklace_Diamond.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Diamond.png",
+      "sourceSha256": "ca808a8ebb5941fce10b360448e82aded322140907906cc54b816ba12bf6a8c0",
+      "sha256": "5381df1d83242cf21af15150991147c5341d13b17c37e6fc17c593db46e0da4f",
+      "width": 512,
+      "height": 512,
+      "bytes": 22484
+    },
+    {
+      "file": "Necklace_Dog.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Dog.png",
+      "sourceSha256": "188f0846f8e818ae0dfd7dd7e7f49ce049741e584872ac1a827a9ebfbb55ff49",
+      "sha256": "6bd7a9cc27eebfd0256e2abeb4a8255f7822e10f3ee642227fa5b799f3c84cdc",
+      "width": 512,
+      "height": 512,
+      "bytes": 17216
+    },
+    {
+      "file": "Necklace_Gold.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Gold.png",
+      "sourceSha256": "3417fd83ec1bcc548825c1cf82884ceed93af37846e3853e15ace14d1e2038f3",
+      "sha256": "13efb2b446d85c4fbe45b66ce0a9aaba4025a3280ecc72b02539806be3ea0618",
+      "width": 512,
+      "height": 512,
+      "bytes": 48520
+    },
+    {
+      "file": "Necklace_Key.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Key.png",
+      "sourceSha256": "15282417f68e914fd0e223460fbc2ef721c25a5d5493e7d9d8e7433d7433e252",
+      "sha256": "2fcb639918d15988d9e0ea42bec156bef41997726f855d810a3fa032302c729e",
+      "width": 512,
+      "height": 512,
+      "bytes": 23454
+    },
+    {
+      "file": "Necklace_Lai.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Lai.png",
+      "sourceSha256": "9ff2032cc45e319b5ed6ad68b4a821f611ba03c296454c84ec9ca8b4fb893819",
+      "sha256": "72712aaaff9b1d81491f4c9ce50c68a6be0e6c6ce29115e4ef292e3c9c2f6551",
+      "width": 512,
+      "height": 512,
+      "bytes": 35254
+    },
+    {
+      "file": "Necklace_Leather.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Leather.png",
+      "sourceSha256": "4be709290484c56b2fc612f1b7cf9b66c61ac651a9ab4c74f4fb9dbad0a0a5ab",
+      "sha256": "7f610a8e5ebe759c9f5444c8353f4c2b6597f43a420cbf2f9e1aacba5cf252bd",
+      "width": 512,
+      "height": 512,
+      "bytes": 10026
+    },
+    {
+      "file": "Necklace_Nazar.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Nazar.png",
+      "sourceSha256": "1f2671d7b3b1d2e3ec20d98be35e310e3adaf39331257fda80f19984b58ecdde",
+      "sha256": "2512a18ba253e87574073db8aa424301534d27ad9d129a598296443a70482ef2",
+      "width": 512,
+      "height": 512,
+      "bytes": 22100
+    },
+    {
+      "file": "Necklace_Pearls.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Pearls.png",
+      "sourceSha256": "a86fc21a8db9c38fd9bd0d72a66ee3e6c0c22e42e593f31e9f2bef521836cbdd",
+      "sha256": "5055d0574fb2e3793d1b96fad5695bb38ddd4dd46f2d0d26b6b11e114eaaecc6",
+      "width": 512,
+      "height": 512,
+      "bytes": 33242
+    },
+    {
+      "file": "Necklace_Pirate.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Pirate.png",
+      "sourceSha256": "94c01e545f58b31f039238aad9c5852a4761cb047726eb29707b2ac3250ed4e7",
+      "sha256": "b6d87c159e9815af98f8cac704edb041d7d6cb567dc63ab069fec54418cb4f49",
+      "width": 512,
+      "height": 512,
+      "bytes": 23402
+    },
+    {
+      "file": "Necklace_Salt.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Salt.png",
+      "sourceSha256": "514557d27275ec3e85726af1467481e24bcb1b4bcb51eb661cdcb74ef878b837",
+      "sha256": "7b5cc292aa57f9a92a8f844733a6cc0864c0ae24b44a3c1f2d6434a86947fd96",
+      "width": 512,
+      "height": 512,
+      "bytes": 26322
+    },
+    {
+      "file": "Necklace_Sausage.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Sausage.png",
+      "sourceSha256": "f2501fbdf1a9f0943188e74bb2efbf837e73b60f74f90132aec1491c8615ac7c",
+      "sha256": "2e2bc1033848517d9f13c5ee091e13075f1d1f464a87630869d0013f5fb71721",
+      "width": 512,
+      "height": 512,
+      "bytes": 35914
+    },
+    {
+      "file": "Necklace_Scarf.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Scarf.png",
+      "sourceSha256": "564432d4a4d9f701f0e53e262310a665d8cc0e94030afed6e5ffd8692f8aa486",
+      "sha256": "f3c85cdb301e5664153e63e9192587a15ddb44012819df37d071a2295b27dc99",
+      "width": 512,
+      "height": 512,
+      "bytes": 40700
+    },
+    {
+      "file": "Necklace_Shark.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Shark.png",
+      "sourceSha256": "f9e98f6c2382e736187de883d87c08b5c0ccb8b0945182fec337af6dfa6ce20d",
+      "sha256": "42325533f9f98e29d0768ced0c9e0cf6272ca9d2eed48d15d039a8d7ef206298",
+      "width": 512,
+      "height": 512,
+      "bytes": 24512
+    },
+    {
+      "file": "Necklace_Shelfish.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Shelfish.png",
+      "sourceSha256": "5ab57fe54ecffdf4f4d4c81ace2ec9072a607bed91f4f388558b1d1a1f8a0067",
+      "sha256": "9cc9a93c8fc11db153e901673e9002ff033e611ec48de691161a2850a78100d5",
+      "width": 512,
+      "height": 512,
+      "bytes": 24294
+    },
+    {
+      "file": "Necklace_Trident.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Necklace_Trident.png",
+      "sourceSha256": "65aff2d51dbdad36d4d36424be5a640f08f731b1cf9a3a96521f7ea13387b7a9",
+      "sha256": "8cd4c1469f8f877a847047f4842e727aebcc631f9fbffdba4a8d7ff6d446e322",
+      "width": 512,
+      "height": 512,
+      "bytes": 44132
+    },
+    {
+      "file": "Pet_BabyDragon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_BabyDragon.png",
+      "sourceSha256": "468667a18113bede4d9d16bf013e7c9160ade4e3671f44dd09d9830c53bdcb04",
+      "sha256": "b78510b67f6d2c65ac46d336c3339535e9eccab95a8026762adef48a2e881eae",
+      "width": 512,
+      "height": 512,
+      "bytes": 32070
+    },
+    {
+      "file": "Pet_BabyKraken.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_BabyKraken.png",
+      "sourceSha256": "86879e1c1156eefd8573ac39c892904a52266af21a7f7e0413943575d7648a84",
+      "sha256": "260717d65748efbe43556e6baa1a8abd1ee18cd18c4d0c9118a767db3aea4e48",
+      "width": 512,
+      "height": 512,
+      "bytes": 57124
+    },
+    {
+      "file": "Pet_Chicken.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Chicken.png",
+      "sourceSha256": "ced9f823dc8007468a08ad06e00bd947615537e0924a7164100f84c9b9b93697",
+      "sha256": "de9d4baa5ff04f5b94678dcb9dfe7e3cb3e7e665a152661e78c631b7f292573f",
+      "width": 512,
+      "height": 512,
+      "bytes": 28596
+    },
+    {
+      "file": "Pet_DarkHorse.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_DarkHorse.png",
+      "sourceSha256": "47e82483a93832de77a8c6603fdd9977d644bf07f81b689b940c91c9c5f70209",
+      "sha256": "e00b35d5d8e234a13594a7d5962e303b1e26c3a3564a8b7ee33ca1b9e3c4f370",
+      "width": 512,
+      "height": 512,
+      "bytes": 9700
+    },
+    {
+      "file": "Pet_Egg_Common.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Egg_Common.png",
+      "sourceSha256": "cc4d14e24578ca28ac3a0209dda21146ec5204e72ecd3f9baae30a190ff41336",
+      "sha256": "f3f5496762ac066b1a6bbb70c99df7bf97310deae573de06e0627b3f8117ccff",
+      "width": 512,
+      "height": 512,
+      "bytes": 23760
+    },
+    {
+      "file": "Pet_Egg_Epic.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Egg_Epic.png",
+      "sourceSha256": "87655ce8f15231a0567240d863eed8e506ad9b4338a3f54490aaecbb1254d3aa",
+      "sha256": "d92b53515ebb229ecdffb63498c3531ea2720e416d7bc2606c9e1e7a71a4cf21",
+      "width": 512,
+      "height": 512,
+      "bytes": 22032
+    },
+    {
+      "file": "Pet_Egg_Legendary.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Egg_Legendary.png",
+      "sourceSha256": "f3ce4b1c5dc60d83d579bacdceffe01d2e99ad74acf9c338c9ba568531650998",
+      "sha256": "bdeb5cd97dd9a18ce9cfb87a697cae6a7f82028960d0d857232871e5ce7ace0f",
+      "width": 512,
+      "height": 512,
+      "bytes": 20974
+    },
+    {
+      "file": "Pet_Egg_Rare.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Egg_Rare.png",
+      "sourceSha256": "d1ab557293e1a35c304db8e57a9a3f6dd91588ec2af5c0a4da9dad8f65a6a047",
+      "sha256": "e26eb18c120b1bae9df4f6ee8932bc2112881f0466ebaabe1646b673a0925e4f",
+      "width": 512,
+      "height": 512,
+      "bytes": 21510
+    },
+    {
+      "file": "Pet_Egg_Ultimate.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Egg_Ultimate.png",
+      "sourceSha256": "dcc057f0b86b8f148818b0c7f32ee46073bd6ab7ad35cdc3ef39d3d413cc7a2b",
+      "sha256": "bac90409f0d046d0ae201599210a02ac972666c89a5e3599dcd07d6ee2593da6",
+      "width": 512,
+      "height": 512,
+      "bytes": 18348
+    },
+    {
+      "file": "Pet_GoldenRetriever.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_GoldenRetriever.png",
+      "sourceSha256": "01414c81de6c3d751bcda7c8366cb0f44d67ebf65478d22ca69d221e925863e1",
+      "sha256": "4394daad63d6c674d81020eab717c2db1282053819b315a5559d234300e02134",
+      "width": 512,
+      "height": 512,
+      "bytes": 20980
+    },
+    {
+      "file": "Pet_HouseCat.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_HouseCat.png",
+      "sourceSha256": "30eec2be355b5a3306576afd2b9541eaa037b3d0f76a5397ea17a5239964f687",
+      "sha256": "31f76174dde72d90375231ac836d837803fc8a2578cb1bcb21a3422f513769ce",
+      "width": 512,
+      "height": 512,
+      "bytes": 23980
+    },
+    {
+      "file": "Pet_Mole.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Mole.png",
+      "sourceSha256": "c8d0935890fff0b429914923f6834ae3955bfc46867fc79f931c78d7af93b698",
+      "sha256": "f92422619a89d9d60ad7adebfa7a937826c01f573e52966ff8e04f99d0f29ecc",
+      "width": 512,
+      "height": 512,
+      "bytes": 26442
+    },
+    {
+      "file": "Pet_Panda.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Panda.png",
+      "sourceSha256": "948ba34f83529cc26d1a33941536660ca3a8c24de2f4a5f2a12580ea367703c1",
+      "sha256": "dc33a878c794eaf19b97df12230adf3571c5e135e25be726f4bcdef4e56d4a2f",
+      "width": 512,
+      "height": 512,
+      "bytes": 17680
+    },
+    {
+      "file": "Pet_Penguin.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Penguin.png",
+      "sourceSha256": "7ab71a9be6b4f03149963b7526555e18b1f3dc7ca8dddfd27e285032ad4f1ebc",
+      "sha256": "9098823e938a4e991a02f5e294da294068eff261aa56eadd1ca013c39e410c7a",
+      "width": 512,
+      "height": 512,
+      "bytes": 13996
+    },
+    {
+      "file": "Pet_Pony.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Pony.png",
+      "sourceSha256": "3e34c79ad78d859039cbd2dd0a3c8d88f2eb15af1813b8934a127cf7e0c6a6a7",
+      "sha256": "be88bd435765ee6b243978d163184ecaa6e35e90b3a1d57009fc8dcff925dde4",
+      "width": 512,
+      "height": 512,
+      "bytes": 22148
+    },
+    {
+      "file": "Pet_RedPanda.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_RedPanda.png",
+      "sourceSha256": "a6fb875235869bbbc20f8523b40c9e095d82a66e4f3da6f4415266e88df82a18",
+      "sha256": "a95e483e53a2e84be0f3b7c72526f95096133c3b3d06cf909e8a16bdcfc14313",
+      "width": 512,
+      "height": 512,
+      "bytes": 32324
+    },
+    {
+      "file": "Pet_Roomba.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Roomba.png",
+      "sourceSha256": "8f9e7dedb177d9d74ab9f319ce8f390b9d10678be8b2b4336ca18d54cfe3ca04",
+      "sha256": "49a3bf81d06d6047db2cac15f68372a5c45fffd561c0f63c4e4fbbbf19d79f3d",
+      "width": 512,
+      "height": 512,
+      "bytes": 18358
+    },
+    {
+      "file": "Pet_Tortoise.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Tortoise.png",
+      "sourceSha256": "34d2cbc2be36d10304865114f6400004b1608eb98e8ab7b0ab8437ed6d7897df",
+      "sha256": "569d8987309d3ed011ab079d56baefaa04df1360607018065ac93c381fd4104c",
+      "width": 512,
+      "height": 512,
+      "bytes": 20570
+    },
+    {
+      "file": "Pet_Turtle.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Pet_Turtle.png",
+      "sourceSha256": "ea9de756c4cc7f5e65551340a6e83a62dff72573961a5bfe6485127238c9a606",
+      "sha256": "7420cded3746d20debd943e23011d0adc135b65814cc0b071aecc0f3e5838d16",
+      "width": 512,
+      "height": 512,
+      "bytes": 21002
+    },
+    {
+      "file": "PetChestIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/PetChestIcon.png",
+      "sourceSha256": "409fef6a122dcf6228cda0373a558a501e1919627071d5252aa9e0d0a764d2e5",
+      "sha256": "a960eded98c7b066205dd90223f5054d862fda458302eb2158123b95a1f80490",
+      "width": 256,
+      "height": 256,
+      "bytes": 5634
+    },
+    {
+      "file": "PetFood.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/PetFood.png",
+      "sourceSha256": "a0a34ecc08ae2c3e26f4377d701662c5db2f5b7363d27ae1a80da7dfb8762ff0",
+      "sha256": "271bb3e7cc1e78ac3ecc1dc6fc29835a996ec9c0c74a1a3dfa0e7b9719a27fd9",
+      "width": 256,
+      "height": 256,
+      "bytes": 3346
+    },
+    {
+      "file": "PirateEventIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/PirateEventIcon.png",
+      "sourceSha256": "eb6dc5ba39738a217dc1723fd7320820a13193cbd229fe46dcc8fe1d18e34ff4",
+      "sha256": "743c268521feb26ff5f766b48afd90bb4c7cca1e4e3e62366b357e931116f004",
+      "width": 256,
+      "height": 256,
+      "bytes": 5868
+    },
+    {
+      "file": "PirateKeyIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/PirateKeyIcon.png",
+      "sourceSha256": "d09b50d5a45c0d750357d004ce4c454631e6cc713513cd029335e0759d06893f",
+      "sha256": "060b797639260d431ac4dba5fb98dda6c14b67e97e72815fdee77307f36bdff9",
+      "width": 256,
+      "height": 256,
+      "bytes": 4998
+    },
+    {
+      "file": "PotionChest.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/PotionChest.png",
+      "sourceSha256": "a802927a7f59af0fec87ddc2fd3dca1c2a00ea9a67fe48b22f028ca501dafe2d",
+      "sha256": "0e45d56f74b3e19ead3234c8783b55ec2261b2e5f7e2f7c4f48ca7acd099d1b6",
+      "width": 257,
+      "height": 256,
+      "bytes": 3220
+    },
+    {
+      "file": "Ring_Bagel.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Bagel.png",
+      "sourceSha256": "47d363f158f57c920cb8c57ca08a9abe93e01d61a9426e4c448716902fd915e3",
+      "sha256": "afeceac5b5f5763c424ed54882bccda304c0a507a0495354f154c036c24d1d09",
+      "width": 512,
+      "height": 512,
+      "bytes": 49202
+    },
+    {
+      "file": "Ring_Bee.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Bee.png",
+      "sourceSha256": "c713932f40f9a5a010373290dfee721b20b3cbd0d2d49b8487db1dfdffad175f",
+      "sha256": "35eac2ac4deab8cea54aac39f86cec4ffcec692275145a3883ca7972c7724c81",
+      "width": 512,
+      "height": 512,
+      "bytes": 41258
+    },
+    {
+      "file": "Ring_Bronze.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Bronze.png",
+      "sourceSha256": "d4e78b29cc190da63bb38a64af441f887d78a91016a77e8e159726d07cece512",
+      "sha256": "6704b055c489c12aef848391590f5c770e49ce8cef4afe2dd8d82d24927d8f4d",
+      "width": 512,
+      "height": 512,
+      "bytes": 19964
+    },
+    {
+      "file": "Ring_Candy.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Candy.png",
+      "sourceSha256": "960995eba74b3d7631d7c84a9ecff2a7cb55c23c252dd6121ef31d1a39b4f22e",
+      "sha256": "283fadca2916017356ec1e4b15ffd81f080ea86ba212d274fc9c873a67db862f",
+      "width": 512,
+      "height": 512,
+      "bytes": 37798
+    },
+    {
+      "file": "Ring_Donut.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Donut.png",
+      "sourceSha256": "06ebe99736658c2d54ab45d552f4440be9f386b08fc2bcbf5aa44bfdf1c80c46",
+      "sha256": "8c9185b05a1317888e555fb8cc2a06e98e6ff0b5fed18ce97cae1d5c8ac1b187",
+      "width": 512,
+      "height": 512,
+      "bytes": 40096
+    },
+    {
+      "file": "Ring_Evil.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Evil.png",
+      "sourceSha256": "ff1072ee8d245b80f8fbca9f6855f767d0374c88dca639708c43c9c6177cf21b",
+      "sha256": "e6ebc2063ab338e7c0da69748327f1a50cc92b461e19e404a4fe94b93933b763",
+      "width": 512,
+      "height": 512,
+      "bytes": 22610
+    },
+    {
+      "file": "Ring_Gold.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Gold.png",
+      "sourceSha256": "2d3d2f95a964f01eb43267ae416195830d752928b1ae07ab99a2f92918fdc242",
+      "sha256": "f778b6302254520f35195e85b458dd40ffdb54d3e3f98bf73fb9930f9ecaa8ab",
+      "width": 512,
+      "height": 512,
+      "bytes": 24140
+    },
+    {
+      "file": "Ring_Love.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Love.png",
+      "sourceSha256": "82a890239af7ea4583096125b63ea896a113840bab1904f02148ff916aa2e8a2",
+      "sha256": "8089d4a33c9d198d45054c883dc9a90665b43812e5a3690c75061d32cf4d7729",
+      "width": 512,
+      "height": 512,
+      "bytes": 22776
+    },
+    {
+      "file": "Ring_Lucky.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Lucky.png",
+      "sourceSha256": "d69570c40b8a12f7c7b04ead63cd84380837d713baa20a79e50636d32eda5caf",
+      "sha256": "37d0612181d8c43be39c9eeaec489c9352db295b897ca33366f76dae81980264",
+      "width": 512,
+      "height": 512,
+      "bytes": 32944
+    },
+    {
+      "file": "Ring_Nature.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Nature.png",
+      "sourceSha256": "db5cafaff46ca7a96c7ca325fdb99fb85b0390dc9d309c1b67f448d6c851510b",
+      "sha256": "2944f81ad290dad863c2bc8a7a80aea8e6224342c814e4ae26ee0baf00155148",
+      "width": 512,
+      "height": 512,
+      "bytes": 34418
+    },
+    {
+      "file": "Ring_Onion.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Onion.png",
+      "sourceSha256": "c045edc27fed0736732a1435497b262bb9a2ba1249dcd491fa494f18c6d07c64",
+      "sha256": "dcb9ab4c2ee7058cef968e98b250fdb55430fe03d67d631f7096794a13c15636",
+      "width": 512,
+      "height": 512,
+      "bytes": 15084
+    },
+    {
+      "file": "Ring_Plaster.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Plaster.png",
+      "sourceSha256": "4e31134bbe2a6d7db9302c7f159a0bad59aba4efbd097c5268cb07f6c6ea5736",
+      "sha256": "daaddd3f95551bf51a73289456a0cda1446bf96617bd152242edd634728bb73c",
+      "width": 512,
+      "height": 512,
+      "bytes": 27440
+    },
+    {
+      "file": "Ring_Plastic.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Plastic.png",
+      "sourceSha256": "335224939a9b080eb829bd7fb2feadee0b40e8b131e0b2f924122a6a2af1c307",
+      "sha256": "44f5a6b97a6e7d80efac826bae8ad17312073f47f123d7ace356507f5080ddf2",
+      "width": 512,
+      "height": 512,
+      "bytes": 38336
+    },
+    {
+      "file": "Ring_Rubber.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Rubber.png",
+      "sourceSha256": "0fe86ada35e5361574cef40aa884197c5b39e5f0f4befa4895992719f1be1adc",
+      "sha256": "d85f72c440de7ab9e4a5340227b6a948be307863073102faa89f3d5990238563",
+      "width": 512,
+      "height": 512,
+      "bytes": 43232
+    },
+    {
+      "file": "Ring_Sea.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Sea.png",
+      "sourceSha256": "d2b9366df27916f09481eff0db5947924ea82a137d34a39b3f9d960f02e0ff3a",
+      "sha256": "bc72db60c912f659db7f93f6b84d67f590de60361625434b7197bdd91ba2cb59",
+      "width": 512,
+      "height": 512,
+      "bytes": 50412
+    },
+    {
+      "file": "Ring_Silver.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Silver.png",
+      "sourceSha256": "25333eb8ae775385a9c0b966986670a9658db6cb852c0d10f53d5e0de7d388b6",
+      "sha256": "1894906b033a11bd1fbf0ef2f41c3a77257a150b0a1679d77afc6196b7e36182",
+      "width": 512,
+      "height": 512,
+      "bytes": 25234
+    },
+    {
+      "file": "Ring_Snake.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Snake.png",
+      "sourceSha256": "215bda081583aba361e8e30905ff076d37f5d04ab0c776d328d1edd494a283bc",
+      "sha256": "27b8eac573e66f3b520d6cc517e86a5e7d5c36ee739081c5ced1cbb0f2a5a18f",
+      "width": 512,
+      "height": 512,
+      "bytes": 46360
+    },
+    {
+      "file": "Ring_Thunder.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Thunder.png",
+      "sourceSha256": "ec2a6bdd29131274f9c693ca63af30e2b56664f4d292a05b8ddc7b268c64004b",
+      "sha256": "8ced833d43c4afc13ef776b146df56b06a6cd93ddb95a0f88f79250238defee0",
+      "width": 512,
+      "height": 512,
+      "bytes": 42178
+    },
+    {
+      "file": "Ring_Winged.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Winged.png",
+      "sourceSha256": "9c77ed7078386fd68064687496fe895f794390b76502db94d9a11a5c76f46995",
+      "sha256": "30eff7013e8492e17378599ba4d681956dcf9655c1d34a6511a3f960c77ee4a5",
+      "width": 512,
+      "height": 512,
+      "bytes": 24702
+    },
+    {
+      "file": "Ring_Wooden.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Wooden.png",
+      "sourceSha256": "54fb7c557d81483fdd8d07eadece9151cd437b57f032547767b0854c29e2c7e1",
+      "sha256": "ba29d642cdfdeebf33fa01b756f0a785a65a8a03e86686d5a97f2002f526e1d0",
+      "width": 512,
+      "height": 512,
+      "bytes": 10776
+    },
+    {
+      "file": "Ring_Wreath.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Ring_Wreath.png",
+      "sourceSha256": "77dcca07a364e354ddb69be4501566481af4d42c8f084b6d417ad4fac8836185",
+      "sha256": "2f838d02680dadbacf5e244ad6ffbfe1d7782640db16e5f3fdf3f77f22b9f690",
+      "width": 512,
+      "height": 512,
+      "bytes": 29084
+    },
+    {
+      "file": "SeaportChestIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/SeaportChestIcon.png",
+      "sourceSha256": "e2ba92b3be1c02c3853edd1fcbcfd986b6cca2bacf46d2fa6f8f1ac273ea6378",
+      "sha256": "28da16e6664f6f9d25cec440d6e6fc5e40745c280fc8cd612500f604160aed92",
+      "width": 256,
+      "height": 256,
+      "bytes": 11202
+    },
+    {
+      "file": "SmallChestIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/SmallChestIcon.png",
+      "sourceSha256": "46e48e36f1de740af630ac9cd04631c98a420aa070b01552e379f34927c7c9f1",
+      "sha256": "e85b1b28654b9e66437437c56da2b13d9135fa3ba03f5d8dae85f64c9fe505b5",
+      "width": 257,
+      "height": 256,
+      "bytes": 1846
+    },
+    {
+      "file": "SpaceChestIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/SpaceChestIcon.png",
+      "sourceSha256": "f54e50a83ed5819785e53819f42e38520a4012325f403fb9bce15cfdaac92eba",
+      "sha256": "9b891e70536035a3bdeca8d0ccff1b5b9f4d3d9e33d3c46af5495a65585afe7e",
+      "width": 256,
+      "height": 255,
+      "bytes": 7748
+    },
+    {
+      "file": "Tool_Anchor.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Anchor.png",
+      "sourceSha256": "51b366e01d639b433325db5bedbe7a879d3918a023c1a0cf911216bbe37bc09e",
+      "sha256": "99c8a79e1af63b1775bc91ce1cd936c9941df6eb396cae63e48b3eb352602049",
+      "width": 512,
+      "height": 512,
+      "bytes": 11738
+    },
+    {
+      "file": "Tool_Broom.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Broom.png",
+      "sourceSha256": "4851de5bb96f5ac4c0d1588aa7aa0b242a1aebf3fd9872f1cc69e6bb94eccb24",
+      "sha256": "13807b4cb6aa5efa0664e089ca1daa45942a26e2e18cffb3cd81b1c83817e058",
+      "width": 512,
+      "height": 512,
+      "bytes": 10994
+    },
+    {
+      "file": "Tool_CheeseGrater.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_CheeseGrater.png",
+      "sourceSha256": "cb935340ab3ad11cb67ab200be0304290ebef8aa436233f552ddc571f2893714",
+      "sha256": "3c15bf1a771f9bf011d2a360c3dfe35aa90f9fae12f4be7cdaf66e565c179fc7",
+      "width": 512,
+      "height": 512,
+      "bytes": 10486
+    },
+    {
+      "file": "Tool_Chopper.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Chopper.png",
+      "sourceSha256": "0e49d14941f0dc64b35f52e5a570524d53d378e434db3801c245f0bfe0dc2bbd",
+      "sha256": "006d7b5e6ee233beb5c78c50e47c55542a65e0325f15f0b6341b238cb03925d5",
+      "width": 512,
+      "height": 512,
+      "bytes": 4376
+    },
+    {
+      "file": "Tool_ChopSticks.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_ChopSticks.png",
+      "sourceSha256": "0cfb510b1ccaeef6a9295832086594b10c466b56fb65b84aa267979b5ac6cb23",
+      "sha256": "67ef53109340f08463dfefff498f18fef2800dd9d5eee37701605ea94fd8930a",
+      "width": 512,
+      "height": 512,
+      "bytes": 15276
+    },
+    {
+      "file": "Tool_CookBook.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_CookBook.png",
+      "sourceSha256": "f006a2193e12bc866c61c0d032139a010fa68499fd681ec9e5665625528591d2",
+      "sha256": "1ffb0a3fad003e24941725cc2e125b9ac5dea773f85f5e24b2da98b780a4ff75",
+      "width": 512,
+      "height": 512,
+      "bytes": 11640
+    },
+    {
+      "file": "Tool_Flask.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Flask.png",
+      "sourceSha256": "7c72ea323698fa78d456c74881295989a0173506a086cc85b94673afb4b9e433",
+      "sha256": "4e713bbd0cfe754a1244b4bf2b55e78e0dd02d39ddc654b8e4c80db1433c9e14",
+      "width": 512,
+      "height": 512,
+      "bytes": 28776
+    },
+    {
+      "file": "Tool_FlourSpoon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_FlourSpoon.png",
+      "sourceSha256": "4ff4f4750fe6ece460a46caac5e0a9cd4138e77b6b6af12d5929bbafbcc1089e",
+      "sha256": "c57658a235f80629f1fafbe8706b872330a374d762e77cfe99d9fa21df440c57",
+      "width": 512,
+      "height": 512,
+      "bytes": 16888
+    },
+    {
+      "file": "Tool_Hammer.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Hammer.png",
+      "sourceSha256": "e396b6dc4aa380fd9f7c10ef359d3c232ea1cb033abe58596cace34eff6419ab",
+      "sha256": "b4c63c55dc752cfb0811964886044550e092d1fd5743124c2b72f21b9e046f2b",
+      "width": 512,
+      "height": 512,
+      "bytes": 9188
+    },
+    {
+      "file": "Tool_KetchupBottle.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_KetchupBottle.png",
+      "sourceSha256": "aa9b0fbf287ab716a1cf99d3f788ebefb81aa8c26f81c12017db8bd715fd0cb3",
+      "sha256": "04cfa0162e46780fd2f100f19af90089b91bf23c78a5969968a2aa80afb13909",
+      "width": 512,
+      "height": 512,
+      "bytes": 18880
+    },
+    {
+      "file": "Tool_Knife.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Knife.png",
+      "sourceSha256": "f898f3305e822f7600ced6f4844d35a5509a90f7eefc5ad16e15ab6ad892b402",
+      "sha256": "45af4ba607076cb0335b60aad120ce6cf74fe08966a3788257975db687bc1f6b",
+      "width": 512,
+      "height": 512,
+      "bytes": 4366
+    },
+    {
+      "file": "Tool_LaserGun.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_LaserGun.png",
+      "sourceSha256": "392da93f01a87f9a271f8f664ab0e26808cf5ebe3e9d4cdda9f259f8cccebfe0",
+      "sha256": "40e817e02fe92a438a0eac9d1fb5ad6e2dd42a646d1e9c212088d820f0c148b7",
+      "width": 512,
+      "height": 512,
+      "bytes": 15828
+    },
+    {
+      "file": "Tool_MetalSpatula.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_MetalSpatula.png",
+      "sourceSha256": "ba5bd8883fc8deef93c67847aa5fbeb995ea77d3e21d329ab825c215c682dda8",
+      "sha256": "a0b85ce9d776accac894e8402d62025fdd2e7fb6ab49f228f2a266dd1098a5c6",
+      "width": 512,
+      "height": 512,
+      "bytes": 3778
+    },
+    {
+      "file": "Tool_Mixer.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Mixer.png",
+      "sourceSha256": "628cebd19d7ebaf99684de3ae496a5f29eed07ea814d69902ca762558f4751f5",
+      "sha256": "4c3e3608a80b395125162f0c896bb5cbb6ea5ac6000114883ee50ea1e595facd",
+      "width": 512,
+      "height": 512,
+      "bytes": 29898
+    },
+    {
+      "file": "Tool_Mug.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Mug.png",
+      "sourceSha256": "0b6afa0cb676a4fd2229786097e2a8a2d2c4b9ed6526814d702955419f8b211c",
+      "sha256": "56cdd27030d2237d2c44b512df6a4df4ab326ee0c0c5fecce665384b5f6b3ca5",
+      "width": 512,
+      "height": 512,
+      "bytes": 30352
+    },
+    {
+      "file": "Tool_NoodleSpoon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_NoodleSpoon.png",
+      "sourceSha256": "1dad0f634a8a1a2649e17bebf68d4824cf2b91d06326b060ccef06627fd95e8f",
+      "sha256": "f9700b1c50f2889e15e4804663483bf742134aa72ab9f1073ba33e2ddb06dc0b",
+      "width": 512,
+      "height": 512,
+      "bytes": 14562
+    },
+    {
+      "file": "Tool_PepperMill.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_PepperMill.png",
+      "sourceSha256": "4d3f01e0f3ba60584666009c412cc0879e2fdceedd904f56eae36ac8214aa331",
+      "sha256": "3507795a687dfacd26be4ad815a7d92d3104d5f864de5dac84a7c4506ed4168a",
+      "width": 512,
+      "height": 512,
+      "bytes": 14006
+    },
+    {
+      "file": "Tool_Pickaxe_Special.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Pickaxe_Special.png",
+      "sourceSha256": "0fa8102074c0c40b4c1fab46fb8d88fab21f6dd8d0f04bd329a8a60d5eebd179",
+      "sha256": "eabf99fcdc203815b633e00a1a820480a579a11b7056d8e349ae4ba68cded7ca",
+      "width": 512,
+      "height": 512,
+      "bytes": 11436
+    },
+    {
+      "file": "Tool_PizzaCutter.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_PizzaCutter.png",
+      "sourceSha256": "f5f4ed6e943d3804d658f6693914f4d7637b9f164b195e15db19eae6a1e5a0b3",
+      "sha256": "7b898d9059a98dc912eaf3b6c1525bea7dae184f4ef8a6eda3a12106ff38d327",
+      "width": 512,
+      "height": 512,
+      "bytes": 11212
+    },
+    {
+      "file": "Tool_RollingPin.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_RollingPin.png",
+      "sourceSha256": "3d345a78d9ed90df0c015061fd5cf76daa9604a6e8383d7b7944ccfc3e21d361",
+      "sha256": "d3380921781325154cdc69219d3fbe183f0b13ca1ff8bf1c32918b973d94b17f",
+      "width": 512,
+      "height": 512,
+      "bytes": 10254
+    },
+    {
+      "file": "Tool_RoyalSceptre.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_RoyalSceptre.png",
+      "sourceSha256": "247241b9846f5207e4388cc9ec34665b07b85c8733ecd70135fb9ac2bf13f823",
+      "sha256": "4a33d349c3c196996e774612f94f0696211b8649c4cdf5de907bc8851fc96159",
+      "width": 512,
+      "height": 512,
+      "bytes": 16578
+    },
+    {
+      "file": "Tool_SoupSpoon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_SoupSpoon.png",
+      "sourceSha256": "a7309eecbe570b1acafcd32c40b2bc64d3474af8e962935bd47eafff7810ab67",
+      "sha256": "8910331058758fb303f2159fb5a5681d9dd3a05ca1577b5c081d51e73016c839",
+      "width": 512,
+      "height": 512,
+      "bytes": 9558
+    },
+    {
+      "file": "Tool_WarriorCleaver.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_WarriorCleaver.png",
+      "sourceSha256": "8cb0fb1c77b12f8f89a533b5aa47c8b3c46d7569a80e390269412825a6a7b64d",
+      "sha256": "f7bcb6a595ae2d78458d27e8c8ebbc8f201a13f6d17c0e36edc77966d7fbfc3e",
+      "width": 512,
+      "height": 512,
+      "bytes": 30646
+    },
+    {
+      "file": "Tool_WarriorTenderiser.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_WarriorTenderiser.png",
+      "sourceSha256": "e91995780766e97ff8a4ff731ad4b7bac75aa1c5f2c12a0ea316cd63ca51d418",
+      "sha256": "ffc5916f242a890c7f086ed18d977f08e124b2581e8d7144559a50b88958e718",
+      "width": 512,
+      "height": 512,
+      "bytes": 26194
+    },
+    {
+      "file": "Tool_Whisk.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Whisk.png",
+      "sourceSha256": "0cfc4898d5b758ace2d3bab34fc3fceb6708f43e3c66232396cf04b61134291d",
+      "sha256": "6acc7af56a06c3ab98fd92fdaa4f58b9a6fb64925f8789cc047fdc05c12d8546",
+      "width": 512,
+      "height": 512,
+      "bytes": 16864
+    },
+    {
+      "file": "Tool_Wok.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_Wok.png",
+      "sourceSha256": "0a976e345bc387e82d6b33f2008a27a5b320c2f131a8957002a2183e52e2b270",
+      "sha256": "3c0c9d3c45c3f33da8ca5843fac1da4100b1e3e21ed152847ffcc79b41e9b968",
+      "width": 512,
+      "height": 512,
+      "bytes": 9858
+    },
+    {
+      "file": "Tool_WoodSpoon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/Tool_WoodSpoon.png",
+      "sourceSha256": "5b52c7176f33a168a00072b35e8ba6e7355514c71a122d9a0dbd8f102763d23e",
+      "sha256": "26a6c94535d7bb30566e2dc5a06530f06e2cb45f5b7ff058034f67d75d679701",
+      "width": 512,
+      "height": 512,
+      "bytes": 9744
+    },
+    {
+      "file": "ZeusKeyIcon.webp",
+      "source": "https://raw.githubusercontent.com/1vcian/ev/f427d12473f3d78f10be7450cfc95ab35703fd44/src/ZeusKeyIcon.png",
+      "sourceSha256": "abdf1ce33e2c65a1b9490141e162ae4278fb227ad77d981334f27d3fde5b3e63",
+      "sha256": "c01632c04dc4d5ee68360555ef300a8c637aa86c2c4b95aa5babf1f3c9cac62c",
+      "width": 256,
+      "height": 256,
+      "bytes": 5402
+    }
+  ]
+}
