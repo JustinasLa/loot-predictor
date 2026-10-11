@@ -1,25 +1,81 @@
-/* area:phone-shell-polish — phone layout (< 768px): Boxes / Box screens. */
+/* area:phone-shell-polish — phone layout (< 768px): Boxes / Box screens.
+   Frame-level only: gutters, sticky offsets, safe areas and room for the
+   sticky action bar. Component colours stay in their own files. */
 @media (max-width: 767px) {
-  body { padding-bottom: 120px; }
-  .hud { padding: 0 10px; }
-  .hud-title { font-size: 20px; white-space: nowrap; }
-  .hud-brand img { width: 30px; height: 30px; }
-  .app-main { padding: 12px; }
+  :root { --bar-room: calc(104px + env(safe-area-inset-bottom)); }
+
+  .hud {
+    padding-inline: max(12px, var(--safe-left)) max(12px, var(--safe-right));
+    gap: 8px;
+  }
+  .hud-right { gap: 8px; }
+  .hud-title { font-size: 20px; }
+  .hud-brand { gap: 8px; }
+  .hud-brand img { width: 32px; height: 32px; }
+
+  .app-main { padding: calc(12px + var(--awning-h)) max(12px, var(--safe-right)) 24px max(12px, var(--safe-left)); }
 
   .workspace { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .box-rail { position: static; max-height: none; overflow: visible; }
-  .box-main { max-width: none; gap: 12px; }
+  .box-main { gap: 12px; }
 
+  /* Two screens on one page; navigation.js sets data-screen. */
   .workspace[data-screen="boxes"] .box-main { display: none; }
   .workspace[data-screen="box"] .box-rail { display: none; }
 
-  body[data-screen="box"] .hud-back { display: inline-flex; }
-  body[data-screen="box"] .hud-brand { display: none; }
+  /* Box screen: a back button replaces the brand to save room. */
+  body:has(#workspace[data-screen="box"]:not(.is-hidden)) .hud-back { display: inline-flex; }
+  body:has(#workspace[data-screen="box"]:not(.is-hidden)) .hud-brand { display: none; }
 
-  .seg-tabs { position: sticky; top: calc(var(--hud-h) + 8px); z-index: 20; }
+  /* Tabs stick under the HUD, on a strip of sky so cards never show through. */
+  .box-main > .seg-tabs {
+    position: sticky; top: calc(var(--frame-top) + 8px); z-index: 20;
+    margin-top: 4px;
+  }
+  /* Sticky elements always form a stacking context, so the sky strip (::before)
+     would cover the tabs' own face; ::after repaints that face from the
+     inherited component styles, under the tab buttons. */
+  .box-main > .seg-tabs::before,
+  .box-main > .seg-tabs::after {
+    content: "";
+    position: absolute; z-index: -1;
+    pointer-events: none;
+  }
+  .box-main > .seg-tabs::before {
+    inset: -8px -12px -10px;
+    background: var(--page-bg);
+    background-color: var(--bg-top);
+  }
+  .box-main > .seg-tabs::after {
+    inset: 0;
+    background: inherit;
+    border-radius: inherit;
+    box-shadow: inherit;
+  }
+
+  /* Room for the fixed action bar, but only while one is on screen. */
+  body:has(#welcome-screen:not(.is-hidden) .action-bar:not(.is-hidden)),
+  body:has(#workspace[data-screen="box"]:not(.is-hidden) .tab-panel:not(.is-hidden) .action-bar:not(.is-hidden)) {
+    padding-bottom: var(--bar-room);
+    scroll-padding-bottom: var(--bar-room);
+  }
+  body:has(#welcome-screen:not(.is-hidden) .action-bar:not(.is-hidden)) .toast-region,
+  body:has(#workspace[data-screen="box"]:not(.is-hidden) .tab-panel:not(.is-hidden) .action-bar:not(.is-hidden)) .toast-region {
+    bottom: calc(var(--bar-room) + 12px);
+  }
+  .action-bar {
+    padding-left: max(16px, var(--safe-left));
+    padding-right: max(16px, var(--safe-right));
+  }
 }
 
 /* Narrow phones: the demo banner already says which save is open. */
 @media (max-width: 420px) {
   .hud-pill { display: none; }
+}
+
+/* Very narrow phones (360px and below): keep the HUD on one line. */
+@media (max-width: 374px) {
+  .hud-title { font-size: 18px; }
+  .hud-right, .hud-group { gap: 6px; }
 }

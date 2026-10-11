@@ -74,6 +74,32 @@ describe("keyboard-accessible controls", () => {
     }
   });
 
+  it("names every icon button, gives every image an alt and wires the HUD sheet triggers", () => {
+    document.body.innerHTML = html;
+    const iconButtons = document.querySelectorAll(".icon-btn");
+    expect(iconButtons.length).toBeGreaterThan(0);
+    for (const button of iconButtons) {
+      expect(button.getAttribute("aria-label")?.trim(), button.outerHTML).toBeTruthy();
+    }
+    const images = document.querySelectorAll("img");
+    expect(images.length).toBeGreaterThan(0);
+    for (const image of images) {
+      expect(image.hasAttribute("alt"), image.outerHTML).toBe(true);
+    }
+    for (const [id, sheet] of [["settings-trigger", "settings-sheet"], ["help-trigger", "help-sheet"], ["user-menu-trigger", "user-menu"]]) {
+      const trigger = document.getElementById(id);
+      expect(trigger.getAttribute("aria-controls")).toBe(sheet);
+      expect(trigger.getAttribute("aria-expanded")).toBe("false");
+      const target = document.getElementById(sheet);
+      expect(target, `#${id} controls a missing sheet`).not.toBeNull();
+      expect(target.querySelector('[role="dialog"]')).not.toBeNull();
+    }
+    // Decorative HUD glyphs stay out of the accessibility tree.
+    for (const glyph of document.querySelectorAll(".hud svg")) {
+      expect(glyph.getAttribute("aria-hidden")).toBe("true");
+    }
+  });
+
   it("keeps the focused item selected and usable through repeated activation", () => {
     const container = document.createElement("div");
     document.body.append(container);
