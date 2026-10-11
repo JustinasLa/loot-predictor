@@ -4,6 +4,7 @@ import { validateInteger } from "../validation.js";
 import * as storage from "../storage.js";
 import { renderHistory } from "../ui/render.js";
 import { showToast } from "../ui/components/toast.js";
+import { closeSheet } from "../ui/components/sheet.js";
 import { currentId, currentState } from "./state.js";
 import { $, $$, numberField, positiveInteger } from "./dom.js";
 import { invalidateChest } from "./routes.js";
@@ -36,12 +37,19 @@ export function syncMarking(cardId, boxState) {
   renderHistory($("#history"), cardId, boxState.history);
 }
 
+// Marks from the Settings sheet, then closes it so the cards, the toast or
+// any error in #out are in view.
+function markFromSettings(action) {
+  predictAction(action);
+  closeSheet("settings-sheet");
+}
+
 export function initMarking() {
   for (const button of $$(".open-btn")) {
-    button.addEventListener("click", () => predictAction(() => openChest(Number(button.dataset.open))));
+    button.addEventListener("click", () => markFromSettings(() => openChest(Number(button.dataset.open))));
   }
   $("#open-custom-go").addEventListener("click", () => {
-    predictAction(() => {
+    markFromSettings(() => {
       const times = numberField("#open-custom", positiveInteger);
       // Each open is three-plus draws; keep the click from locking up the tab.
       openChest(Math.min(times, 10000));

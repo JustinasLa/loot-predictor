@@ -1,4 +1,31 @@
 /* area:marking-history-savemenu — Save menu sheet. */
-.save-file { display: flex; align-items: center; gap: 10px; font-weight: 800; overflow-wrap: anywhere; }
-.save-file svg { width: 28px; height: 28px; color: var(--primary-lip); flex: none; }
-.save-menu-body .btn { margin-bottom: 6px; }
+.save-menu-body { gap: 16px; }
+.save-file {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--panel-row); border-radius: 16px; padding: 12px 14px;
+  font: 800 var(--t-btn)/1.2 var(--font-ui); color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.save-file-icon {
+  width: 48px; height: 48px; flex: none; display: grid; place-items: center;
+  border-radius: 12px; background: var(--primary); color: #fff;
+  border: 3px solid var(--primary-lip); box-shadow: 0 4px 0 var(--primary-lip);
+}
+.save-file-icon svg { width: 26px; height: 26px; }
+.save-filename { min-width: 0; }
+
+.save-menu-actions { display: grid; gap: 14px; }
+.save-menu-btn { justify-content: flex-start; gap: 14px; padding-inline: 18px; margin-bottom: 6px; }
+.save-menu-btn svg { width: 26px; height: 26px; flex: none; }
+.save-menu-btn.btn--ghost svg { color: var(--primary-lip); }
+
+.save-confirm {
+  display: grid; gap: 14px;
+  border-radius: 18px; padding: 16px;
+  background: var(--panel-row);
+  border: 3px solid var(--divider);
+}
+.save-confirm--remove { background: var(--r-ultimate-tint); border-color: var(--danger); }
+.save-confirm-text { font: 800 var(--t-btn)/1.3 var(--font-ui); color: var(--ink); text-align: center; }
+.save-confirm-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.save-confirm-buttons .btn { margin-bottom: 6px; }

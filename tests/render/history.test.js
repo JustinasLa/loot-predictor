@@ -17,8 +17,14 @@ describe("history renderer", () => {
   it("renders empty history and past boxes without actions", () => {
     renderHistory(container, "big", []);
     expect(container.textContent).toBe("Nothing opened yet.");
-    renderHistory(container, "big", [opening()]);
-    expect(container.querySelector(".is-past")).not.toBeNull();
+    expect(container.querySelector(".empty img").getAttribute("src")).toContain("SmallChestIcon.webp");
+    expect(container.querySelector(".empty img").alt).toBe("");
+    expect(container.querySelector(".empty img").getAttribute("src")).toMatch(/SmallChestIcon\.webp$/);
+    expect(container.querySelector(".empty img").alt).toBe("");
+    renderHistory(container, "big", [opening(2), opening(1)]);
+    expect([...container.querySelectorAll(".open-box.is-past .open-title")].map((t) => t.textContent)).toEqual(["Opened #2", "Opened #1"]);
     expect(container.querySelector("button")).toBeNull();
+    renderHistory(container, "big", [opening(2), opening(1)]);
+    expect([...container.querySelectorAll(".open-box.is-past .open-title")].map((t) => t.textContent)).toEqual(["Opened #2", "Opened #1"]);
   });
 });
