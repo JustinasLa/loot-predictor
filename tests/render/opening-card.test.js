@@ -53,4 +53,25 @@ describe("opening-card renderer", () => {
     expect(next.lastElementChild.classList.contains("btn--go")).toBe(true);
     expect(later.lastElementChild.classList.contains("btn--ghost")).toBe(true);
   });
+
+  it("marks history cards as past, without a button or ribbon", () => {
+    renderHistory(container, "big", [opening(12)]);
+    const card = container.querySelector(".open-box");
+    expect(card.classList.contains("is-past")).toBe(true);
+    expect(card.classList.contains("is-next")).toBe(false);
+    expect(card.querySelector(".open-title").textContent).toBe("Opened #12");
+    expect(card.querySelector("button")).toBeNull();
+    expect(card.querySelector(".open-ribbon")).toBeNull();
+  });
+
+  it("keeps exactly one open button per upcoming card and the number in an aria-label", () => {
+    renderResults(container, "big", [opening(1), opening(2), opening(3)], vi.fn());
+    for (const card of container.children) expect(card.querySelectorAll("button")).toHaveLength(1);
+    const [first, second] = container.querySelectorAll(".open-card-btn");
+    expect(first.className).toContain("btn--go btn--lg btn--block");
+    expect(first.textContent).toBe("I opened it!");
+    expect(second.className).toContain("btn--ghost btn--sm");
+    expect(second.textContent).toBe("Opened up to here");
+    expect(container.children[2].querySelector(".open-title").getAttribute("aria-label")).toBe("Opening 3");
+  });
 });
