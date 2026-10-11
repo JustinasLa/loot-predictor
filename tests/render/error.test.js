@@ -27,4 +27,18 @@ describe("error renderer", () => {
     expect(container.querySelector(".item-name").textContent).toBe(markup);
     expect(container.querySelector("img")).toBeNull();
   });
+
+  it("renders one alert line: a bold lead and the muted reason", () => {
+    container.append(document.createElement("p"));
+    renderError(container, "Enter a valid number for Level.");
+    expect(container.children).toHaveLength(1);
+    const box = container.firstElementChild;
+    expect(box.className).toBe("error-box");
+    expect(box.getAttribute("role")).toBe("alert");
+    expect(box.querySelector("strong.error-lead").textContent).toBe("Oops! That didn't work.");
+    expect(box.querySelector("span.error-reason").textContent).toBe("Enter a valid number for Level.");
+    expect(box.textContent).toBe("Oops! That didn't work. Enter a valid number for Level.");
+    expect(box.textContent).not.toContain("Something went wrong");
+  });
 });
+

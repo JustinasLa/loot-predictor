@@ -1,31 +1,31 @@
 <!-- area:settings-help-errors start (Help sheet) -->
 <div id="help-sheet" class="sheet-layer is-hidden">
   <div class="sheet-backdrop" data-sheet-close></div>
-  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="help-title">
+  <div class="sheet help-sheet" role="dialog" aria-modal="true" aria-labelledby="help-title">
     <div class="sheet-handle" aria-hidden="true"></div>
     <div class="sheet-head">
       <h2 id="help-title" class="sheet-title">How it works</h2>
       <button type="button" class="icon-btn btn btn--danger sheet-close" data-sheet-close aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M5.6 5.6a2 2 0 0 1 2.8 0L12 9.2l3.6-3.6a2 2 0 1 1 2.8 2.8L14.8 12l3.6 3.6a2 2 0 1 1-2.8 2.8L12 14.8l-3.6 3.6a2 2 0 1 1-2.8-2.8L9.2 12 5.6 8.4a2 2 0 0 1 0-2.8Z"/></svg></button>
     </div>
-    <ul class="sheet-body help-rows">
-      <li class="help-row panel-row">
-        <span class="help-pic help-pic--box"><img src="{{BASE}}assets/items/BigChestIcon.webp" width="56" height="56" alt="" /></span>
-        <span>Pick a box.</span>
+    <ul class="help-rows">
+      <li class="help-row">
+        <span class="help-pic"><span class="box-art help-box" data-box="big"><img src="{{BASE}}assets/items/BigChestIcon.webp" width="64" height="64" alt="" /></span></span>
+        <span class="help-text">Pick a box.</span>
       </li>
-      <li class="help-row panel-row">
+      <li class="help-row">
         <span class="help-pic help-pic--tiles">
-          <span class="item-tile item-tile--mini" data-rarity="Rare"><img src="{{BASE}}assets/items/Hat_CoolCap.webp" width="40" height="40" alt="" /></span>
-          <span class="item-tile item-tile--mini" data-rarity="Legendary"><img src="{{BASE}}assets/items/Hat_ChefTall_Dark.webp" width="40" height="40" alt="" /></span>
+          <span class="item-tile item-tile--mini" data-rarity="Rare" title="Silver Ring · Rare"><img src="{{BASE}}assets/items/Ring_Silver.webp" width="48" height="48" alt="" /></span>
+          <span class="item-tile item-tile--mini" data-rarity="Legendary" title="Snake Ring · Legendary"><img src="{{BASE}}assets/items/Ring_Snake.webp" width="48" height="48" alt="" /></span>
         </span>
-        <span>See what comes out, in order.</span>
+        <span class="help-text">See what comes out, in order.</span>
       </li>
-      <li class="help-row panel-row">
+      <li class="help-row">
         <span class="help-pic"><span class="btn btn--go btn--mini" aria-hidden="true">I opened it!</span></span>
-        <span>Opened it in the game? Tap I opened it!</span>
+        <span class="help-text">Opened it in the game? Tap I opened it!</span>
       </li>
-      <li class="help-row panel-row">
+      <li class="help-row help-row--lock">
         <span class="help-pic help-pic--lock"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a5 5 0 0 1 5 5v3h.5A2.5 2.5 0 0 1 20 12.5v7a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 19.5v-7A2.5 2.5 0 0 1 6.5 10H7V7a5 5 0 0 1 5-5Zm0 3a2 2 0 0 0-2 2v3h4V7a2 2 0 0 0-2-2Z"/></svg></span>
-        <span>Your save stays on this device.</span>
+        <span class="help-text">Your save stays on this device.</span>
       </li>
     </ul>
   </div>
